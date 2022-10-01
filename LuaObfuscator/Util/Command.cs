@@ -10,7 +10,7 @@ namespace LuaObfuscator.Util
     {
         public static void Execute(string command)
         {
-            System.Diagnostics.Process.Start("CMD.exe", "/C cd ./temp && " + command);
+            System.Diagnostics.Process.Start("CMD.exe", "/C cd ./temp && " + command).WaitForExit();
         }
     }
 }
