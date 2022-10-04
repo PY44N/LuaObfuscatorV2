@@ -19,5 +19,8 @@
   "homepage": "https://github.com/PY44N/LuaObfuscator#readme",
   "devDependencies": {
     "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@types/node": "^18.8.1"
   }
 }
