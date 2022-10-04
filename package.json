@@ -1,0 +1,23 @@
+{
+  "name": "luaobfuscator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx tsc && node ./build/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PY44N/LuaObfuscator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PY44N/LuaObfuscator/issues"
+  },
+  "homepage": "https://github.com/PY44N/LuaObfuscator#readme",
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}
