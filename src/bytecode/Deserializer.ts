@@ -23,7 +23,7 @@ export class Deserializer {
 
   readString(length = this.readSizeT()): string {
     // let length = this.readSizeT();
-    //TODO: make preset length actually work
+    //TODO: make passed in length actually work
     return String.fromCharCode(...this.byteStream.read(length));
   }
 
