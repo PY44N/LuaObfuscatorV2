@@ -30,14 +30,42 @@ export class MemoryStream {
     return this.ReadInt32() + this.ReadInt32() * 2 ** 32;
   }
 
+  //From https://gist.github.com/kg/2192799
   ReadDouble(): number {
-    let bits = this.ReadInt64();
-    let sign = bits >> 63 == 0 ? 1 : -1;
-    let exponent = (bits << 1) >> 54;
-    let mantissa = (bits << 12) >> 12;
-    console.log(sign);
-    console.log(exponent);
-    console.log(mantissa);
-    return sign * mantissa * 2 ** exponent;
+    let bytes = this.Read(8);
+    let littleEndian = true;
+
+    let binary = "";
+    for (let i = 0, l = bytes.length; i < l; i++) {
+      let bits = bytes[i].toString(2);
+      while (bits.length < 8) bits = "0" + bits;
+
+      if (littleEndian) binary = bits + binary;
+      else binary += bits;
+    }
+
+    let sign = binary.charAt(0) == "1" ? -1 : 1;
+    let exponent = parseInt(binary.substr(1, 11), 2) - 1023;
+    let significandBase = binary.substr(12, 52);
+    let significandBin = "1" + significandBase;
+    let i = 0;
+    let val = 1;
+    let significand = 0;
+
+    if (exponent == -1023) {
+      if (significandBase.indexOf("1") == -1) return 0;
+      else {
+        exponent = -1023;
+        significandBin = "0" + significandBase;
+      }
+    }
+
+    while (i < significandBin.length) {
+      significand += val * parseInt(significandBin.charAt(i));
+      val = val / 2;
+      i++;
+    }
+
+    return sign * significand * Math.pow(2, exponent);
   }
 }
