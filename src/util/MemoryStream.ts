@@ -29,4 +29,15 @@ export class MemoryStream {
   ReadInt64(): number {
     return this.ReadInt32() + this.ReadInt32() * 2 ** 32;
   }
+
+  ReadDouble(): number {
+    let bits = this.ReadInt64();
+    let sign = bits >> 63 == 0 ? 1 : -1;
+    let exponent = (bits << 1) >> 54;
+    let mantissa = (bits << 12) >> 12;
+    console.log(sign);
+    console.log(exponent);
+    console.log(mantissa);
+    return sign * mantissa * 2 ** exponent;
+  }
 }

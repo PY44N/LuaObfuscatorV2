@@ -5,5 +5,7 @@ export class Deserializer {
 
   constructor(bytes: number[]) {
     this.byteStream = new MemoryStream(bytes);
+
+    console.log(this.byteStream.ReadDouble());
   }
 }
