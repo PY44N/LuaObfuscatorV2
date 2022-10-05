@@ -66,6 +66,6 @@ export class MemoryStream {
       i++;
     }
 
-    return sign * significand * Math.pow(2, exponent);
+    return sign * significand * 2 ** exponent;
   }
 }
