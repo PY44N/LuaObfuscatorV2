@@ -19,6 +19,5 @@ let compiled = readFileSync("./temp/luac.out", "binary")
   .split("")
   .map((v) => v.charCodeAt(0));
 
-console.log(compiled);
-
 let deserializer = new Deserializer(compiled);
+deserializer.deserialize();

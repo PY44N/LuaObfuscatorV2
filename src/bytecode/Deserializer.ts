@@ -7,8 +7,6 @@ export class Deserializer {
 
   constructor(bytes: number[]) {
     this.byteStream = new MemoryStream(bytes);
-
-    console.log(this.byteStream.readDouble());
   }
 
   readSizeT(): number {
@@ -23,5 +21,13 @@ export class Deserializer {
       : this.byteStream.readInt64();
   }
 
-  deserialize() {}
+  readString(length = this.readSizeT()): string {
+    // let length = this.readSizeT();
+    //TODO: make preset length actually work
+    return String.fromCharCode(...this.byteStream.read(length));
+  }
+
+  deserialize() {
+    console.log(this.readString(2));
+  }
 }
