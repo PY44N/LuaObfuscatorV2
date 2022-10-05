@@ -7,32 +7,32 @@ export class MemoryStream {
     this.position = 0;
   }
 
-  Read(count: number): number[] {
+  read(count: number): number[] {
     //TODO: Endianess Things
     return this.bytes.slice(this.position, (this.position += count));
   }
 
-  ReadInt8(): number {
-    return this.Read(1)[0];
+  readInt8(): number {
+    return this.read(1)[0];
   }
 
-  ReadInt16(): number {
-    let [a, b] = this.Read(2);
+  readInt16(): number {
+    let [a, b] = this.read(2);
     return a + b * 2 ** 8;
   }
 
-  ReadInt32(): number {
-    let [a, b, c, d] = this.Read(4);
+  readInt32(): number {
+    let [a, b, c, d] = this.read(4);
     return a + b * 2 ** 8 + c * 2 ** 16 + d * 2 ** 24;
   }
 
-  ReadInt64(): number {
-    return this.ReadInt32() + this.ReadInt32() * 2 ** 32;
+  readInt64(): number {
+    return this.readInt32() + this.readInt32() * 2 ** 32;
   }
 
   //From https://gist.github.com/kg/2192799
-  ReadDouble(): number {
-    let bytes = this.Read(8);
+  readDouble(): number {
+    let bytes = this.read(8);
     let littleEndian = true;
 
     let binary = "";
