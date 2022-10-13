@@ -13,6 +13,7 @@ import { Deserializer } from "./bytecode/Deserializer";
 
 // copyFileSync("Input.lua", "./temp/temp1.lua");
 
+// //TODO: Maybe strip comments and minify before compiling
 // execSync("luac temp1.lua", { cwd: "temp" });
 
 let compiled = readFileSync("./temp/luac.out", "binary")
