@@ -23,5 +23,9 @@ export class Chunk {
     this.parameterCount = this.byteStream.readInt8();
     this.varargFlag = this.byteStream.readInt8();
     this.maxStackSize = this.byteStream.readInt8();
+
+    for (let i = 0; i < this.byteStream.readInt(); i++) {
+      //TODO: instruction parsing
+    }
   }
 }
