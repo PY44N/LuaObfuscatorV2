@@ -1,10 +1,14 @@
 export class MemoryStream {
   bytes: number[];
   position: number;
+  sizeTSize: number;
+  intSize: number;
 
   constructor(bytes: number[]) {
     this.bytes = bytes;
     this.position = 0;
+    this.sizeTSize = 4;
+    this.intSize = 4;
   }
 
   read(count: number): number[] {
@@ -67,5 +71,17 @@ export class MemoryStream {
     }
 
     return sign * significand * 2 ** exponent;
+  }
+
+  readSizeT(): number {
+    return this.sizeTSize == 4 ? this.readInt32() : this.readInt64();
+  }
+
+  readInt(): number {
+    return this.intSize == 4 ? this.readInt32() : this.readInt64();
+  }
+
+  readString(length = this.readSizeT()): string {
+    return String.fromCharCode(...this.read(length));
   }
 }
