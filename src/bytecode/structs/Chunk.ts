@@ -26,6 +26,8 @@ export class Chunk {
 
     for (let i = 0; i < this.byteStream.readInt(); i++) {
       //TODO: instruction parsing
+      let data = this.byteStream.readInt32();
+      console.log(data);
     }
   }
 }
