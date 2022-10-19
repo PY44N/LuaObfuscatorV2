@@ -49,8 +49,8 @@ export class MemoryStream {
     }
 
     let sign = binary.charAt(0) == "1" ? -1 : 1;
-    let exponent = parseInt(binary.substr(1, 11), 2) - 1023;
-    let significandBase = binary.substr(12, 52);
+    let exponent = parseInt(binary.substring(1, 11), 2) - 1023;
+    let significandBase = binary.substring(12, 52);
     let significandBin = "1" + significandBase;
     let i = 0;
     let val = 1;
