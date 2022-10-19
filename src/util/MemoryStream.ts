@@ -50,27 +50,27 @@ export class MemoryStream {
 
     let sign = binary.charAt(0) == "1" ? -1 : 1;
     let exponent = parseInt(binary.substring(1, 11), 2) - 1023;
-    let significandBase = binary.substring(12, 52);
-    let significandBin = "1" + significandBase;
+    let significantBase = binary.substring(12, 52);
+    let significantBin = "1" + significantBase;
     let i = 0;
     let val = 1;
-    let significand = 0;
+    let significant = 0;
 
     if (exponent == -1023) {
-      if (significandBase.indexOf("1") == -1) return 0;
+      if (significantBase.indexOf("1") == -1) return 0;
       else {
         exponent = -1023;
-        significandBin = "0" + significandBase;
+        significantBin = "0" + significantBase;
       }
     }
 
-    while (i < significandBin.length) {
-      significand += val * parseInt(significandBin.charAt(i));
+    while (i < significantBin.length) {
+      significant += val * parseInt(significantBin.charAt(i));
       val = val / 2;
       i++;
     }
 
-    return sign * significand * 2 ** exponent;
+    return sign * significant * 2 ** exponent;
   }
 
   readSizeT(): number {
