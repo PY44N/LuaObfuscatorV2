@@ -24,10 +24,25 @@ export class Chunk {
     this.varargFlag = this.byteStream.readInt8();
     this.maxStackSize = this.byteStream.readInt8();
 
-    for (let i = 0; i < this.byteStream.readInt(); i++) {
+    let instructionLength = this.byteStream.readInt();
+    console.log(instructionLength);
+    for (let i = 0; i < instructionLength; i++) {
       //TODO: instruction parsing
-      let data = this.byteStream.readInt32();
-      console.log(data);
+      //TODO: instruction size support
+      let data = this.byteStream.read(4);
+
+      let binary = "";
+      for (let i = 0, l = data.length; i < l; i++) {
+        let bits = data[i].toString(2);
+        while (bits.length < 8) bits = "0" + bits;
+
+        binary = binary + bits;
+      }
+
+      let opcode = parseInt(binary.substring(0, 5), 2);
+      console.log(opcode);
     }
+
+    // console.log(this.byteStream.readInt());
   }
 }
