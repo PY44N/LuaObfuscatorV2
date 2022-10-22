@@ -29,17 +29,8 @@ export class Chunk {
     for (let i = 0; i < instructionLength; i++) {
       //TODO: instruction parsing
       //TODO: instruction size support
-      let data = this.byteStream.read(4);
-
-      let binary = "";
-      for (let i = 0, l = data.length; i < l; i++) {
-        let bits = data[i].toString(2);
-        while (bits.length < 8) bits = "0" + bits;
-
-        binary = binary + bits;
-      }
-
-      let opcode = parseInt(binary.substring(0, 5), 2);
+      let data = this.byteStream.readInt32();
+      let opcode = data & 0b111111;
       console.log(opcode);
     }
 
