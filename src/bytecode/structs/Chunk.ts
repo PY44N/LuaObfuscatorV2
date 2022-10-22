@@ -1,4 +1,5 @@
 import { MemoryStream } from "../../util/MemoryStream";
+import { Instruction } from "./Instruction";
 
 export class Chunk {
   byteStream: MemoryStream;
@@ -30,8 +31,7 @@ export class Chunk {
       //TODO: instruction parsing
       //TODO: instruction size support
       let data = this.byteStream.readInt32();
-      let opcode = data & 0b111111;
-      console.log(opcode);
+      let instr = new Instruction(data);
     }
 
     // console.log(this.byteStream.readInt());
