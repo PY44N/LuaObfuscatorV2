@@ -45,12 +45,32 @@ const instructionMappings: Record<Opcode, InstructionType> = {
 export class Instruction {
   data: number;
   opcode: Opcode;
+  opcodeString: string;
   instructionType: InstructionType;
+  dataA: number;
+  dataB: number;
+  dataC: number | null;
 
   constructor(data: number) {
     this.data = data;
+    this.opcodeString = Opcode[this.data & 0x3f];
     // I hate that I have to do this
-    this.opcode = Object.values(Opcode).indexOf(Opcode[data & 0b111111]);
+    this.opcode = Object.values(Opcode).indexOf(this.opcodeString);
     this.instructionType = instructionMappings[this.opcode];
+
+    this.dataA = (this.data >> 6) & 0xff;
+
+    if (this.instructionType == InstructionType.ABC) {
+      this.dataB = (this.data >> 14) & 0x1ff;
+      this.dataC = (this.data >> 23) & 0x1ff;
+    } else if (this.instructionType == InstructionType.ABx) {
+      this.dataB = (this.data >> 14) & 0x3ffff;
+      this.dataC = -1;
+    } else {
+      this.dataB = ((this.data >> 14) & 0x3ffff) - 131071;
+      this.dataC = -1;
+    }
+
+    console.log(Opcode[this.data & 0x3f], this.dataA, this.dataB, this.dataC);
   }
 }
