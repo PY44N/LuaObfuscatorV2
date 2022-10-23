@@ -8,11 +8,7 @@ export class Deserializer {
     this.byteStream = new MemoryStream(bytes);
   }
 
-  readChunk() {
-    let chunk = new Chunk(this.byteStream);
-  }
-
-  deserialize() {
+  deserialize(): Chunk {
     if (this.byteStream.readString(4) != String.fromCharCode(27) + "Lua")
       throw new Error("Invalid file header");
 
@@ -44,6 +40,6 @@ export class Deserializer {
     if (this.byteStream.readInt8() != 0)
       throw new Error("Invalid integral flag");
 
-    this.readChunk();
+    return new Chunk(this.byteStream);
   }
 }
