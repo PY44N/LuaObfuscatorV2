@@ -13,6 +13,8 @@ export class Chunk {
   maxStackSize: number;
   instructions: Instruction[];
   constants: Constant[];
+  protos: Chunk[];
+  sourceLines: number[];
 
   constructor(byteStream: MemoryStream) {
     this.sourceName = byteStream.readString();
@@ -50,10 +52,21 @@ export class Chunk {
           break;
       }
 
+      console.log(constant);
+
       this.constants.push(constant);
     }
 
+    this.protos = [];
     let protoLength = byteStream.readInt();
-    for (let i = 0; i < protoLength; i++) {}
+    for (let i = 0; i < protoLength; i++) {
+      this.protos.push(new Chunk(byteStream));
+    }
+
+    this.sourceLines = [];
+    let sourceLineLength = byteStream.readInt();
+    for (let i = 0; i < sourceLineLength; i++) {
+      this.sourceLines.push(byteStream.readInt());
+    }
   }
 }

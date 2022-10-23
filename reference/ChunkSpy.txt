@@ -26,137 +26,72 @@ Pos   Hex Data           Description or Code
 0023  00                 nups (0)
 0024  00                 numparams (0)
 0025  02                 is_vararg (2)
-0026  05                 maxstacksize (5)
+0026  04                 maxstacksize (4)
                          * code:
-0027  12000000           sizecode (18)
+0027  0E000000           sizecode (14)
 002B  0A000001           [01] newtable   0   2   0    ; array=2, hash=0
 002F  41000000           [02] loadk      1   0        ; "Hello"
 0033  81400000           [03] loadk      2   1        ; "world"
 0037  22400001           [04] setlist    0   2   1    ; index 1 to 2
-003B  43008000           [05] loadnil    1   1      
-003F  A4000000           [06] closure    2   0        ; 1 upvalues
-0043  00008000           [07] move       0   1      
-0047  87800000           [08] setglobal  2   2        ; log
-004B  81C00000           [09] loadk      2   3        ; 1
-004F  D4000000           [10] len        3   0      
-0053  19C00001           [11] le         0   2   3    ; to [13] if true
-0057  16000180           [12] jmp        5            ; to [18]
-005B  C5800000           [13] getglobal  3   2        ; log
-005F  06810000           [14] gettable   4   0   2  
-0063  DC400001           [15] call       3   2   1  
-0067  8CC04001           [16] add        2   2   259  ; 1
-006B  16C0FD7F           [17] jmp        -8           ; to [10]
-006F  1E008000           [18] return     0   1      
+003B  41800000           [05] loadk      1   2        ; 1
+003F  94000000           [06] len        2   0      
+0043  19808000           [07] le         0   1   2    ; to [9] if true
+0047  16000180           [08] jmp        5            ; to [14]
+004B  85C00000           [09] getglobal  2   3        ; print
+004F  C6400000           [10] gettable   3   0   1  
+0053  9C400001           [11] call       2   2   1  
+0057  4C80C000           [12] add        1   1   258  ; 1
+005B  16C0FD7F           [13] jmp        -8           ; to [6]
+005F  1E008000           [14] return     0   1      
                          * constants:
-0073  04000000           sizek (4)
-0077  04                 const type 4
-0078  06000000           string size (6)
-007C  48656C6C6F00       "Hello\0"
+0063  04000000           sizek (4)
+0067  04                 const type 4
+0068  06000000           string size (6)
+006C  48656C6C6F00       "Hello\0"
                          const [0]: "Hello"
-0082  04                 const type 4
-0083  06000000           string size (6)
-0087  776F726C6400       "world\0"
+0072  04                 const type 4
+0073  06000000           string size (6)
+0077  776F726C6400       "world\0"
                          const [1]: "world"
-008D  04                 const type 4
-008E  04000000           string size (4)
-0092  6C6F6700           "log\0"
-                         const [2]: "log"
-0096  03                 const type 3
-0097  000000000000F03F   const [3]: (1)
+007D  03                 const type 3
+007E  000000000000F03F   const [2]: (1)
+0086  04                 const type 4
+0087  06000000           string size (6)
+008B  7072696E7400       "print\0"
+                         const [3]: "print"
                          * functions:
-009F  01000000           sizep (1)
-                         
-00A3                     ** function [0] definition (level 2)
-                         ** start of function **
-00A3  00000000           string size (0)
-                         source name: (none)
-00A7  04000000           line defined (4)
-00AB  07000000           last line defined (7)
-00AF  01                 nups (1)
-00B0  00                 numparams (0)
-00B1  03                 is_vararg (3)
-00B2  03                 maxstacksize (3)
-                         * code:
-00B3  06000000           sizecode (6)
-00B7  65000001           [1] vararg     1   2      
-00BB  48000000           [2] setupval   1   0        ; printVal
-00BF  45000000           [3] getglobal  1   0        ; print
-00C3  84000000           [4] getupval   2   0        ; printVal
-00C7  5C400001           [5] call       1   2   1  
-00CB  1E008000           [6] return     0   1      
-                         * constants:
-00CF  01000000           sizek (1)
-00D3  04                 const type 4
-00D4  06000000           string size (6)
-00D8  7072696E7400       "print\0"
-                         const [0]: "print"
-                         * functions:
-00DE  00000000           sizep (0)
+0091  00000000           sizep (0)
                          * lines:
-00E2  06000000           sizelineinfo (6)
+0095  0E000000           sizelineinfo (14)
                          [pc] (line)
-00E6  05000000           [1] (5)
-00EA  05000000           [2] (5)
-00EE  06000000           [3] (6)
-00F2  06000000           [4] (6)
-00F6  06000000           [5] (6)
-00FA  07000000           [6] (7)
+0099  01000000           [01] (1)
+009D  01000000           [02] (1)
+00A1  01000000           [03] (1)
+00A5  01000000           [04] (1)
+00A9  03000000           [05] (3)
+00AD  04000000           [06] (4)
+00B1  04000000           [07] (4)
+00B5  04000000           [08] (4)
+00B9  05000000           [09] (5)
+00BD  05000000           [10] (5)
+00C1  05000000           [11] (5)
+00C5  06000000           [12] (6)
+00C9  06000000           [13] (6)
+00CD  07000000           [14] (7)
                          * locals:
-00FE  01000000           sizelocvars (1)
-0102  04000000           string size (4)
-0106  61726700           "arg\0"
-                         local [0]: arg
-010A  00000000             startpc (0)
-010E  05000000             endpc   (5)
-                         * upvalues:
-0112  01000000           sizeupvalues (1)
-0116  09000000           string size (9)
-011A  7072696E7456616C+  "printVal"
-0122  00                 "\0"
-                         upvalue [0]: printVal
-                         ** end of function **
-
-                         * lines:
-0123  12000000           sizelineinfo (18)
-                         [pc] (line)
-0127  01000000           [01] (1)
-012B  01000000           [02] (1)
-012F  01000000           [03] (1)
-0133  01000000           [04] (1)
-0137  03000000           [05] (3)
-013B  07000000           [06] (7)
-013F  07000000           [07] (7)
-0143  04000000           [08] (4)
-0147  09000000           [09] (9)
-014B  0A000000           [10] (10)
-014F  0A000000           [11] (10)
-0153  0A000000           [12] (10)
-0157  0B000000           [13] (11)
-015B  0B000000           [14] (11)
-015F  0B000000           [15] (11)
-0163  0C000000           [16] (12)
-0167  0C000000           [17] (12)
-016B  0D000000           [18] (13)
-                         * locals:
-016F  03000000           sizelocvars (3)
-0173  02000000           string size (2)
-0177  6100               "a\0"
+00D1  02000000           sizelocvars (2)
+00D5  02000000           string size (2)
+00D9  6100               "a\0"
                          local [0]: a
-0179  04000000             startpc (4)
-017D  11000000             endpc   (17)
-0181  09000000           string size (9)
-0185  7072696E7456616C+  "printVal"
-018D  00                 "\0"
-                         local [1]: printVal
-018E  05000000             startpc (5)
-0192  11000000             endpc   (17)
-0196  02000000           string size (2)
-019A  6900               "i\0"
-                         local [2]: i
-019C  09000000             startpc (9)
-01A0  11000000             endpc   (17)
+00DB  04000000             startpc (4)
+00DF  0D000000             endpc   (13)
+00E3  02000000           string size (2)
+00E7  6900               "i\0"
+                         local [1]: i
+00E9  05000000             startpc (5)
+00ED  0D000000             endpc   (13)
                          * upvalues:
-01A4  00000000           sizeupvalues (0)
+00F1  00000000           sizeupvalues (0)
                          ** end of function **
 
-01A8                     ** end of chunk **
+00F5                     ** end of chunk **
