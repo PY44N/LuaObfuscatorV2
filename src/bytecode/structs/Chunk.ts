@@ -2,8 +2,6 @@ import { MemoryStream } from "../../util/MemoryStream";
 import { Instruction } from "./Instruction";
 
 export class Chunk {
-  byteStream: MemoryStream;
-
   sourceName: string;
   lineDefined: number;
   lastLineDefined: number;
@@ -11,29 +9,26 @@ export class Chunk {
   parameterCount: number;
   varargFlag: number;
   maxStackSize: number;
+  instructions: Instruction[];
 
   constructor(byteStream: MemoryStream) {
-    this.byteStream = byteStream;
-
-    this.sourceName = this.byteStream.readString();
+    this.sourceName = byteStream.readString();
     console.log(this.sourceName);
 
-    this.lineDefined = this.byteStream.readInt();
-    this.lastLineDefined = this.byteStream.readInt();
-    this.upvalueCount = this.byteStream.readInt8();
-    this.parameterCount = this.byteStream.readInt8();
-    this.varargFlag = this.byteStream.readInt8();
-    this.maxStackSize = this.byteStream.readInt8();
+    this.lineDefined = byteStream.readInt();
+    this.lastLineDefined = byteStream.readInt();
+    this.upvalueCount = byteStream.readInt8();
+    this.parameterCount = byteStream.readInt8();
+    this.varargFlag = byteStream.readInt8();
+    this.maxStackSize = byteStream.readInt8();
 
-    let instructionLength = this.byteStream.readInt();
-    console.log(instructionLength);
+    this.instructions = [];
+
+    let instructionLength = byteStream.readInt();
     for (let i = 0; i < instructionLength; i++) {
-      //TODO: instruction parsing
       //TODO: instruction size support
-      let data = this.byteStream.readInt32();
-      let instr = new Instruction(data);
+      let data = byteStream.readInt32();
+      this.instructions.push(new Instruction(data));
     }
-
-    // console.log(this.byteStream.readInt());
   }
 }
