@@ -2,6 +2,7 @@ import { MemoryStream } from "../../util/MemoryStream";
 import { LuaType } from "../enums/LuaType";
 import { Constant } from "./Constant";
 import { Instruction } from "./Instruction";
+import { Local } from "./Local";
 
 export class Chunk {
   sourceName: string;
@@ -15,6 +16,8 @@ export class Chunk {
   constants: Constant[];
   protos: Chunk[];
   sourceLines: number[];
+  locals: Local[];
+  upvalues: string[];
 
   constructor(byteStream: MemoryStream) {
     this.sourceName = byteStream.readString();
@@ -38,6 +41,7 @@ export class Chunk {
     this.constants = [];
     let constantLength = byteStream.readInt();
     for (let i = 0; i < constantLength; i++) {
+      //TODO: move the logic to the constant class
       let constant: Constant = new Constant(byteStream.readInt8());
 
       switch (constant.type) {
@@ -67,6 +71,18 @@ export class Chunk {
     let sourceLineLength = byteStream.readInt();
     for (let i = 0; i < sourceLineLength; i++) {
       this.sourceLines.push(byteStream.readInt());
+    }
+
+    this.locals = [];
+    let localLength = byteStream.readInt();
+    for (let i = 0; i < localLength; i++) {
+      this.locals.push(new Local(byteStream));
+    }
+
+    this.upvalues = [];
+    let upvalueLength = byteStream.readInt();
+    for (let i = 0; i < upvalueLength; i++) {
+      this.upvalues.push(byteStream.readString());
     }
   }
 }
