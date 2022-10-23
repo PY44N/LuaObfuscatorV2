@@ -41,24 +41,7 @@ export class Chunk {
     this.constants = [];
     let constantLength = byteStream.readInt();
     for (let i = 0; i < constantLength; i++) {
-      //TODO: move the logic to the constant class
-      let constant: Constant = new Constant(byteStream.readInt8());
-
-      switch (constant.type) {
-        case LuaType.BOOLEAN:
-          constant.data = byteStream.readInt8() == 1;
-          break;
-        case LuaType.NUMBER:
-          constant.data = byteStream.readDouble();
-          break;
-        case LuaType.STRING:
-          constant.data = byteStream.readString();
-          break;
-      }
-
-      console.log(constant);
-
-      this.constants.push(constant);
+      this.constants.push(new Constant(byteStream));
     }
 
     this.protos = [];
