@@ -34,43 +34,8 @@ export class MemoryStream {
     return this.readInt32() + this.readInt32() * 2 ** 32;
   }
 
-  //From https://gist.github.com/kg/2192799
   readDouble(): number {
-    let bytes = this.read(8);
-    let littleEndian = true;
-
-    let binary = "";
-    for (let i = 0, l = bytes.length; i < l; i++) {
-      let bits = bytes[i].toString(2);
-      while (bits.length < 8) bits = "0" + bits;
-
-      if (littleEndian) binary = bits + binary;
-      else binary += bits;
-    }
-
-    let sign = binary.charAt(0) == "1" ? -1 : 1;
-    let exponent = parseInt(binary.substring(1, 11), 2) - 1023;
-    let significantBase = binary.substring(12, 52);
-    let significantBin = "1" + significantBase;
-    let i = 0;
-    let val = 1;
-    let significant = 0;
-
-    if (exponent == -1023) {
-      if (significantBase.indexOf("1") == -1) return 0;
-      else {
-        exponent = -1023;
-        significantBin = "0" + significantBase;
-      }
-    }
-
-    while (i < significantBin.length) {
-      significant += val * parseInt(significantBin.charAt(i));
-      val = val / 2;
-      i++;
-    }
-
-    return sign * significant * 2 ** exponent;
+    return Buffer.from(this.read(8)).readDoubleLE();
   }
 
   readSizeT(): number {
