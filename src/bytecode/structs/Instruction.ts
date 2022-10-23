@@ -61,8 +61,9 @@ export class Instruction {
     this.dataA = (this.data >> 6) & 0xff;
 
     if (this.instructionType == InstructionType.ABC) {
-      this.dataB = (this.data >> 14) & 0x1ff;
-      this.dataC = (this.data >> 23) & 0x1ff;
+      // Why Lua?
+      this.dataB = (this.data >> 23) & 0x1ff;
+      this.dataC = (this.data >> 14) & 0x1ff;
     } else if (this.instructionType == InstructionType.ABx) {
       this.dataB = (this.data >> 14) & 0x3ffff;
       this.dataC = -1;
