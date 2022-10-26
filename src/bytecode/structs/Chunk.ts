@@ -1,7 +1,7 @@
 import { MemoryStream } from "../../util/MemoryStream";
 import { LuaType } from "../enums/LuaType";
 import { Constant } from "./Constant";
-import { Instruction } from "./Instruction";
+import { Opcode } from "./Opcode";
 import { Local } from "./Local";
 
 export class Chunk {
@@ -12,7 +12,7 @@ export class Chunk {
   parameterCount: number;
   varargFlag: number;
   maxStackSize: number;
-  instructions: Instruction[];
+  instructions: Opcode[];
   constants: Constant[];
   protos: Chunk[];
   sourceLines: number[];
@@ -35,7 +35,7 @@ export class Chunk {
     for (let i = 0; i < instructionLength; i++) {
       //TODO: instruction size support
       let data = byteStream.readInt32();
-      this.instructions.push(new Instruction(data));
+      this.instructions.push(new Opcode(data));
     }
 
     this.constants = [];

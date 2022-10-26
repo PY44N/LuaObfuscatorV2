@@ -1,4 +1,4 @@
-export enum Opcode {
+export enum OpcodeType {
   Move,
   LoadConst,
   LoadBool,
