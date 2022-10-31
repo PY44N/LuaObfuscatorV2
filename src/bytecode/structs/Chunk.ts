@@ -35,7 +35,7 @@ export class Chunk {
     for (let i = 0; i < instructionLength; i++) {
       //TODO: instruction size support
       let data = byteStream.readInt32();
-      this.instructions.push(new Opcode(data));
+      this.instructions.push(new Instruction(data));
     }
 
     this.constants = [];
