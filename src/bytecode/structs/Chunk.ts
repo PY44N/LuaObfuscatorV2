@@ -3,6 +3,7 @@ import { LuaType } from "../enums/LuaType";
 import { Constant } from "./Constant";
 import { Opcode } from "./Opcode";
 import { Local } from "./Local";
+import { Instruction } from "./Instruction";
 
 export class Chunk {
   sourceName: string;
@@ -12,7 +13,7 @@ export class Chunk {
   parameterCount: number;
   varargFlag: number;
   maxStackSize: number;
-  instructions: Opcode[];
+  instructions: Instruction[];
   constants: Constant[];
   protos: Chunk[];
   sourceLines: number[];

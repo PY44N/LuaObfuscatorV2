@@ -1,7 +1,7 @@
 import { Instruction } from "../Instruction";
 import { Opcode } from "../Opcode";
 
-export class OpTForLoop extends Opcode {
+export class OpSetUpval extends Opcode {
   instruction: Instruction;
 
   constructor(instruction: Instruction) {
