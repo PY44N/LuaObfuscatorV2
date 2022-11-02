@@ -74,6 +74,10 @@ abstract class Opcode
         }
     }
 
+    public static Opcode Create(int opcode) {
+        
+    }
+
     public virtual string getObfuscatated()
     {
         throw new NotImplementedException();
