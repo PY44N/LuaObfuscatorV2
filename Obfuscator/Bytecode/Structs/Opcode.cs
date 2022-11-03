@@ -122,11 +122,6 @@ abstract class Opcode
         return opcodeConstructors[code].Invoke(data);
     }
 
-    public override string ToString()
-    {
-        return string.Format("Opcode {0}, A: {1}, B: {2}, C: {3}", opcode, dataA, dataB, dataC);
-    }
-
     public virtual string getObfuscatated()
     {
         throw new NotImplementedException();

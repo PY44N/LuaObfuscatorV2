@@ -59,6 +59,11 @@ class Deserializer
         return ReadString(ReadSizeT());
     }
 
+    public double ReadDouble()
+    {
+        return BitConverter.ToDouble(Read(8));
+    }
+
     public void Deserialize()
     {
         if (ReadString(4) != (char)27 + "Lua")

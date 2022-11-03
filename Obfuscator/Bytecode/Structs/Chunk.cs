@@ -11,6 +11,7 @@ class Chunk
     private int maxStackSize;
 
     private List<Opcode> instructions;
+    private List<Constant> constants;
 
     public Chunk()
     {
@@ -30,8 +31,16 @@ class Chunk
         int instructionCount = deserializer.ReadInt();
         for (int i = 0; i < instructionCount; i++)
         {
+            //TODO: Instruction size
             int data = deserializer.ReadInt32();
             instructions.Add(Opcode.Create(data & 0x3f, data));
+        }
+
+        constants = new List<Constant>();
+        int constantCount = deserializer.ReadInt();
+        for (int i = 0; i < constantCount; i++)
+        {
+            constants.Add(new Constant());
         }
     }
 }
