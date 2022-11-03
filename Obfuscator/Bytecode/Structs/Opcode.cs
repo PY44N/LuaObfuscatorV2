@@ -43,45 +43,45 @@ abstract class Opcode
         InstructionType.ABC,
    };
 
-   private static readonly Opcode[] opcodes = {
-  OpMove,
-  OpLoadConst,
-  OpLoadBool,
-  OpLoadNil,
-  OpGetUpval,
-  OpGetGlobal,
-  OpGetTable,
-  OpSetGlobal,
-  OpSetUpval,
-  OpSetTable,
-  OpNewTable,
-  OpSelf,
-  OpAdd,
-  OpSub,
-  OpMul,
-  OpDiv,
-  OpMod,
-  OpPow,
-  OpUnm,
-  OpNot,
-  OpLen,
-  OpConcat,
-  OpJmp,
-  OpEq,
-  OpLt,
-  OpLe,
-  OpTest,
-  OpTestSet,
-  OpCall,
-  OpTailCall,
-  OpReturn,
-  OpForLoop,
-  OpForPrep,
-  OpTForLoop,
-  OpSetList,
-  OpClose,
-  OpClosure,
-  OpVarArg,
+    private static readonly Func<int, Opcode>[] opcodeConstructors = {
+        (int data) => new OpMove(data),
+        (int data) => new OpLoadConst(data),
+        (int data) => new OpLoadBool(data),
+        (int data) => new OpLoadNil(data),
+        (int data) => new OpGetUpval(data),
+        (int data) => new OpGetGlobal(data),
+        (int data) => new OpGetTable(data),
+        (int data) => new OpSetGlobal(data),
+        (int data) => new OpSetUpval(data),
+        (int data) => new OpSetTable(data),
+        (int data) => new OpNewTable(data),
+        (int data) => new OpSelf(data),
+        (int data) => new OpAdd(data),
+        (int data) => new OpSub(data),
+        (int data) => new OpMul(data),
+        (int data) => new OpDiv(data),
+        (int data) => new OpMod(data),
+        (int data) => new OpPow(data),
+        (int data) => new OpUnm(data),
+        (int data) => new OpNot(data),
+        (int data) => new OpLen(data),
+        (int data) => new OpConcat(data),
+        (int data) => new OpJmp(data),
+        (int data) => new OpEq(data),
+        (int data) => new OpLt(data),
+        (int data) => new OpLe(data),
+        (int data) => new OpTest(data),
+        (int data) => new OpTestSet(data),
+        (int data) => new OpCall(data),
+        (int data) => new OpTailCall(data),
+        (int data) => new OpReturn(data),
+        (int data) => new OpForLoop(data),
+        (int data) => new OpForPrep(data),
+        (int data) => new OpTForLoop(data),
+        (int data) => new OpSetList(data),
+        (int data) => new OpClose(data),
+        (int data) => new OpClosure(data),
+        (int data) => new OpVarArg(data),
    };
 
     public int opcode;
@@ -91,11 +91,8 @@ abstract class Opcode
     public int dataB;
     public int dataC;
 
-    public Opcode()
+    public Opcode(int data)
     {
-        //TODO: Instruction size things
-        int data = Deserializer.instance.ReadInt32();
-
         opcode = data & 0x3f;
 
         instructionType = instructionMappings[opcode];
@@ -120,20 +117,14 @@ abstract class Opcode
         }
     }
 
-    public static Opcode Create(int index) {
-        // What did I just write?
-        object opcodeObject = Activator.CreateInstance(opcodes[index]);
-        MethodInfo method = opcodeObject.GetType().GetMethod("get");
-        
-        object newObject = method.Invoke(opcodeObject, null);
-        if (newObject != null) {
-            return (Opcode)newObject;
-        }
-        throw new Exception("Failed to create opcode");
+    public static Opcode Create(int code, int data)
+    {
+        return opcodeConstructors[code].Invoke(data);
     }
 
-    public Opcode get() {
-        return this;
+    public override string ToString()
+    {
+        return string.Format("Opcode {0}, A: {1}, B: {2}, C: {3}", opcode, dataA, dataB, dataC);
     }
 
     public virtual string getObfuscatated()

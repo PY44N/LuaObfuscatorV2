@@ -27,9 +27,11 @@ class Chunk
         maxStackSize = deserializer.ReadInt8();
 
         instructions = new List<Opcode>();
-        int instructionCount = deserializer.ReadInt8();
-        for (int i = 0; i < instructionCount; i++) {
-            instructions.Append(Opcode.Create(deserializer.ReadInt32()));
+        int instructionCount = deserializer.ReadInt();
+        for (int i = 0; i < instructionCount; i++)
+        {
+            int data = deserializer.ReadInt32();
+            instructions.Add(Opcode.Create(data & 0x3f, data));
         }
     }
 }

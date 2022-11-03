@@ -9,7 +9,7 @@ class Obfuscator
 
         File.Copy(file, "./temp/temp1.lua");
 
-        ProcessStartInfo startInfo = new ProcessStartInfo("luac5.1", "temp1.lua")
+        ProcessStartInfo startInfo = new ProcessStartInfo(OperatingSystem.IsLinux() ? "luac5.1" : "luac", "temp1.lua")
         {
             WorkingDirectory = "./temp",
         };
