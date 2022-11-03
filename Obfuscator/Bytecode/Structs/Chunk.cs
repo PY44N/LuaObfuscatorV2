@@ -1,6 +1,6 @@
 class Chunk
 {
-    Deserializer deserializer;
+    private Deserializer deserializer;
 
     private string sourceName;
     private int lineDefined;
@@ -10,7 +10,7 @@ class Chunk
     private int varargFlag;
     private int maxStackSize;
 
-    private Opcode[] instructions;
+    private List<Opcode> instructions;
 
     public Chunk()
     {
@@ -26,11 +26,10 @@ class Chunk
         varargFlag = deserializer.ReadInt8();
         maxStackSize = deserializer.ReadInt8();
 
+        instructions = new List<Opcode>();
         int instructionCount = deserializer.ReadInt8();
         for (int i = 0; i < instructionCount; i++) {
-            //TODO: Instruction size support
-            int data = deserializer.ReadInt32();
-            instructions.Append(new Opcode(data));
+            instructions.Append(Opcode.Create(deserializer.ReadInt32()));
         }
     }
 }

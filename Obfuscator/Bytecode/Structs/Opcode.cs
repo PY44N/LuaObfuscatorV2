@@ -1,6 +1,8 @@
+using System.Reflection;
+
 abstract class Opcode
 {
-    private InstructionType[] instructionMappings = {
+    private static readonly InstructionType[] instructionMappings = {
         InstructionType.ABC,
         InstructionType.ABx,
         InstructionType.ABC,
@@ -41,6 +43,47 @@ abstract class Opcode
         InstructionType.ABC,
    };
 
+   private static readonly Opcode[] opcodes = {
+  OpMove,
+  OpLoadConst,
+  OpLoadBool,
+  OpLoadNil,
+  OpGetUpval,
+  OpGetGlobal,
+  OpGetTable,
+  OpSetGlobal,
+  OpSetUpval,
+  OpSetTable,
+  OpNewTable,
+  OpSelf,
+  OpAdd,
+  OpSub,
+  OpMul,
+  OpDiv,
+  OpMod,
+  OpPow,
+  OpUnm,
+  OpNot,
+  OpLen,
+  OpConcat,
+  OpJmp,
+  OpEq,
+  OpLt,
+  OpLe,
+  OpTest,
+  OpTestSet,
+  OpCall,
+  OpTailCall,
+  OpReturn,
+  OpForLoop,
+  OpForPrep,
+  OpTForLoop,
+  OpSetList,
+  OpClose,
+  OpClosure,
+  OpVarArg,
+   };
+
     public int opcode;
     public InstructionType instructionType;
 
@@ -48,8 +91,11 @@ abstract class Opcode
     public int dataB;
     public int dataC;
 
-    public Opcode(int data)
+    public Opcode()
     {
+        //TODO: Instruction size things
+        int data = Deserializer.instance.ReadInt32();
+
         opcode = data & 0x3f;
 
         instructionType = instructionMappings[opcode];
@@ -74,8 +120,20 @@ abstract class Opcode
         }
     }
 
-    public static Opcode Create(int opcode) {
+    public static Opcode Create(int index) {
+        // What did I just write?
+        object opcodeObject = Activator.CreateInstance(opcodes[index]);
+        MethodInfo method = opcodeObject.GetType().GetMethod("get");
         
+        object newObject = method.Invoke(opcodeObject, null);
+        if (newObject != null) {
+            return (Opcode)newObject;
+        }
+        throw new Exception("Failed to create opcode");
+    }
+
+    public Opcode get() {
+        return this;
     }
 
     public virtual string getObfuscatated()
