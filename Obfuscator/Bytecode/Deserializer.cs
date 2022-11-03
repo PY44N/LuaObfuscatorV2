@@ -64,7 +64,7 @@ class Deserializer
         return BitConverter.ToDouble(Read(8));
     }
 
-    public void Deserialize()
+    public Chunk Deserialize()
     {
         if (ReadString(4) != (char)27 + "Lua")
             throw new Exception("Invalid file header");
@@ -97,6 +97,6 @@ class Deserializer
         if (ReadInt8() != 0)
             throw new Exception("Invalid integral flag");
 
-        Chunk chunk = new Chunk();
+        return new Chunk();
     }
 }

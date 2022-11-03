@@ -14,10 +14,10 @@ class Obfuscator
             WorkingDirectory = "./temp",
         };
 
-        Process.Start(startInfo).WaitForExit();
+        Process.Start(startInfo)?.WaitForExit();
 
         byte[] compiled = File.ReadAllBytes("./temp/luac.out");
         Deserializer deserializer = new Deserializer(compiled);
-        deserializer.Deserialize();
+        Chunk mainChunk = deserializer.Deserialize();
     }
 }
