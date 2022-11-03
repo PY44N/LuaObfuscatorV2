@@ -12,6 +12,10 @@ class Chunk
 
     private List<Opcode> instructions;
     private List<Constant> constants;
+    private List<Chunk> protos;
+    private List<int> sourceLines;
+    private List<Local> locals;
+    private List<string> upvalues;
 
     public Chunk()
     {
@@ -41,6 +45,34 @@ class Chunk
         for (int i = 0; i < constantCount; i++)
         {
             constants.Add(new Constant());
+        }
+
+        protos = new List<Chunk>();
+        int protoCount = deserializer.ReadInt();
+        for (int i = 0; i < protoCount; i++)
+        {
+            protos.Add(new Chunk());
+        }
+
+        sourceLines = new List<int>();
+        int sourceLineCount = deserializer.ReadInt();
+        for (int i = 0; i < sourceLineCount; i++)
+        {
+            sourceLines.Add(deserializer.ReadInt());
+        }
+
+        locals = new List<Local>();
+        int localCount = deserializer.ReadInt();
+        for (int i = 0; i < localCount; i++)
+        {
+            locals.Add(new Local());
+        }
+
+        upvalues = new List<string>();
+        int upvalueLength = deserializer.ReadInt();
+        for (int i = 0; i < upvalueLength; i++)
+        {
+            upvalues.Add(deserializer.ReadString());
         }
     }
 }
