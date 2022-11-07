@@ -1,1 +1,0 @@
-﻿Obfuscator.obfuscate("Input.lua");

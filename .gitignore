@@ -1,4 +1,2 @@
-.vscode
-bin
-obj
-temp
+*.o
+LuaObfuscator.exe
