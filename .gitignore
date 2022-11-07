@@ -1,5 +1,1 @@
-.vscode
-*.o
-LuaObfuscator
-LuaObfuscator.exe
-temp
+/target
