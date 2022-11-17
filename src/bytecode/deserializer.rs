@@ -12,6 +12,18 @@ impl Deserializer {
     }
 
     pub fn deserialize(&mut self) {
-        println!("{:?}", self.memory_stream.read_string(4));
+        assert_eq!(
+            self.memory_stream.read_string(4),
+            String::from_utf8(vec![27]).unwrap() + "Lua",
+            "Invalid file header"
+        );
+
+        assert_eq!(
+            self.memory_stream.read_int8(),
+            0x51,
+            "Invalid Lua version, only Lua 5.1 supported"
+        );
+
+        assert_eq!(self.memory_stream.read_int8(), 0, "Invalid format version");
     }
 }
