@@ -38,5 +38,5 @@ fn main() {
 
     let mut memory_stream = MemoryStream::new(buffer);
 
-    println!("{:?}", memory_stream.read_double());
+    println!("{:?}", memory_stream.read_string(6));
 }
