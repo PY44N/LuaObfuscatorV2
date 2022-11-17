@@ -42,4 +42,8 @@ impl MemoryStream {
     pub fn read_int64(&mut self) -> u64 {
         self.read_int32() as u64 + self.read_int32() as u64 * 2u64.pow(32)
     }
+
+    pub fn read_double(&mut self) -> f64 {
+        f64::from_le_bytes(self.read(8).try_into().expect("Failed to read double"))
+    }
 }

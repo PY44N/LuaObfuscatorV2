@@ -37,4 +37,6 @@ fn main() {
     println!("{:?}", buffer);
 
     let mut memory_stream = MemoryStream::new(buffer);
+
+    println!("{:?}", memory_stream.read_double());
 }
