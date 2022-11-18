@@ -31,7 +31,6 @@ impl Chunk {
             //TODO: Instruction size support
             let data = memory_stream.read_int32();
             let instruction = Instruction::new(data);
-            println!("{:?}", instruction);
             new_self.instructions.push(instruction);
         }
 

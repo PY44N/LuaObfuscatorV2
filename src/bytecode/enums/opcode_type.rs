@@ -1,6 +1,6 @@
 //I hate programming
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum OpcodeType {
     OpMove,
     OpLoadConst,
