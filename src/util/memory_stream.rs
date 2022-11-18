@@ -64,7 +64,12 @@ impl MemoryStream {
         f64::from_le_bytes(self.read(8).try_into().expect("Failed to read double"))
     }
 
-    pub fn read_string(&mut self, length: usize) -> String {
+    pub fn read_string_length(&mut self, length: usize) -> String {
+        self.read(length).into_iter().map(|v| v as char).collect()
+    }
+
+    pub fn read_string(&mut self) -> String {
+        let length = self.read_size_t() as usize;
         self.read(length).into_iter().map(|v| v as char).collect()
     }
 }

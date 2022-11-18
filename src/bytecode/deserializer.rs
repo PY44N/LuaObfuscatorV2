@@ -1,4 +1,7 @@
-use crate::MemoryStream;
+use crate::{
+    bytecode::structs::{self, chunk::Chunk},
+    MemoryStream,
+};
 
 pub struct Deserializer {
     memory_stream: MemoryStream,
@@ -13,7 +16,7 @@ impl Deserializer {
 
     pub fn deserialize(&mut self) {
         assert_eq!(
-            self.memory_stream.read_string(4),
+            self.memory_stream.read_string_length(4),
             String::from_utf8(vec![27]).unwrap() + "Lua",
             "Invalid file header"
         );
@@ -52,5 +55,8 @@ impl Deserializer {
         assert_eq!(self.memory_stream.read_int8(), 8, "Invalid lua number size");
 
         assert_eq!(self.memory_stream.read_int8(), 0, "Invalid integral flag");
+
+        let chunk = Chunk::new(&mut self.memory_stream);
+        println!("{}", chunk.source_name);
     }
 }
