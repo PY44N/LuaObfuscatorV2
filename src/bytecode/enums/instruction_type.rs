@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum InstructionType {
     ABC,
     ABx,
