@@ -30,7 +30,9 @@ impl Chunk {
         for i in 0..instruction_count {
             //TODO: Instruction size support
             let data = memory_stream.read_int32();
-            new_self.instructions.push(Instruction::new(data));
+            let instruction = Instruction::new(data);
+            println!("{:?}", instruction);
+            new_self.instructions.push(instruction);
         }
 
         new_self
