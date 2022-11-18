@@ -1,7 +1,4 @@
-use crate::{
-    bytecode::structs::{self, chunk::Chunk},
-    MemoryStream,
-};
+use crate::{bytecode::structs::chunk::Chunk, MemoryStream};
 
 pub struct Deserializer {
     memory_stream: MemoryStream,

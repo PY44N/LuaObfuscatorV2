@@ -27,7 +27,7 @@ impl Chunk {
         };
 
         let instruction_count = memory_stream.read_int();
-        for i in 0..instruction_count {
+        for _ in 0..instruction_count {
             //TODO: Instruction size support
             let data = memory_stream.read_int32();
             let instruction = Instruction::new(data);
