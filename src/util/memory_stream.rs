@@ -1,8 +1,9 @@
 pub struct MemoryStream {
+    pub size_t_size: u8,
+    pub int_size: u8,
+
     bytes: Vec<u8>,
     position: usize,
-    size_t_size: u8,
-    int_size: u8,
 }
 
 impl MemoryStream {
@@ -41,6 +42,22 @@ impl MemoryStream {
 
     pub fn read_int64(&mut self) -> u64 {
         self.read_int32() as u64 + self.read_int32() as u64 * 2u64.pow(32)
+    }
+
+    pub fn read_int(&mut self) -> u64 {
+        if self.int_size == 4 {
+            self.read_int32() as u64
+        } else {
+            self.read_int64()
+        }
+    }
+
+    pub fn read_size_t(&mut self) -> u64 {
+        if self.size_t_size == 4 {
+            self.read_int32() as u64
+        } else {
+            self.read_int64()
+        }
     }
 
     pub fn read_double(&mut self) -> f64 {

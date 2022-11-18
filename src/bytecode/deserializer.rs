@@ -25,5 +25,32 @@ impl Deserializer {
         );
 
         assert_eq!(self.memory_stream.read_int8(), 0, "Invalid format version");
+
+        //TODO: Alternate endianess
+        // Endianess value (1 = little 0 = big)
+        assert_eq!(self.memory_stream.read_int8(), 1, "Invalid endianess value");
+
+        self.memory_stream.int_size = self.memory_stream.read_int8();
+        assert!(
+            self.memory_stream.int_size == 4 || self.memory_stream.int_size == 8,
+            "Invalid int size"
+        );
+
+        self.memory_stream.size_t_size = self.memory_stream.read_int8();
+        assert!(
+            self.memory_stream.size_t_size == 4 || self.memory_stream.size_t_size == 8,
+            "Invalid size t size"
+        );
+
+        assert_eq!(
+            self.memory_stream.read_int8(),
+            4,
+            "Invalid instruction size"
+        );
+
+        //TODO: Float (4-bit) number support
+        assert_eq!(self.memory_stream.read_int8(), 8, "Invalid lua number size");
+
+        assert_eq!(self.memory_stream.read_int8(), 0, "Invalid integral flag");
     }
 }
