@@ -1,8 +1,9 @@
 use crate::{
-    bytecode::enums::lua_type::{self, LuaType, LUA_TYPE_MAP},
+    bytecode::enums::lua_type::{LuaType, LUA_TYPE_MAP},
     util::memory_stream::MemoryStream,
 };
 
+#[derive(Debug)]
 pub struct Constant {
     lua_type: LuaType,
     string_data: String,

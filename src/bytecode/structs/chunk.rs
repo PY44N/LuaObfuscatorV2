@@ -1,6 +1,6 @@
 use crate::util::memory_stream::MemoryStream;
 
-use super::instruction::Instruction;
+use super::{constant::Constant, instruction::Instruction};
 
 pub struct Chunk {
     pub source_name: String,
@@ -11,6 +11,7 @@ pub struct Chunk {
     pub vararg_flag: u8,
     pub max_stack_size: u8,
     pub instructions: Vec<Instruction>,
+    pub constants: Vec<Constant>,
 }
 
 impl Chunk {
@@ -24,14 +25,19 @@ impl Chunk {
             vararg_flag: memory_stream.read_int8(),
             max_stack_size: memory_stream.read_int8(),
             instructions: vec![],
+            constants: vec![],
         };
 
         let instruction_count = memory_stream.read_int();
         for _ in 0..instruction_count {
             //TODO: Instruction size support
             let data = memory_stream.read_int32();
-            let instruction = Instruction::new(data);
-            new_self.instructions.push(instruction);
+            new_self.instructions.push(Instruction::new(data));
+        }
+
+        let constant_count = memory_stream.read_int();
+        for _ in 0..constant_count {
+            new_self.constants.push(Constant::new(memory_stream));
         }
 
         new_self
