@@ -1,4 +1,4 @@
-use crate::{bytecode::enums::opcode_type::OPCODE_TYPE_MAP, util::memory_stream::MemoryStream};
+use crate::{bytecode::enums::opcode_map::OPCODE_MAP, util::memory_stream::MemoryStream};
 
 use super::{constant::Constant, instruction::Instruction, local::Local, opcode::Opcode};
 
@@ -40,8 +40,10 @@ impl Chunk {
         for _ in 0..instruction_count {
             //TODO: Instruction size support
             let data = memory_stream.read_int32();
-            let opcode_type = OPCODE_TYPE_MAP[(data & 0x3f) as usize];
-            // new_self.instructions.push();
+            let instruction = Instruction::new(data);
+            new_self
+                .instructions
+                .push(OPCODE_MAP[instruction.opcode_number as usize](instruction))
         }
 
         let constant_count = memory_stream.read_int();
