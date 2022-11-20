@@ -3,8 +3,6 @@ use crate::bytecode::enums::{
     opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
 };
 
-use super::opcodes::{opcode_strings, opcode_validation};
-
 pub struct Instruction {
     pub data: u32,
     pub opcode: OpcodeType,
@@ -36,13 +34,5 @@ impl Instruction {
         }
 
         new_self
-    }
-
-    pub fn get_obfuscated(&self) -> String {
-        opcode_strings::get_obfuscated(self)
-    }
-
-    pub fn is_valid(&self) -> bool {
-        opcode_validation::is_valid_opcode(self)
     }
 }

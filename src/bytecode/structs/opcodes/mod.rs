@@ -1,2 +1,1 @@
-pub mod opcode_strings;
-pub mod opcode_validation;
+pub mod op_move;

@@ -1,6 +1,6 @@
-use crate::util::memory_stream::MemoryStream;
+use crate::{bytecode::enums::opcode_type::OPCODE_TYPE_MAP, util::memory_stream::MemoryStream};
 
-use super::{constant::Constant, instruction::Instruction, local::Local};
+use super::{constant::Constant, instruction::Instruction, local::Local, opcode::Opcode};
 
 pub struct Chunk {
     pub source_name: String,
@@ -10,7 +10,7 @@ pub struct Chunk {
     pub parameter_count: u8,
     pub vararg_flag: u8,
     pub max_stack_size: u8,
-    pub instructions: Vec<Instruction>,
+    pub instructions: Vec<Box<dyn Opcode>>,
     pub constants: Vec<Constant>,
     pub protos: Vec<Chunk>,
     pub source_lines: Vec<u64>,
@@ -40,7 +40,8 @@ impl Chunk {
         for _ in 0..instruction_count {
             //TODO: Instruction size support
             let data = memory_stream.read_int32();
-            new_self.instructions.push(Instruction::new(data));
+            let opcode_type = OPCODE_TYPE_MAP[(data & 0x3f) as usize];
+            // new_self.instructions.push();
         }
 
         let constant_count = memory_stream.read_int();
