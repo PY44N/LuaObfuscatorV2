@@ -3,6 +3,7 @@ use crate::bytecode::enums::{
     opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
 };
 
+#[derive(Debug)]
 pub struct Instruction {
     pub data: u32,
     pub opcode_number: u32,
