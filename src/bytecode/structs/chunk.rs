@@ -12,6 +12,7 @@ pub struct Chunk {
     pub max_stack_size: u8,
     pub instructions: Vec<Instruction>,
     pub constants: Vec<Constant>,
+    pub protos: Vec<Chunk>,
 }
 
 impl Chunk {
@@ -26,6 +27,7 @@ impl Chunk {
             max_stack_size: memory_stream.read_int8(),
             instructions: vec![],
             constants: vec![],
+            protos: vec![],
         };
 
         let instruction_count = memory_stream.read_int();
@@ -38,6 +40,11 @@ impl Chunk {
         let constant_count = memory_stream.read_int();
         for _ in 0..constant_count {
             new_self.constants.push(Constant::new(memory_stream));
+        }
+
+        let proto_count = memory_stream.read_int();
+        for _ in 0..proto_count {
+            new_self.protos.push(Chunk::new(memory_stream));
         }
 
         new_self
