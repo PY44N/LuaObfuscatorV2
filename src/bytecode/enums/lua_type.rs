@@ -2,7 +2,7 @@
 pub enum LuaType {
     NIL,
     BOOLEAN,
-    INVALID,
+    INVALID, //Who decided that this was a good idea?
     NUMBER,
     STRING,
 }

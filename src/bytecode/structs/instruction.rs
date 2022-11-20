@@ -27,7 +27,7 @@ impl Instruction {
         };
 
         new_self.data_b = match new_self.instruction_type {
-            InstructionType::ABC => ((data as i128) >> 23) & 0x1ff,
+            InstructionType::ABC => ((data as i128) >> 23) & 0x1ff, //What idiot decided that this should be a thing? I spent way too long with the registers flipped because some imbecile twenty years ago decided that C should come before B
             InstructionType::ABx => ((data as i128) >> 14) & 0x3ffff,
             InstructionType::AsBx => (((data as i128) >> 14) & 0x3ffff) - 131071,
         };
