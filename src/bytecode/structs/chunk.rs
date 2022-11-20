@@ -71,7 +71,7 @@ impl Chunk {
             new_self.upvalues.push(memory_stream.read_string());
         }
 
-        for v in new_self.instructions {}
+        for v in &new_self.instructions {}
 
         new_self
     }

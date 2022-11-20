@@ -11,6 +11,10 @@ impl OpSetGlobal {
 }
 
 impl Opcode for OpSetGlobal {
+    fn get_instruction(&self) -> &Instruction {
+        &self.instruction
+    }
+
     fn get_obfuscated(&self) -> String {
         todo!()
     }

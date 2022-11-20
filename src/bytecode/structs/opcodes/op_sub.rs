@@ -11,6 +11,10 @@ impl OpSub {
 }
 
 impl Opcode for OpSub {
+    fn get_instruction(&self) -> &Instruction {
+        &self.instruction
+    }
+
     fn get_obfuscated(&self) -> String {
         todo!()
     }

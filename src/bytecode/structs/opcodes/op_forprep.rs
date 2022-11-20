@@ -11,6 +11,10 @@ impl OpForPrep {
 }
 
 impl Opcode for OpForPrep {
+    fn get_instruction(&self) -> &Instruction {
+        &self.instruction
+    }
+
     fn get_obfuscated(&self) -> String {
         todo!()
     }

@@ -11,6 +11,10 @@ impl OpConcat {
 }
 
 impl Opcode for OpConcat {
+    fn get_instruction(&self) -> &Instruction {
+        &self.instruction
+    }
+
     fn get_obfuscated(&self) -> String {
         todo!()
     }

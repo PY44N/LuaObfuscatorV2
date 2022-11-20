@@ -11,6 +11,10 @@ impl OpLoadConst {
 }
 
 impl Opcode for OpLoadConst {
+    fn get_instruction(&self) -> &Instruction {
+        &self.instruction
+    }
+
     fn get_obfuscated(&self) -> String {
         todo!()
     }

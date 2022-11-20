@@ -11,6 +11,10 @@ impl OpForLoop {
 }
 
 impl Opcode for OpForLoop {
+    fn get_instruction(&self) -> &Instruction {
+        &self.instruction
+    }
+
     fn get_obfuscated(&self) -> String {
         todo!()
     }

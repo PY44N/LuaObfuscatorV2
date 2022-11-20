@@ -11,6 +11,10 @@ impl OpGetUpval {
 }
 
 impl Opcode for OpGetUpval {
+    fn get_instruction(&self) -> &Instruction {
+        &self.instruction
+    }
+
     fn get_obfuscated(&self) -> String {
         todo!()
     }
