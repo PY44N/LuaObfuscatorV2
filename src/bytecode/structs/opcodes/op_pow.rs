@@ -1,27 +1,12 @@
-use crate::bytecode::{
-    enums::{instruction_type::InstructionType, opcode_type::OpcodeType},
-    structs::{instruction::Instruction, opcode::Opcode},
-};
+use crate::bytecode::structs::{instruction::Instruction, opcode::Opcode};
 
 pub struct OpPow {
-    pub data: u32,
-    pub opcode: OpcodeType,
-    pub instruction_type: InstructionType,
-    pub data_a: u8,
-    pub data_b: i128,
-    pub data_c: i64,
+    instruction: Instruction,
 }
 
 impl OpPow {
     pub fn new(instruction: Instruction) -> Self {
-        Self {
-            data: instruction.data,
-            opcode: instruction.opcode,
-            instruction_type: instruction.instruction_type,
-            data_a: instruction.data_a,
-            data_b: instruction.data_b,
-            data_c: instruction.data_c,
-        }
+        Self { instruction }
     }
 }
 

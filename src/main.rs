@@ -38,5 +38,5 @@ fn main() {
     reader.read_to_end(&mut buffer).unwrap();
 
     let mut deserializer = Deserializer::new(buffer);
-    deserializer.deserialize();
+    let main_chunk = deserializer.deserialize();
 }

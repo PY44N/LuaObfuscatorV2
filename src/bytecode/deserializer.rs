@@ -11,7 +11,7 @@ impl Deserializer {
         }
     }
 
-    pub fn deserialize(&mut self) {
+    pub fn deserialize(&mut self) -> Chunk {
         assert_eq!(
             self.memory_stream.read_string_length(4),
             String::from_utf8(vec![27]).unwrap() + "Lua",
@@ -53,7 +53,6 @@ impl Deserializer {
 
         assert_eq!(self.memory_stream.read_int8(), 0, "Invalid integral flag");
 
-        let chunk = Chunk::new(&mut self.memory_stream);
-        println!("{}", chunk.source_name);
+        Chunk::new(&mut self.memory_stream)
     }
 }
