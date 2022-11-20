@@ -5,7 +5,7 @@ use crate::bytecode::enums::{
 
 pub struct Instruction {
     pub data: u32,
-    pub opcode: OpcodeType,
+    pub opcode_type: OpcodeType,
     pub instruction_type: InstructionType,
     pub data_a: u8,
     pub data_b: i128,
@@ -16,7 +16,7 @@ impl Instruction {
     pub fn new(data: u32) -> Self {
         let mut new_self = Self {
             data,
-            opcode: OPCODE_TYPE_MAP[(data & 0x3f) as usize],
+            opcode_type: OPCODE_TYPE_MAP[(data & 0x3f) as usize],
             instruction_type: INSTRUCTION_TYPE_MAP[(data & 0x3f) as usize],
             data_a: ((data >> 6) & 0xff) as u8,
             data_b: -1,
