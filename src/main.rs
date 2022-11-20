@@ -5,11 +5,13 @@ use std::{
     process::Command,
 };
 
+use obfuscator::vm_generator::VMGenerator;
 use util::memory_stream::MemoryStream;
 
 use crate::bytecode::deserializer::Deserializer;
 
 pub mod bytecode;
+pub mod obfuscator;
 pub mod util;
 
 fn main() {
@@ -39,4 +41,7 @@ fn main() {
 
     let mut deserializer = Deserializer::new(buffer);
     let main_chunk = deserializer.deserialize();
+
+    let vm_generator = VMGenerator::new();
+    vm_generator.generate(main_chunk);
 }
