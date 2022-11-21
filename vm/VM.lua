@@ -2,7 +2,7 @@
     VM Stuff
 
     TODO: Add junk registers between real ones
-    TODO: Remove all the Opcode values in the instruction (put instruction index with the registers in numbered values)
+    TODO: Remove all the named values in the chunk (put randomized index for everything)
 ]]
 
 local chunkData = {
@@ -60,6 +60,7 @@ local Pcall = pcall
 local Nil = nil
 local Table = table
 local Unpack = Table.unpack
+local Getfenv = getfenv
 
 local function run_chunk(chunk)
     return function(...)
@@ -88,6 +89,39 @@ local function run_chunk(chunk)
                 pointer = pointer + 1
 
                 --TODO: Implement all of the instructions
+                local instructionImplementations = {
+                    [0] = function() -- Move
+                        stack[instructionData[1]] = stack[instructionData[2]]
+                    end,
+                    [1] = function() -- LoadConst
+                        stack[instructionData[1]] = chunk.Constants[instructionData[2]]
+                    end,
+                    [2] = function() -- LoadBool
+                        stack[instructionData[1]] = instructionData[2] ~= 0
+
+                        if instructionData[3] ~= 0 then
+                            pointer = pointer + 1
+                        end
+                    end,
+                    [3] = function() -- LoadNil 
+                        for i = instructionData[1], instructionData[2] do
+                            stack[i] = nil
+                        end
+                    end,
+                    [4] = function() -- GetUpval
+                        stack[instructionData[1]] = upvalues[instructionData[2]]
+                    end,
+                    [5] = function() -- GetGlobal
+                        stack[instructionData[1]] = Getfenv(0)[chunk.Constants[instructionData[2]]]
+                    end
+                }
+
+                local returnValue = instructionImplementations[instructionData.Opcode]()
+                
+                -- Handle the stupid cases where it returns something
+                if returnValue ~= Nil then
+                    return returnValue
+                end
             end
         end
 
