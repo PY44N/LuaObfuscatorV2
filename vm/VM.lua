@@ -89,6 +89,7 @@ local function run_chunk(chunk)
                 pointer = pointer + 1
 
                 --TODO: Implement all of the instructions
+                --?: Does checking if register is greater than 256 actually check for register or constant?
                 local instructionImplementations = {
                     [0] = function() -- Move
                         stack[instructionData[1]] = stack[instructionData[2]]
@@ -113,6 +114,24 @@ local function run_chunk(chunk)
                     end,
                     [5] = function() -- GetGlobal
                         stack[instructionData[1]] = Getfenv(0)[chunk.Constants[instructionData[2]]]
+                    end,
+                    [6] = function() -- GetTable
+                        local idx = instructionData[3] > 256 and instructionData[3] - 256 or stack[instructionData[3]]
+                        stack[instructionData[1]] = stack[instructionData[2]][idx]
+                    end,
+                    [7] = function() -- SetGlobal
+                        Getfenv(0)[chunk.Constants[instructionData[2]]] = stack[instructionData[1]]
+                    end,
+                    [8] = function() -- SetUpval
+                        upvalues[instructionData[2]] = stack[instructionData[1]]
+                    end,
+                    [9] = function() -- SetTable
+                        local b = instructionData[2] > 256 and instructionData[2] - 256 or stack[instructionData[2]]
+                        local c = instructionData[3] > 256 and instructionData[3] - 256 or stack[instructionData[3]]
+                        stack[instructionData[1]][b] = c
+                    end,
+                    [10] = function() -- NewTable
+                        stack[instructionData[1]] = {}
                     end
                 }
 
