@@ -833,5 +833,4 @@ end
 
 local Buffer	= GetMeaning(read_file("luac.out"));
 
-print_table(Buffer)
-
+Wrap(Buffer, getfenv(0))()
