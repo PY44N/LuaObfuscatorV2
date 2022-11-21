@@ -83,13 +83,20 @@ local function run_chunk(chunk)
 			end;
 		});
 
+        local function registerOrConstant(register)
+            --?: Does checking if register is greater than 256 actually check for register or constant?
+            if register >= 256 then
+                return register - 256
+            end
+            return stack[register]
+        end
+
         local function loop()
             while true do
                 local instructionData = chunk.Instructions[pointer]
                 pointer = pointer + 1
 
                 --TODO: Implement all of the instructions
-                --?: Does checking if register is greater than 256 actually check for register or constant?
                 local instructionImplementations = {
                     [0] = function() -- Move
                         stack[instructionData[1]] = stack[instructionData[2]]
@@ -116,8 +123,7 @@ local function run_chunk(chunk)
                         stack[instructionData[1]] = Getfenv(0)[chunk.Constants[instructionData[2]]]
                     end,
                     [6] = function() -- GetTable
-                        local idx = instructionData[3] > 256 and instructionData[3] - 256 or stack[instructionData[3]]
-                        stack[instructionData[1]] = stack[instructionData[2]][idx]
+                        stack[instructionData[1]] = stack[instructionData[2]][registerOrConstant(instructionData[3])]
                     end,
                     [7] = function() -- SetGlobal
                         Getfenv(0)[chunk.Constants[instructionData[2]]] = stack[instructionData[1]]
@@ -126,12 +132,38 @@ local function run_chunk(chunk)
                         upvalues[instructionData[2]] = stack[instructionData[1]]
                     end,
                     [9] = function() -- SetTable
-                        local b = instructionData[2] > 256 and instructionData[2] - 256 or stack[instructionData[2]]
-                        local c = instructionData[3] > 256 and instructionData[3] - 256 or stack[instructionData[3]]
-                        stack[instructionData[1]][b] = c
+                        stack[instructionData[1]][registerOrConstant(instructionData[2])] = registerOrConstant(instructionData[3])
                     end,
                     [10] = function() -- NewTable
                         stack[instructionData[1]] = {}
+                    end,
+                    [11] = function() -- Self
+                        stack[instructionData[1] + 1] = stack[instructionData[2]]
+                        stack[instructionData[1]] = stack[instructionData[2]][registerOrConstant(instructionData[3])]
+                    end,
+                    [12] = function() -- Add
+                        stack[instructionData[1]] = registerOrConstant(instructionData[2]) + registerOrConstant(instructionData[3])
+                    end,
+                    [13] = function() -- Sub
+                        stack[instructionData[1]] = registerOrConstant(instructionData[2]) - registerOrConstant(instructionData[3])
+                    end,
+                    [14] = function() -- Mul
+                        stack[instructionData[1]] = registerOrConstant(instructionData[2]) * registerOrConstant(instructionData[3])
+                    end,
+                    [15] = function() -- Div
+                        stack[instructionData[1]] = registerOrConstant(instructionData[2]) / registerOrConstant(instructionData[3])
+                    end,
+                    [16] = function() -- Mod
+                        stack[instructionData[1]] = registerOrConstant(instructionData[2]) % registerOrConstant(instructionData[3])
+                    end,
+                    [17] = function() -- Pow
+                        stack[instructionData[1]] = registerOrConstant(instructionData[2]) ^ registerOrConstant(instructionData[3])
+                    end,
+                    [18] = function() -- Unm
+                        stack[instructionData[1]] = -stack[instructionData[2]]
+                    end,
+                    [19] = function() -- Not
+                        stack[instructionData[1]] = not stack[instructionData[2]]
                     end
                 }
 
