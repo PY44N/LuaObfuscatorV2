@@ -197,6 +197,23 @@ local function run_chunk(chunk)
                         if (instructionData[3] == 0 and stack[instructionData[1]]) or ((not instructionData[3]) and (not stack[instructionData[1]])) then
                             pointer = pointer + 1
                         end
+                    end,
+                    [27] = function() -- TestSet
+                        --?: Does this work
+                        if instructionData[3] then 
+                            if stack[instructionData[2]] then
+                                InstrPoint = InstrPoint + 1;
+                            else 
+                                stack[instructionData[1]] = stack[instructionData[2]]
+                            end
+                        elseif stack[instructionData[2]] then
+                            stack[instructionData[1]] = stack[instructionData[2]]
+                        else 
+                            InstrPoint = InstrPoint + 1;
+                        end
+                    end,
+                    [28] = function() -- Call
+                        
                     end
                 }
 
