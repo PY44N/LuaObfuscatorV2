@@ -191,6 +191,12 @@ local function run_chunk(chunk)
                         if (registerOrConstant(instructionData[2]) <= registerOrConstant(instructionData[3])) ~= instructionData[1] then
                             pointer = pointer + 1
                         end
+                    end,
+                    [26] = function() -- Test
+                        -- ?: Does this work?
+                        if (instructionData[3] == 0 and stack[instructionData[1]]) or ((not instructionData[3]) and (not stack[instructionData[1]])) then
+                            pointer = pointer + 1
+                        end
                     end
                 }
 
