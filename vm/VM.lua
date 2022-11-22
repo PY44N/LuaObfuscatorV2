@@ -164,6 +164,33 @@ local function run_chunk(chunk)
                     end,
                     [19] = function() -- Not
                         stack[instructionData[1]] = not stack[instructionData[2]]
+                    end,
+                    [20] = function() -- Len
+                        stack[instructionData[1]] = #stack[instructionData[2]]
+                    end,
+                    [21] = function() -- Concat
+                        stack[instructionData[1]] = stack[instructionData[2]]
+                        for i = instructionData[2] + 1, instructionData[3] do
+                            stack[instructionData[1]] = stack[instructionData[1]] .. stack[i]
+                        end
+                    end,
+                    [22] = function() -- Jmp
+                        pointer = pointer + instructionData[2]
+                    end,
+                    [23] = function() -- Eq
+                        if (registerOrConstant(instructionData[2]) == registerOrConstant(instructionData[3])) ~= instructionData[1] then
+                            pointer = pointer + 1
+                        end
+                    end,
+                    [24] = function() -- Lt
+                        if (registerOrConstant(instructionData[2]) < registerOrConstant(instructionData[3])) ~= instructionData[1] then
+                            pointer = pointer + 1
+                        end
+                    end,
+                    [25] = function() -- Le
+                        if (registerOrConstant(instructionData[2]) <= registerOrConstant(instructionData[3])) ~= instructionData[1] then
+                            pointer = pointer + 1
+                        end
                     end
                 }
 
