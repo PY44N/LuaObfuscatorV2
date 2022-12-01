@@ -1,16 +1,80 @@
-local Bit = bit or bit32 or require('bit')
-local BitAnd = Bit.band
-local BitRShift = Bit.rshift
-local BitLShift = Bit.lshift
 local String = string
 local StringChar = String.char
 local Select = select
 local Table = table
+local Math = math
 local TableCreate = function(...) return {} end
 local TableUnpack = Table.unpack or unpack
 local TablePack = function(...) return {n = Select(StringChar(35), ...), ...} end
 local TableMove = function(src, first, last, offset, dst) for i = 0, last - first do dst[offset + i] = src[first + i] end end
+local TableConcat = Table.concat
 local Getfenv = getfenv
+local MathFloor = Math.floor
+local MathMax = Math.max
+local Tonumber = tonumber
+local BitAnd, BitRShift, BitLShift = (function()	
+	local function tobittable_r(x, ...)
+		if (x or 0) == 0 then return ... end
+		return tobittable_r(MathFloor(x/2), x%2, ...)
+	end
+	
+	local function tobittable(x)
+		if x == 0 then return { 0 } end
+		return { tobittable_r(x) }
+	end
+	
+	local function makeop(cond)
+		local function oper(x, y, ...)
+			if not y then return x end
+			x, y = tobittable(x), tobittable(y)
+			local xl, yl = #x, #y
+			local t, tl = { }, MathMax(xl, yl)
+			for i = 0, tl-1 do
+				local b1, b2 = x[xl-i], y[yl-i]
+				if not (b1 or b2) then break end
+				t[tl-i] = (cond((b1 or 0) ~= 0, (b2 or 0) ~= 0)
+						and 1 or 0)
+			end
+			return oper(Tonumber(TableConcat(t), 2), ...)
+		end
+		return oper
+	end
+	
+	---
+	-- Perform bitwise AND of several numbers.
+	-- Truth table:
+	--   band(0,0) -> 0,
+	--   band(0,1) -> 0,
+	--   band(1,0) -> 0,
+	--   band(1,1) -> 1.
+	-- @class function
+	-- @name band
+	-- @param ...  Numbers.
+	-- @return  A number.
+	local band = makeop(function(a, b) return a and b end)
+	
+	---
+	-- Shift a number's bits to the left.
+	-- Roughly equivalent to (x * (2^bits)).
+	-- @param x  The number to shift (number).
+	-- @param bits  Number of positions to shift by (number).
+	-- @return  A number.
+	local function blshift(x, bits)
+		return MathFloor(x) * (2^bits)
+	end
+	
+	---
+	-- Shift a number's bits to the right.
+	-- Roughly equivalent to (x / (2^bits)).
+	-- @param x  The number to shift (number).
+	-- @param bits  Number of positions to shift by (number).
+	-- @return  A number.
+	local function brshift(x, bits)
+		return MathFloor(MathFloor(x) / (2^bits))
+	end
+	
+	return band, brshift, blshift
+end)() 
 
 local lua_bc_to_state
 local lua_wrap_state
