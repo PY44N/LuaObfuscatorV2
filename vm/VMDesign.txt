@@ -1,8 +1,0 @@
-- Constants and instructions randomly ordered in the bytecode (vm changes to properly run it)
-- Lua Number is double
-- Everything is little endian
-- The whole bytecode string is encrypted with a key using one encryption method
-- Everything is individually encrypted with another key using a more secure encryption method
-- Instructions and Constants are encrypted with their own key and a more secure encryption method
-- Encryption keys are stored in random places throughout the obfuscated code
-- Garbage keys are thrown in randomly
