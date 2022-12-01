@@ -1,1 +1,2 @@
-pub mod memory_stream;
+pub mod read_stream;
+pub mod write_stream;

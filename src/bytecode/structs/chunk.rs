@@ -1,4 +1,4 @@
-use crate::{bytecode::enums::opcode_map::OPCODE_MAP, util::memory_stream::MemoryStream};
+use crate::{bytecode::enums::opcode_map::OPCODE_MAP, util::read_stream::ReadStream};
 
 use super::{constant::Constant, instruction::Instruction, local::Local, opcode::Opcode};
 
@@ -19,7 +19,7 @@ pub struct Chunk {
 }
 
 impl Chunk {
-    pub fn new(memory_stream: &mut MemoryStream) -> Self {
+    pub fn new(memory_stream: &mut ReadStream) -> Self {
         let mut new_self = Self {
             source_name: memory_stream.read_string(),
             line_defined: memory_stream.read_int(),

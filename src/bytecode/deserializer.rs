@@ -1,13 +1,13 @@
-use crate::{bytecode::structs::chunk::Chunk, MemoryStream};
+use crate::{bytecode::structs::chunk::Chunk, ReadStream};
 
 pub struct Deserializer {
-    memory_stream: MemoryStream,
+    memory_stream: ReadStream,
 }
 
 impl Deserializer {
     pub fn new(bytes: Vec<u8>) -> Self {
         Self {
-            memory_stream: MemoryStream::new(bytes),
+            memory_stream: ReadStream::new(bytes),
         }
     }
 

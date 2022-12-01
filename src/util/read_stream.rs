@@ -1,4 +1,4 @@
-pub struct MemoryStream {
+pub struct ReadStream {
     pub size_t_size: u8,
     pub int_size: u8,
 
@@ -6,7 +6,7 @@ pub struct MemoryStream {
     position: usize,
 }
 
-impl MemoryStream {
+impl ReadStream {
     pub fn new(bytes: Vec<u8>) -> Self {
         Self {
             bytes,

@@ -6,7 +6,7 @@ use std::{
 };
 
 use obfuscator::vm_generator::VMGenerator;
-use util::memory_stream::MemoryStream;
+use util::{read_stream::ReadStream, write_stream::WriteStream};
 
 use crate::bytecode::deserializer::Deserializer;
 

@@ -1,6 +1,6 @@
 use crate::{
     bytecode::enums::lua_type::{LuaType, LUA_TYPE_MAP},
-    util::memory_stream::MemoryStream,
+    util::read_stream::ReadStream,
 };
 
 #[derive(Debug)]
@@ -12,7 +12,7 @@ pub struct Constant {
 }
 
 impl Constant {
-    pub fn new(memory_stream: &mut MemoryStream) -> Self {
+    pub fn new(memory_stream: &mut ReadStream) -> Self {
         let mut new_self = Self {
             lua_type: LUA_TYPE_MAP[memory_stream.read_int8() as usize],
             string_data: String::from(""),

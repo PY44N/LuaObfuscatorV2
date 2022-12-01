@@ -1,4 +1,4 @@
-use crate::util::memory_stream::MemoryStream;
+use crate::util::read_stream::ReadStream;
 
 pub struct Local {
     pub name: String,
@@ -7,7 +7,7 @@ pub struct Local {
 }
 
 impl Local {
-    pub fn new(memory_stream: &mut MemoryStream) -> Self {
+    pub fn new(memory_stream: &mut ReadStream) -> Self {
         Self {
             name: memory_stream.read_string(),
             start: memory_stream.read_int(),
