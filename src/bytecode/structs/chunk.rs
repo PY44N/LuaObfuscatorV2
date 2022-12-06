@@ -1,4 +1,7 @@
-use crate::{bytecode::enums::opcode_map::OPCODE_MAP, util::read_stream::ReadStream};
+use crate::{
+    bytecode::enums::opcode_map::OPCODE_MAP,
+    util::{read_stream::ReadStream, write_stream::WriteStream},
+};
 
 use super::{constant::Constant, instruction::Instruction, local::Local, opcode::Opcode};
 
@@ -72,5 +75,11 @@ impl Chunk {
         }
 
         new_self
+    }
+
+    pub fn serialize(&self, write_stream: &mut WriteStream) -> Vec<u8> {
+        println!("{}", self.source_name);
+
+        vec![]
     }
 }
