@@ -3,13 +3,13 @@ use crate::{
         instruction_type::{InstructionType, INSTRUCTION_TYPE_MAP},
         opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
     },
+    obfuscator::obfuscation_context::ObfuscationContext,
     util::write_stream::{self, WriteStream},
 };
 
 #[derive(Debug)]
 pub struct Instruction {
     pub data: u32,
-    pub opcode_number: u32,
     pub opcode: OpcodeType,
     pub instruction_type: InstructionType,
     pub data_a: u8,
@@ -21,7 +21,6 @@ impl Instruction {
     pub fn new(data: u32) -> Self {
         let mut new_self = Self {
             data,
-            opcode_number: data & 0x3f,
             opcode: OPCODE_TYPE_MAP[(data & 0x3f) as usize],
             instruction_type: INSTRUCTION_TYPE_MAP[(data & 0x3f) as usize],
             data_a: ((data >> 6) & 0xff) as u8,
@@ -40,5 +39,31 @@ impl Instruction {
         }
 
         new_self
+    }
+
+    pub fn serialize(
+        &self,
+        write_stream: &mut WriteStream,
+        obfuscation_context: &ObfuscationContext,
+    ) {
+        let opcode_num = obfuscation_context
+            .opcode_map
+            .iter()
+            .position(|&v| v == self.opcode)
+            .unwrap();
+
+        //There is a 100% chance I screwed something up in this mess
+        let mut serialized: u64 = 0;
+        serialized |= self.data_c as u64;
+        serialized |= (self.data_b as u64) << 19;
+        serialized |= (self.data_a as u64) << 38;
+        serialized |= (opcode_num as u64) << 57;
+        serialized |= if self.instruction_type == InstructionType::AsBx {
+            1 << 63
+        } else {
+            0
+        };
+
+        write_stream.write_int64(serialized);
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    bytecode::enums::opcode_map::OPCODE_MAP,
+    bytecode::enums::{opcode_map::OPCODE_MAP, opcode_type::OPCODE_TYPE_MAP},
     obfuscator::obfuscation_context::{self, ObfuscationContext},
     util::{read_stream::ReadStream, write_stream::WriteStream},
 };
@@ -45,9 +45,10 @@ impl Chunk {
             //TODO: Instruction size support
             let data = memory_stream.read_int32();
             let instruction = Instruction::new(data);
-            new_self
-                .instructions
-                .push(OPCODE_MAP[instruction.opcode_number as usize](instruction))
+            new_self.instructions.push(OPCODE_MAP[OPCODE_TYPE_MAP
+                .into_iter()
+                .position(|v| v == instruction.opcode)
+                .unwrap() as usize](instruction))
         }
 
         let constant_count = memory_stream.read_int();
@@ -87,6 +88,13 @@ impl Chunk {
         write_stream.write_int64(self.constants.len() as u64);
         for constant in &self.constants {
             constant.serialize(write_stream, obfuscation_context);
+        }
+
+        write_stream.write_int64(self.instructions.len() as u64);
+        for instruction in &self.instructions {
+            instruction
+                .get_instruction()
+                .serialize(write_stream, obfuscation_context);
         }
     }
 }
