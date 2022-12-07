@@ -53,17 +53,24 @@ impl Instruction {
             .unwrap();
 
         //There is a 100% chance I screwed something up in this mess
-        let mut serialized: u64 = 0;
-        serialized |= self.data_c as u64;
-        serialized |= (self.data_b as u64) << 19;
-        serialized |= (self.data_a as u64) << 38;
-        serialized |= (opcode_num as u64) << 57;
-        serialized |= if self.instruction_type == InstructionType::AsBx {
-            1 << 63
-        } else {
-            0
+        let mut instruction_data: u16 = 0;
+        instruction_data |= ((opcode_num as u16) & 0x3f) << 3;
+        instruction_data |= match self.instruction_type {
+            InstructionType::ABC => 0b01,
+            InstructionType::ABx => 0b10,
+            InstructionType::AsBx => 0b11,
         };
 
-        write_stream.write_int64(serialized);
+        write_stream.write_int16(instruction_data);
+        write_stream.write_int8(self.data_a);
+
+        match self.instruction_type {
+            InstructionType::ABC => {
+                write_stream.write_int16(self.data_b as u16);
+                write_stream.write_int16(self.data_c as u16);
+            }
+            InstructionType::ABx => write_stream.write_int32(self.data_b as u32),
+            InstructionType::AsBx => write_stream.write_int32((self.data_b + 131071) as u32),
+        }
     }
 }
