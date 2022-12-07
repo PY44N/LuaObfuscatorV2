@@ -1,5 +1,6 @@
 use crate::{
     bytecode::enums::opcode_map::OPCODE_MAP,
+    obfuscator::obfuscation_context::{self, ObfuscationContext},
     util::{read_stream::ReadStream, write_stream::WriteStream},
 };
 
@@ -77,9 +78,15 @@ impl Chunk {
         new_self
     }
 
-    pub fn serialize(&self, write_stream: &mut WriteStream) -> Vec<u8> {
-        println!("{}", self.source_name);
-
-        vec![]
+    pub fn serialize(
+        &self,
+        write_stream: &mut WriteStream,
+        obfuscation_context: &ObfuscationContext,
+    ) {
+        //TODO: Serialize debug info
+        write_stream.write_int64(self.constants.len() as u64);
+        for constant in &self.constants {
+            constant.serialize(write_stream, obfuscation_context);
+        }
     }
 }

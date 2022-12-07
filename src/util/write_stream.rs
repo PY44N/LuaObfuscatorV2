@@ -1,5 +1,5 @@
 pub struct WriteStream {
-    bytes: Vec<u8>,
+    pub bytes: Vec<u8>,
 }
 
 impl WriteStream {

@@ -1,6 +1,9 @@
-use crate::bytecode::enums::{
-    instruction_type::{InstructionType, INSTRUCTION_TYPE_MAP},
-    opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
+use crate::{
+    bytecode::enums::{
+        instruction_type::{InstructionType, INSTRUCTION_TYPE_MAP},
+        opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
+    },
+    util::write_stream::{self, WriteStream},
 };
 
 #[derive(Debug)]

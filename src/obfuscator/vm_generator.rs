@@ -1,4 +1,7 @@
-use crate::{bytecode::structs::chunk::Chunk, obfuscator::obfuscation_context::ObfuscationContext};
+use crate::{
+    bytecode::{enums::lua_type::LuaType, structs::chunk::Chunk},
+    obfuscator::obfuscation_context::ObfuscationContext,
+};
 
 use super::serializer::Serializer;
 
@@ -10,9 +13,17 @@ impl VMGenerator {
     }
 
     pub fn generate(&self, main_chunk: Chunk) {
-        let context = ObfuscationContext { debug_info: true };
+        let obfuscation_context = ObfuscationContext {
+            debug_info: true,
+            constant_type_map: [
+                LuaType::NIL,
+                LuaType::BOOLEAN,
+                LuaType::NUMBER,
+                LuaType::STRING,
+            ],
+        };
 
-        let serializer = Serializer::new(main_chunk);
+        let serializer = Serializer::new(main_chunk, obfuscation_context);
         let bytes = serializer.serialze();
 
         println!("{:?}", bytes);

@@ -1,6 +1,7 @@
 use crate::{
     bytecode::enums::lua_type::{LuaType, LUA_TYPE_MAP},
-    util::read_stream::ReadStream,
+    obfuscator::obfuscation_context::ObfuscationContext,
+    util::{read_stream::ReadStream, write_stream::WriteStream},
 };
 
 #[derive(Debug)]
@@ -29,5 +30,19 @@ impl Constant {
         }
 
         new_self
+    }
+
+    pub fn serialize(
+        &self,
+        write_stream: &mut WriteStream,
+        obfuscation_context: &ObfuscationContext,
+    ) {
+        let type_code = obfuscation_context
+            .constant_type_map
+            .iter()
+            .position(|&v| v == self.lua_type)
+            .unwrap();
+
+        write_stream.write_int8(type_code as u8);
     }
 }
