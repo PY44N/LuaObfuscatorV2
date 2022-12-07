@@ -84,7 +84,9 @@ impl Chunk {
         write_stream: &mut WriteStream,
         obfuscation_context: &ObfuscationContext,
     ) {
-        //TODO: Serialize debug info
+        write_stream.write_int8(self.upvalue_count);
+        write_stream.write_int8(self.parameter_count);
+
         write_stream.write_int64(self.constants.len() as u64);
         for constant in &self.constants {
             constant.serialize(write_stream, obfuscation_context);
@@ -95,6 +97,11 @@ impl Chunk {
             instruction
                 .get_instruction()
                 .serialize(write_stream, obfuscation_context);
+        }
+
+        write_stream.write_int64(self.protos.len() as u64);
+        for proto in &self.protos {
+            proto.serialize(write_stream, obfuscation_context);
         }
     }
 }
