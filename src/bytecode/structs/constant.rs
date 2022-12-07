@@ -44,5 +44,13 @@ impl Constant {
             .unwrap();
 
         write_stream.write_int8(type_code as u8);
+
+        match self.lua_type {
+            LuaType::NIL => todo!(),
+            LuaType::BOOLEAN => write_stream.write_int8(if self.bool_data { 1 } else { 0 }),
+            LuaType::INVALID => todo!(),
+            LuaType::NUMBER => write_stream.write_double(self.number_data),
+            LuaType::STRING => write_stream.write_string(&self.string_data),
+        }
     }
 }

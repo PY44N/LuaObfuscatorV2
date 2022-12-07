@@ -40,7 +40,12 @@ impl WriteStream {
         self.write(&mut f64::to_le_bytes(num).to_vec());
     }
 
-    pub fn write_string(&mut self, str: &String) {
+    pub fn write_string_len(&mut self, str: &String) {
         self.write(&mut str.as_bytes().to_vec());
+    }
+
+    pub fn write_string(&mut self, str: &String) {
+        self.write_int64(str.len() as u64);
+        self.write_string_len(str);
     }
 }
