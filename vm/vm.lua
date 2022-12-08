@@ -1095,6 +1095,8 @@ local function run_lua_func(state, env, upvals)
 end
 
 function lua_wrap_state(proto, env, upval)
+	env = env or Getfenv(0)
+
 	local function wrapped(...)
 		local passed = TablePack(...)
 		local memory = TableCreate(proto.max_stack)
