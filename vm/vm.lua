@@ -93,16 +93,6 @@ local BitAnd, BitRShift, BitLShift = (function()
 	return band, brshift, blshift
 end)()
 
-if not table.unpack then table.unpack = unpack end
-
-if not table.pack then function table.pack(...) return {n = select('#', ...), ...} end end
-
-if not table.move then
-	function table.move(src, first, last, offset, dst)
-		for i = 0, last - first do dst[offset + i] = src[first + i] end
-	end
-end
-
 local lua_bc_to_state
 local lua_wrap_state
 local stm_lua_func
@@ -733,7 +723,7 @@ local function run_lua_func(state, env, upvals)
 								params = B - 1
 							end
 
-							local ret_list = table.pack(memory[A](table.unpack(memory, A + 1, A + params)))
+							local ret_list = TablePack(memory[A](TableUnpack(memory, A + 1, A + params)))
 							local ret_num = ret_list.n
 
 							if C == 0 then
@@ -742,7 +732,7 @@ local function run_lua_func(state, env, upvals)
 								ret_num = C - 1
 							end
 
-							table.move(ret_list, 1, ret_num, A, memory)
+							TableMove(ret_list, 1, ret_num, A, memory)
 						else
 							--[[SETUPVAL]]
 							local uv = upvals[inst.B]
@@ -783,7 +773,7 @@ local function run_lua_func(state, env, upvals)
 
 							close_lua_upvalues(open_list, 0)
 
-							return memory[A](table.unpack(memory, A + 1, A + params))
+							return memory[A](TableUnpack(memory, A + 1, A + params))
 						else
 							--[[SETTABLE]]
 							local index, value
@@ -868,7 +858,7 @@ local function run_lua_func(state, env, upvals)
 
 							close_lua_upvalues(open_list, 0)
 
-							return table.unpack(memory, A, A + len - 1)
+							return TableUnpack(memory, A, A + len - 1)
 						else
 							--[[CONCAT]]
 							local B = inst.B
@@ -1036,7 +1026,7 @@ local function run_lua_func(state, env, upvals)
 								top_index = A + len - 1
 							end
 
-							table.move(vararg.list, 1, len, A, memory)
+							TableMove(vararg.list, 1, len, A, memory)
 						else
 							--[[FORPREP]]
 							local A = inst.A
@@ -1069,7 +1059,7 @@ local function run_lua_func(state, env, upvals)
 
 						offset = (C - 1) * FIELDS_PER_FLUSH
 
-						table.move(memory, A + 1, A + len, offset + 1, tab)
+						TableMove(memory, A + 1, A + len, offset + 1, tab)
 					else
 						--[[NOT]]
 						memory[inst.A] = not memory[inst.B]
@@ -1086,7 +1076,7 @@ local function run_lua_func(state, env, upvals)
 
 				local vals = {memory[A](memory[A + 1], memory[A + 2])}
 
-				table.move(vals, 1, inst.C, base, memory)
+				TableMove(vals, 1, inst.C, base, memory)
 
 				if memory[base] ~= nil then
 					memory[A + 2] = memory[base]
@@ -1106,26 +1096,26 @@ end
 
 function lua_wrap_state(proto, env, upval)
 	local function wrapped(...)
-		local passed = table.pack(...)
+		local passed = TablePack(...)
 		local memory = TableCreate(proto.max_stack)
 		local vararg = {len = 0, list = {}}
 
-		table.move(passed, 1, proto.num_param, 0, memory)
+		TableMove(passed, 1, proto.num_param, 0, memory)
 
 		if proto.num_param < passed.n then
 			local start = proto.num_param + 1
 			local len = passed.n - proto.num_param
 
 			vararg.len = len
-			table.move(passed, start, start + len - 1, 1, vararg.list)
+			TableMove(passed, start, start + len - 1, 1, vararg.list)
 		end
 
 		local state = {vararg = vararg, memory = memory, code = proto.code, subs = proto.subs, pc = 1}
 
-		local result = table.pack(pcall(run_lua_func, state, env, upval))
+		local result = TablePack(pcall(run_lua_func, state, env, upval))
 
 		if result[1] then
-			return table.unpack(result, 2, result.n)
+			return TableUnpack(result, 2, result.n)
 		else
 			local failed = {pc = state.pc, source = proto.source, lines = proto.lines}
 
@@ -1148,6 +1138,6 @@ local function read_file(path)
 	return content
 end
 
-lua_wrap_state(lua_bc_to_state(read_file("luac.out")), getfenv(0))()
+lua_wrap_state(lua_bc_to_state(read_file("luac.out")))()
 
 -- return {bc_to_state = lua_bc_to_state, wrap_state = lua_wrap_state}
