@@ -1,5 +1,6 @@
 local String = string
 local StringChar = String.char
+local StringByte = String.byte
 local Select = select
 local Table = table
 local Math = math
@@ -19,6 +20,8 @@ local TableConcat = Table.concat
 local Getfenv = getfenv
 local MathFloor = Math.floor
 local MathMax = Math.max
+local Pcall = pcall
+local MathAbs = Math.abs
 local Tonumber = tonumber
 local BitAnd, BitRShift, BitLShift = (function()
 	local function tobittable_r(x, ...)
@@ -197,9 +200,9 @@ local function rd_int_basic(src, s, e, d)
 	-- end
 
 	for i = s, e, d do
-		local mul = 256 ^ math.abs(i - s)
+		local mul = 256 ^ MathAbs(i - s)
 
-		num = num + mul * string.byte(src, i, i)
+		num = num + mul * StringByte(src, i, i)
 	end
 
 	return num
@@ -905,7 +908,7 @@ local function run_lua_func(state, env, upvals)
 			local limit = memory[A + 1]
 			local loops
 
-			if step == math.abs(step) then
+			if step == MathAbs(step) then
 				loops = index <= limit
 			else
 				loops = index >= limit
@@ -919,11 +922,16 @@ local function run_lua_func(state, env, upvals)
 		elseif op == 32 then
 			--[[FORPREP]]
 			local A = inst.A
-			local init, limit, step
+			-- local init, limit, step
 
-			init = assert(tonumber(memory[A]), '`for` initial value must be a number')
-			limit = assert(tonumber(memory[A + 1]), '`for` limit must be a number')
-			step = assert(tonumber(memory[A + 2]), '`for` step must be a number')
+			-- *: Possible additional error checking
+			-- init = assert(tonumber(memory[A]), '`for` initial value must be a number')
+			-- limit = assert(tonumber(memory[A + 1]), '`for` limit must be a number')
+			-- step = assert(tonumber(memory[A + 2]), '`for` step must be a number')
+
+			local init = Tonumber(memory[A])
+			local limit = Tonumber(memory[A + 1])
+			local step = Tonumber(memory[A + 2])
 
 			memory[A] = init - step
 			memory[A + 1] = limit
@@ -1026,7 +1034,7 @@ function lua_wrap_state(proto, env, upval)
 
 		local state = {vararg = vararg, memory = memory, code = proto.code, subs = proto.subs, pc = 1}
 
-		local result = TablePack(pcall(run_lua_func, state, env, upval))
+		local result = TablePack(Pcall(run_lua_func, state, env, upval))
 
 		if result[1] then
 			return TableUnpack(result, 2, result.n)

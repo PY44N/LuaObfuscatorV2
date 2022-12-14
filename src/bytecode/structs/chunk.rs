@@ -1,6 +1,6 @@
 use crate::{
     bytecode::enums::{opcode_map::OPCODE_MAP, opcode_type::OPCODE_TYPE_MAP},
-    obfuscator::obfuscation_context::{self, ObfuscationContext},
+    obfuscator::obfuscation_context::ObfuscationContext,
     util::{read_stream::ReadStream, write_stream::WriteStream},
 };
 

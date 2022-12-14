@@ -4,7 +4,7 @@ use crate::{
         opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
     },
     obfuscator::obfuscation_context::ObfuscationContext,
-    util::write_stream::{self, WriteStream},
+    util::write_stream::WriteStream,
 };
 
 #[derive(Debug)]

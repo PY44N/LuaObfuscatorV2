@@ -1,7 +1,4 @@
-use crate::{
-    bytecode::structs::chunk::Chunk,
-    util::write_stream::{self, WriteStream},
-};
+use crate::{bytecode::structs::chunk::Chunk, util::write_stream::WriteStream};
 
 use super::obfuscation_context::ObfuscationContext;
 
