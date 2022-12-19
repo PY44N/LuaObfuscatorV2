@@ -330,7 +330,7 @@ end
 -- string stm_lstring(Stream S)
 -- @S - Stream object to read from
 local function stm_lstring(S)
-	local len = S:s_szt()
+	local len = S:int64()
 	local str
 
 	if len ~= 0 then str = string.sub(stm_string(S, len), 1, -2) end
@@ -394,7 +394,7 @@ local function stm_inst_list(S)
 end
 
 local function stm_const_list(S)
-	local len = S:s_int()
+	local len = S:int64()
 	local list = TableCreate(len)
 
 	for i = 1, len do
@@ -416,7 +416,7 @@ local function stm_const_list(S)
 end
 
 local function stm_sub_list(S, src)
-	local len = S:s_int()
+	local len = S:int64()
 	local list = TableCreate(len)
 
 	for i = 1, len do
