@@ -33,8 +33,10 @@ impl Instruction {
             data_c: -1,
         };
 
-        // TODO: Finish this
-        if CONSTANT_INSTRUCTION_MAP[new_self.opcode] == ConstantInstructionType::OpArgK {}
+        let (mode_b, mode_c) = CONSTANT_INSTRUCTION_MAP[new_self.opcode as usize];
+
+        new_self.is_constant_b = mode_b == ConstantInstructionType::OpArgK;
+        new_self.is_constant_c = mode_c == ConstantInstructionType::OpArgK;
 
         new_self.data_b = match new_self.instruction_type {
             InstructionType::ABC => ((data as i128) >> 23) & 0x1ff, //What idiot decided that this should be a thing? I spent way too long with the registers flipped because some imbecile twenty years ago decided that C should come before B

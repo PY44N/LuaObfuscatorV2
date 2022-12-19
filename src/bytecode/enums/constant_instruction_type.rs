@@ -1,3 +1,4 @@
+#[derive(Clone, Copy, PartialEq)]
 pub enum ConstantInstructionType {
     OpArgR,
     OpArgN,
