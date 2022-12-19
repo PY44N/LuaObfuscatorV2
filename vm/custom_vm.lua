@@ -202,6 +202,7 @@ local function rd_int_basic(src, s, e, d)
 	for i = s, e, d do
 		local mul = 256 ^ MathAbs(i - s)
 
+		print(num, mul, StringByte(src, i, i), i)
 		num = num + mul * StringByte(src, i, i)
 	end
 
