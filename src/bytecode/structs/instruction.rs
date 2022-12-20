@@ -62,18 +62,29 @@ impl Instruction {
             .position(|&v| v == self.opcode)
             .unwrap();
 
+        //TODO: Instruction compression thing
         //There is a 100% chance I screwed something up in this mess
-        let mut instruction_data: u16 = 0;
-        instruction_data |= ((opcode_num as u16) & 0x3f) << 4;
-        instruction_data |= (match self.instruction_type {
+        // let mut instruction_data: u16 = 0;
+        // instruction_data |= ((opcode_num as u16) & 0x3f) << 4;
+        // instruction_data |= (match self.instruction_type {
+        //     InstructionType::ABC => 0b01,
+        //     InstructionType::ABx => 0b10,
+        //     InstructionType::AsBx => 0b11,
+        // }) << 2;
+        // instruction_data |= if self.is_constant_b { 1 << 1 } else { 0 };
+        // instruction_data |= if self.is_constant_c { 1 } else { 0 };
+
+        // write_stream.write_int16(instruction_data);
+
+        write_stream.write_int8(opcode_num as u8);
+        write_stream.write_int8(match self.instruction_type {
             InstructionType::ABC => 0b01,
             InstructionType::ABx => 0b10,
             InstructionType::AsBx => 0b11,
-        }) << 2;
-        instruction_data |= if self.is_constant_b { 1 << 1 } else { 0 };
-        instruction_data |= if self.is_constant_c { 1 } else { 0 };
+        });
+        write_stream.write_int8(if self.is_constant_b { 1 } else { 0 });
+        write_stream.write_int8(if self.is_constant_c { 1 } else { 0 });
 
-        write_stream.write_int16(instruction_data);
         write_stream.write_int8(self.data_a);
 
         match self.instruction_type {

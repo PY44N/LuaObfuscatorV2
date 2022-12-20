@@ -1,0 +1,97 @@
+Pos   Hex Data           Description or Code
+------------------------------------------------------------------------
+0000                     ** source chunk: luac.out
+                         ** global header start **
+0000  1B4C7561           header signature: "\27Lua"
+0004  51                 version (major:minor hex digits)
+0005  00                 format (0=official)
+0006  01                 endianness (1=little endian)
+0007  04                 size of int (bytes)
+0008  08                 size of size_t (bytes)
+0009  04                 size of Instruction (bytes)
+000A  08                 size of number (bytes)
+000B  00                 integral (1=integral)
+                         * number type: double
+                         * chunk platform unrecognized
+                         ** global header end **
+                         
+000C                     ** function [0] definition (level 1)
+                         ** start of function **
+000C  0B00000000000000   string size (11)
+0014  40496E7075742E6C+  "@Input.l"
+001C  756100             "ua\0"
+                         source name: @Input.lua
+001F  00000000           line defined (0)
+0023  00000000           last line defined (0)
+0027  00                 nups (0)
+0028  00                 numparams (0)
+0029  02                 is_vararg (2)
+002A  04                 maxstacksize (4)
+                         * code:
+002B  0E000000           sizecode (14)
+002F  0A000001       (10)[01] newtable   0   2   0    ; array=2, hash=0
+0033  41000000        (2)[02] loadk      1   0        ; "Hello"
+0037  81400000        (2)[03] loadk      2   1        ; "world"
+003B  22400001       (34)[04] setlist    0   2   1    ; index 1 to 2
+003F  41800000        (2)[05] loadk      1   2        ; 1
+0043  94000000       (20)[06] len        2   0      
+0047  19808000       (25)[07] le         0   1   2    ; to [9] if true
+004B  16000180       (22)[08] jmp        5            ; to [14]
+004F  85C00000        (5)[09] getglobal  2   3        ; print
+0053  C6400000        (6)[10] gettable   3   0   1  
+0057  9C400001       (28)[11] call       2   2   1  
+005B  4C80C000       (12)[12] add        1   1   258  ; 1
+005F  16C0FD7F       (22)[13] jmp        -8           ; to [6]
+0063  1E008000       (30)[14] return     0   1      
+                         * constants:
+0067  04000000           sizek (4)
+006B  04                 const type 4
+006C  0600000000000000   string size (6)
+0074  48656C6C6F00       "Hello\0"
+                         const [0]: "Hello"
+007A  04                 const type 4
+007B  0600000000000000   string size (6)
+0083  776F726C6400       "world\0"
+                         const [1]: "world"
+0089  03                 const type 3
+008A  000000000000F03F   const [2]: (1)
+0092  04                 const type 4
+0093  0600000000000000   string size (6)
+009B  7072696E7400       "print\0"
+                         const [3]: "print"
+                         * functions:
+00A1  00000000           sizep (0)
+                         * lines:
+00A5  0E000000           sizelineinfo (14)
+                         [pc] (line)
+00A9  01000000           [01] (1)
+00AD  01000000           [02] (1)
+00B1  01000000           [03] (1)
+00B5  01000000           [04] (1)
+00B9  03000000           [05] (3)
+00BD  04000000           [06] (4)
+00C1  04000000           [07] (4)
+00C5  04000000           [08] (4)
+00C9  05000000           [09] (5)
+00CD  05000000           [10] (5)
+00D1  05000000           [11] (5)
+00D5  06000000           [12] (6)
+00D9  06000000           [13] (6)
+00DD  07000000           [14] (7)
+                         * locals:
+00E1  02000000           sizelocvars (2)
+00E5  0200000000000000   string size (2)
+00ED  6100               "a\0"
+                         local [0]: a
+00EF  04000000             startpc (4)
+00F3  0D000000             endpc   (13)
+00F7  0200000000000000   string size (2)
+00FF  6900               "i\0"
+                         local [1]: i
+0101  05000000             startpc (5)
+0105  0D000000             endpc   (13)
+                         * upvalues:
+0109  00000000           sizeupvalues (0)
+                         ** end of function **
+
+010D                     ** end of chunk **

@@ -1,3 +1,83 @@
+local function print_table(node)
+    local cache, stack, output = {},{},{}
+    local depth = 1
+    local output_str = "{\n"
+
+    while true do
+        local size = 0
+        for k,v in pairs(node) do
+            size = size + 1
+        end
+
+        local cur_index = 1
+        for k,v in pairs(node) do
+            if (cache[node] == nil) or (cur_index >= cache[node]) then
+
+                if (string.find(output_str,"}",output_str:len())) then
+                    output_str = output_str .. ",\n"
+                elseif not (string.find(output_str,"\n",output_str:len())) then
+                    output_str = output_str .. "\n"
+                end
+
+                -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+                table.insert(output,output_str)
+                output_str = ""
+
+                local key
+                if (type(k) == "number" or type(k) == "boolean") then
+                    key = "["..tostring(k).."]"
+                else
+                    key = "['"..tostring(k).."']"
+                end
+
+                if (type(v) == "number" or type(v) == "boolean") then
+                    output_str = output_str .. string.rep('\t',depth) .. key .. " = "..tostring(v)
+                elseif (type(v) == "table") then
+                    output_str = output_str .. string.rep('\t',depth) .. key .. " = {\n"
+                    table.insert(stack,node)
+                    table.insert(stack,v)
+                    cache[node] = cur_index+1
+                    break
+                else
+                    output_str = output_str .. string.rep('\t',depth) .. key .. " = '"..tostring(v).."'"
+                end
+
+                if (cur_index == size) then
+                    output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+                else
+                    output_str = output_str .. ","
+                end
+            else
+                -- close the table
+                if (cur_index == size) then
+                    output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+                end
+            end
+
+            cur_index = cur_index + 1
+        end
+
+        if (size == 0) then
+            output_str = output_str .. "\n" .. string.rep('\t',depth-1) .. "}"
+        end
+
+        if (#stack > 0) then
+            node = stack[#stack]
+            stack[#stack] = nil
+            depth = cache[node] == nil and depth + 1 or depth - 1
+        else
+            break
+        end
+    end
+
+    -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+    table.insert(output,output_str)
+    output_str = table.concat(output)
+
+    print(output_str)
+end
+
+
 local String = string
 local StringChar = String.char
 local StringByte = String.byte
@@ -202,7 +282,6 @@ local function rd_int_basic(src, s, e, d)
 	for i = s, e, d do
 		local mul = 256 ^ MathAbs(i - s)
 
-		print(num, mul, StringByte(src, i, i), i)
 		num = num + mul * StringByte(src, i, i)
 	end
 
@@ -368,12 +447,13 @@ local function stm_inst_list(S)
 	local len = S:int64()
 	local list = TableCreate(len)
 
+	-- FIXME: This is very broken
 	for i = 1, len do
-		local ins = S:int16()
-		local op = BitAnd(BitRShift(ins, 4), 0x3f)
-		local args = BitAnd(BitRShift(ins, 2), 3)
-		local isConstantB = BitAnd(BitRShift(ins, 1), 1)
-		local isConstantC = BitAnd(ins, 1)
+		-- local ins = S:int16()
+		local op = stm_byte(S)
+		local args = stm_byte(S)
+		local isConstantB = stm_byte(S) == 1
+		local isConstantC = stm_byte(S) == 1
 		local data = {value = ins, op = op, A = stm_byte(S)}
 
 		if args == 1 then -- ABC
@@ -387,9 +467,11 @@ local function stm_inst_list(S)
 		elseif args == 3 then -- AsBx
 			data.sBx = S:int32() - 131071
 		end
+		print_table(data)
 
 		list[i] = data
 	end
+
 
 	return list
 end
@@ -1057,7 +1139,7 @@ function lua_wrap_state(proto, env, upval)
 	return wrapped
 end
 
-local bytecode = "\11\0\0\0\0\0\0\0\64\116\101\109\112\49\46\108\117\97\0\0\0\4\4\0\0\0\0\0\0\0\3\6\0\0\0\0\0\0\0\72\101\108\108\111\0\3\6\0\0\0\0\0\0\0\119\111\114\108\100\0\2\0\0\0\0\0\0\240\63\3\6\0\0\0\0\0\0\0\112\114\105\110\116\0\14\0\0\0\0\0\0\0\164\0\0\2\0\0\0\26\0\1\0\0\0\0\26\0\2\1\0\0\0\36\2\0\2\0\1\0\26\0\1\2\0\0\0\68\1\2\0\0\0\0\151\1\0\1\0\2\0\108\1\0\4\0\2\0\90\0\2\3\0\0\0\101\0\3\0\0\1\0\196\1\2\2\0\1\0\199\0\1\1\0\2\1\108\1\0\247\255\1\0\228\1\0\1\0\0\0\0\0\0\0\0\0\0\0"
+local bytecode = "\11\0\0\0\0\0\0\0\64\116\101\109\112\49\46\108\117\97\0\0\0\4\4\0\0\0\0\0\0\0\3\6\0\0\0\0\0\0\0\72\101\108\108\111\0\3\6\0\0\0\0\0\0\0\119\111\114\108\100\0\2\0\0\0\0\0\0\240\63\3\6\0\0\0\0\0\0\0\112\114\105\110\116\0\14\0\0\0\0\0\0\0\10\1\0\0\0\2\0\0\0\1\2\1\0\1\0\0\0\0\1\2\1\0\2\1\0\0\0\34\1\0\0\0\2\0\1\0\1\2\1\0\1\2\0\0\0\20\1\0\0\2\0\0\0\0\25\1\1\1\0\1\0\2\0\22\3\0\0\0\4\0\2\0\5\2\1\0\2\3\0\0\0\6\1\0\1\3\0\0\1\0\28\1\0\0\2\2\0\1\0\12\1\1\1\1\1\0\2\1\22\3\0\0\0\247\255\1\0\30\1\0\0\0\1\0\0\0\0\0\0\0\0\0\0\0"
 
 lua_wrap_state(lua_bc_to_state(bytecode))()
 
