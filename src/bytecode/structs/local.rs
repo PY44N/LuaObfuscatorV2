@@ -1,5 +1,6 @@
 use crate::util::read_stream::ReadStream;
 
+#[derive(Debug)]
 pub struct Local {
     pub name: String,
     pub start: u64,

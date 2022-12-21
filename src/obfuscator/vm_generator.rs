@@ -69,11 +69,11 @@ impl VMGenerator {
         let serializer = Serializer::new(main_chunk, obfuscation_context);
         let bytes = serializer.serialze();
 
-        let bytecode_string: String = bytes
+        let _bytecode_string: String = bytes
             .into_iter()
             .map(|v| String::from("\\") + &v.to_string())
             .collect();
 
-        println!("{}", bytecode_string);
+        // println!("{}", bytecode_string);
     }
 }

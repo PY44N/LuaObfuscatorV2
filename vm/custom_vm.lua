@@ -454,7 +454,7 @@ local function stm_inst_list(S)
 		local args = stm_byte(S)
 		local isConstantB = stm_byte(S) == 1
 		local isConstantC = stm_byte(S) == 1
-		local data = {value = ins, op = op, A = stm_byte(S)}
+		local data = {op = op, args = args, A = stm_byte(S)}
 
 		if args == 1 then -- ABC
 			data.B = S:int16()
@@ -467,7 +467,6 @@ local function stm_inst_list(S)
 		elseif args == 3 then -- AsBx
 			data.sBx = S:int32() - 131071
 		end
-		print_table(data)
 
 		list[i] = data
 	end
@@ -548,11 +547,12 @@ function stm_lua_func(stream, psrc)
 	proto.num_upval = stm_byte(stream) -- num upvalues
 	proto.num_param = stm_byte(stream) -- num params
 
+
 	-- stm_byte(stream) -- vararg flag
 	proto.max_stack = stm_byte(stream) -- max stack size
 
-	proto.code = stm_inst_list(stream)
 	proto.const = stm_const_list(stream)
+	proto.code = stm_inst_list(stream)
 	proto.subs = stm_sub_list(stream, src)
 	-- proto.lines = stm_line_list(stream)
 

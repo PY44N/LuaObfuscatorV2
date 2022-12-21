@@ -6,6 +6,7 @@ use crate::{
 
 use super::{constant::Constant, instruction::Instruction, local::Local, opcode::Opcode};
 
+#[derive(Debug)]
 pub struct Chunk {
     pub source_name: String,
     pub line_defined: u64,

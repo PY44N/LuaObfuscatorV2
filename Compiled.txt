@@ -1,0 +1,26 @@
+Chunk { source_name: "@temp1.lua\0", line_defined: 0, last_line_defined: 0, upvalue_count: 0, parameter_count: 0, vararg_flag: 2, max_stack_size: 4, instructions: [
+    Instruction { data: 16777226, opcode: OpNewTable, instruction_type: ABC, is_constant_b: false, is_constant_c: false, data_a: 0, data_b: 2, data_c: 0 }
+    , Instruction { data: 65, opcode: OpLoadConst, instruction_type: ABx, is_constant_b: true, is_constant_c: false, data_a: 1, data_b: 0, data_c: -1 }
+    , Instruction { data: 16513, opcode: OpLoadConst, instruction_type: ABx, is_constant_b: true, is_constant_c: false, data_a: 2, data_b: 1, data_c: -1 }
+    , Instruction { data: 16793634, opcode: OpSetList, instruction_type: ABC, is_constant_b: false, is_constant_c: false, data_a: 0, data_b: 2, data_c: 1 }
+    , Instruction { data: 32833, opcode: OpLoadConst, instruction_type: ABx, is_constant_b: true, is_constant_c: false, data_a: 1, data_b: 2, data_c: -1 }
+    , Instruction { data: 148, opcode: OpLen, instruction_type: ABC, is_constant_b: false, is_constant_c: false, data_a: 2, data_b: 0, data_c: 0 }
+    , Instruction { data: 8421401, opcode: OpLe, instruction_type: ABC, is_constant_b: true, is_constant_c: true, data_a: 0, data_b: 1, data_c: 2 }
+    , Instruction { data: 2147549206, opcode: OpJmp, instruction_type: AsBx, is_constant_b: false, is_constant_c: false, data_a: 0, data_b: 5, data_c: -1 }
+    , Instruction { data: 49285, opcode: OpGetGlobal, instruction_type: ABx, is_constant_b: true, is_constant_c: false, data_a: 2, data_b: 3, data_c: -1 }
+    , Instruction { data: 16582, opcode: OpGetTable, instruction_type: ABC, is_constant_b: false, is_constant_c: true, data_a: 3, data_b: 0, data_c: 1 }
+    , Instruction { data: 16793756, opcode: OpCall, instruction_type: ABC, is_constant_b: false, is_constant_c: false, data_a: 2, data_b: 2, data_c: 1 }
+    , Instruction { data: 12615756, opcode: OpAdd, instruction_type: ABC, is_constant_b: true, is_constant_c: true, data_a: 1, data_b: 1, data_c: 258 }
+    , Instruction { data: 2147336214, opcode: OpJmp, instruction_type: AsBx, is_constant_b: false, is_constant_c: false, data_a: 0, data_b: -8, data_c: -1 }
+    , Instruction { data: 8388638, opcode: OpReturn, instruction_type: ABC, is_constant_b: false, is_constant_c: false, data_a: 0, data_b: 1, data_c: 0 }
+], constants: [
+    Constant { lua_type: STRING, string_data: "Hello\0", number_data: 0.0, bool_data: false }, 
+    Constant { lua_type: STRING, string_data: "world\0", number_data: 0.0, bool_data: false }, 
+    Constant { lua_type: NUMBER, string_data: "", number_data: 1.0, bool_data: false }, 
+    Constant { lua_type: STRING, string_data: "print\0", number_data: 0.0, bool_data: false }], 
+protos: [], 
+source_lines: [1, 1, 1, 1, 3, 4, 4, 4, 5, 5, 5, 6, 6, 7], 
+locals: [
+    Local { name: "a\0", start: 4, end: 13 }, 
+    Local { name: "i\0", start: 5, end: 13 }], 
+upvalues: [] }

@@ -42,6 +42,8 @@ fn main() {
     let mut deserializer = Deserializer::new(buffer);
     let main_chunk = deserializer.deserialize();
 
+    println!("{:?}", main_chunk);
+
     let vm_generator = VMGenerator::new();
     vm_generator.generate(main_chunk);
 }
