@@ -291,24 +291,6 @@ local function stm_line_list(S)
 	return list
 end
 
-local function stm_loc_list(S)
-	local len = S:s_int()
-	local list = TableCreate(len)
-
-	for i = 1, len do list[i] = {varname = stm_lstring(S), startpc = S:s_int(), endpc = S:s_int()} end
-
-	return list
-end
-
-local function stm_upval_list(S)
-	local len = S:s_int()
-	local list = TableCreate(len)
-
-	for i = 1, len do list[i] = stm_lstring(S) end
-
-	return list
-end
-
 function stm_lua_func(stream, psrc)
 	local proto = {}
 	local src = stm_lstring(stream) or psrc -- source is propagated
@@ -329,9 +311,6 @@ function stm_lua_func(stream, psrc)
 	proto.code = stm_inst_list(stream)
 	proto.subs = stm_sub_list(stream, src)
 	-- proto.lines = stm_line_list(stream)
-
-	-- stm_loc_list(stream)
-	-- stm_upval_list(stream)
 
 	-- post process optimization
 	for _, v in ipairs(proto.code) do
