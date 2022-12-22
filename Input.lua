@@ -9,4 +9,3 @@ while i <= #a do
     log(a[i])
     i = i + 1
 end
-

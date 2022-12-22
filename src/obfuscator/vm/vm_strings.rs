@@ -403,9 +403,9 @@ pub static RUN_HELPERS: &str = "
 local function close_lua_upvalues(list, index)
 	for i, uv in pairs(list) do
 		if uv.index >= index then
-			uv.value = uv.store[uv.index] -- store value
-			uv.store = uv
-			uv.index = 'value' -- self reference
+			--uv.value = uv.store[uv.index] -- store value
+			--uv.store = uv
+			--uv.index = 'value' -- self reference
 			list[i] = nil
 		end
 	end
@@ -451,9 +451,9 @@ end
 local function close_lua_upvalues(list, index)
 	for i, uv in pairs(list) do
 		if uv.index >= index then
-			uv.value = uv.store[uv.index] -- store value
-			uv.store = uv
-			uv.index = 'value' -- self reference
+			--uv.value = uv.store[uv.index] -- store value
+			--uv.store = uv
+			--uv.index = 'value' -- self reference
 			list[i] = nil
 		end
 	end
