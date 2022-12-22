@@ -340,10 +340,10 @@ end
 
 pub static DESERIALIZER_2_LI: &str = "
 local function stm_line_list(S)
-	local len = S:s_int()
+	local len = S:int64()
 	local list = TableCreate(len)
 
-	for i = 1, len do list[i] = S:s_int() end
+	for i = 1, len do list[i] = S:int64() end
 
 	return list
 end
@@ -930,6 +930,9 @@ local function run_lua_func(state, env, upvals)
 	end
 end
 
+";
+
+pub static RUN_2: &str = "
 function lua_wrap_state(proto, env, upval)
 	env = env or Getfenv(0)
 
@@ -956,6 +959,44 @@ function lua_wrap_state(proto, env, upval)
 			return TableUnpack(result, 2, result.n)
 		else
 			local failed = {pc = state.pc, source = proto.source --[[,lines = proto.lines]]}
+
+			on_lua_error(failed, result[2])
+
+			return
+		end
+	end
+
+	return wrapped
+end
+";
+
+pub static RUN_2_LI: &str = "
+function lua_wrap_state(proto, env, upval)
+	env = env or Getfenv(0)
+
+	local function wrapped(...)
+		local passed = TablePack(...)
+		local memory = TableCreate()
+		local vararg = {len = 0, list = {}}
+
+		TableMove(passed, 1, proto.num_param, 0, memory)
+
+		if proto.num_param < passed.n then
+			local start = proto.num_param + 1
+			local len = passed.n - proto.num_param
+
+			vararg.len = len
+			TableMove(passed, start, start + len - 1, 1, vararg.list)
+		end
+
+		local state = {vararg = vararg, memory = memory, code = proto.code, subs = proto.subs, pc = 1}
+
+		local result = TablePack(Pcall(run_lua_func, state, env, upval))
+
+		if result[1] then
+			return TableUnpack(result, 2, result.n)
+		else
+			local failed = {pc = state.pc, source = proto.source, lines = proto.lines}
 
 			on_lua_error(failed, result[2])
 

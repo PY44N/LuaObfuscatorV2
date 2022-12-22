@@ -3,6 +3,7 @@ use crate::{
         enums::{lua_type::LuaType, opcode_type::OpcodeType},
         structs::chunk::Chunk,
     },
+    obfuscation_settings::ObfuscationSettings,
     obfuscator::obfuscation_context::ObfuscationContext,
 };
 
@@ -67,11 +68,11 @@ impl VMGenerator {
         Self {}
     }
 
-    pub fn generate(&self, main_chunk: Chunk) -> String {
+    pub fn generate(&self, main_chunk: Chunk, settings: &ObfuscationSettings) -> String {
         let obfuscation_context = create_context();
 
         let serializer = Serializer::new(main_chunk, obfuscation_context);
-        let bytes = serializer.serialze();
+        let bytes = serializer.serialze(settings);
 
         let bytecode_string: String = bytes
             .into_iter()
@@ -82,9 +83,22 @@ impl VMGenerator {
 
         vm_string += vm_strings::VARIABLE_DECLARATION;
         vm_string += vm_strings::DESERIALIZER;
-        vm_string += vm_strings::DESERIALIZER_2;
-        vm_string += vm_strings::RUN_HELPERS;
+        vm_string += if settings.include_debug_line_info {
+            vm_strings::DESERIALIZER_2_LI
+        } else {
+            vm_strings::DESERIALIZER_2
+        };
+        vm_string += if settings.include_debug_line_info {
+            vm_strings::RUN_HELPERS_LI
+        } else {
+            vm_strings::RUN_HELPERS
+        };
         vm_string += vm_strings::RUN;
+        vm_string += if settings.include_debug_line_info {
+            vm_strings::RUN_2_LI
+        } else {
+            vm_strings::RUN_2
+        };
 
         vm_string += &format!("lua_wrap_state(lua_bc_to_state('{}'))()", bytecode_string);
 

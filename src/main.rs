@@ -8,13 +8,16 @@ use std::{
 use obfuscator::vm_generator::VMGenerator;
 use util::read_stream::ReadStream;
 
-use crate::bytecode::deserializer::Deserializer;
+use crate::{bytecode::deserializer::Deserializer, obfuscation_settings::ObfuscationSettings};
 
 pub mod bytecode;
+pub mod obfuscation_settings;
 pub mod obfuscator;
 pub mod util;
 
 fn main() {
+    let settings = ObfuscationSettings::new();
+
     if Path::new("temp").is_dir() {
         fs::remove_dir_all("temp").unwrap();
     }
@@ -51,7 +54,7 @@ fn main() {
     println!("[Obfuscator] Generating VM...");
 
     let vm_generator = VMGenerator::new();
-    let vm = vm_generator.generate(main_chunk);
+    let vm = vm_generator.generate(main_chunk, &settings);
 
     fs::write("temp/temp2.lua", vm).expect("Failed to write vm to file");
 
@@ -68,6 +71,10 @@ fn main() {
     .expect("Failed to run temp2.lua");
 
     let output_string: String = output.stdout.into_iter().map(|v| v as char).collect();
+    let output_error: String = output.stderr.into_iter().map(|v| v as char).collect();
 
     println!("Program output:\n{}", output_string);
+    if output_error != "" {
+        println!("Program Error:\n{}", output_error);
+    }
 }
