@@ -15,8 +15,20 @@ impl Opcode for OpTailCall {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local A = inst.A
+        local B = inst.B
+        local params
+
+        if B == 0 then
+            params = top_index - A
+        else
+            params = B - 1
+        end
+
+        close_lua_upvalues(open_list, 0)
+
+        return memory[A](TableUnpack(memory, A + 1, A + params))"
     }
 
     fn is_valid(&self) -> bool {

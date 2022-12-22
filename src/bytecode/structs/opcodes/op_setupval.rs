@@ -15,8 +15,10 @@ impl Opcode for OpSetUpval {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local uv = upvals[inst.B]
+
+        uv.store[uv.index] = memory[inst.A]"
     }
 
     fn is_valid(&self) -> bool {

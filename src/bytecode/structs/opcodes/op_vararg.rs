@@ -15,8 +15,16 @@ impl Opcode for OpVarArg {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local A = inst.A
+        local len = inst.B
+
+        if len == 0 then
+            len = vararg.len
+            top_index = A + len - 1
+        end
+
+        TableMove(vararg.list, 1, len, A, memory)"
     }
 
     fn is_valid(&self) -> bool {

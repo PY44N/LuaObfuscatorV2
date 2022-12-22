@@ -15,8 +15,20 @@ impl Opcode for OpTForLoop {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local A = inst.A
+        local base = A + 3
+
+        local vals = {memory[A](memory[A + 1], memory[A + 2])}
+
+        TableMove(vals, 1, inst.C, base, memory)
+
+        if memory[base] ~= nil then
+            memory[A + 2] = memory[base]
+            pc = pc + code[pc].sBx
+        end
+
+        pc = pc + 1"
     }
 
     fn is_valid(&self) -> bool {

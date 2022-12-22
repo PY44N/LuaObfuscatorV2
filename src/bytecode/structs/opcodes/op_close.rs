@@ -15,8 +15,8 @@ impl Opcode for OpClose {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "close_lua_upvalues(open_list, inst.A)"
     }
 
     fn is_valid(&self) -> bool {

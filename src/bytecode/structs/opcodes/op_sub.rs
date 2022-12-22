@@ -15,8 +15,8 @@ impl Opcode for OpSub {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "memory[inst.A] = constantB(inst) - constantC(inst)"
     }
 
     fn is_valid(&self) -> bool {

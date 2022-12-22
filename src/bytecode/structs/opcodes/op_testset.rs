@@ -15,8 +15,15 @@ impl Opcode for OpTestSet {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local A = inst.A
+        local B = inst.B
+
+        if (not memory[B]) ~= (inst.C ~= 0) then
+            memory[A] = memory[B]
+            pc = pc + code[pc].sBx
+        end
+        pc = pc + 1"
     }
 
     fn is_valid(&self) -> bool {

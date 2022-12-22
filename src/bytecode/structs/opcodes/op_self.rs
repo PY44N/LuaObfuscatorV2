@@ -15,8 +15,9 @@ impl Opcode for OpSelf {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "memory[inst.A + 1] = memory[inst.B]
+        memory[inst.A] = memory[inst.B][constantC(inst)]"
     }
 
     fn is_valid(&self) -> bool {

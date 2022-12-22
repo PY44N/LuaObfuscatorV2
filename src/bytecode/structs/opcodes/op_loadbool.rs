@@ -15,8 +15,10 @@ impl Opcode for OpLoadBool {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "memory[inst.A] = inst.B ~= 0
+
+        if inst.C ~= 0 then pc = pc + 1 end"
     }
 
     fn is_valid(&self) -> bool {

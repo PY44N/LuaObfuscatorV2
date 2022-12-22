@@ -15,8 +15,8 @@ impl Opcode for OpNewTable {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "memory[inst.A] = {}"
     }
 
     fn is_valid(&self) -> bool {

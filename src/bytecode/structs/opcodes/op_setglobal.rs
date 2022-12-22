@@ -15,8 +15,8 @@ impl Opcode for OpSetGlobal {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "env[inst.const] = memory[inst.A]"
     }
 
     fn is_valid(&self) -> bool {

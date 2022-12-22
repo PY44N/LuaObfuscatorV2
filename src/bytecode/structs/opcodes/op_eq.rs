@@ -15,8 +15,10 @@ impl Opcode for OpEq {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "if (constantB(inst) == constantC(inst)) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
+
+        pc = pc + 1"
     }
 
     fn is_valid(&self) -> bool {

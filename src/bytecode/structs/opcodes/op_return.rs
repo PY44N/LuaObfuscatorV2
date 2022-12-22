@@ -15,8 +15,20 @@ impl Opcode for OpReturn {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local A = inst.A
+        local B = inst.B
+        local len
+
+        if B == 0 then
+            len = top_index - A + 1
+        else
+            len = B - 1
+        end
+
+        close_lua_upvalues(open_list, 0)
+
+        return TableUnpack(memory, A, A + len - 1)"
     }
 
     fn is_valid(&self) -> bool {

@@ -15,8 +15,13 @@ impl Opcode for OpConcat {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local B = inst.B
+        local str = memory[B]
+
+        for i = B + 1, inst.C do str = str .. memory[i] end
+
+        memory[inst.A] = str"
     }
 
     fn is_valid(&self) -> bool {

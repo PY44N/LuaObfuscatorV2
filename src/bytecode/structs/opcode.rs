@@ -4,7 +4,7 @@ use super::instruction::Instruction;
 
 pub trait Opcode {
     fn get_instruction(&self) -> &Instruction;
-    fn get_obfuscated(&self) -> String;
+    fn get_obfuscated(&self) -> &str;
     fn is_valid(&self) -> bool;
 }
 

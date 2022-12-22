@@ -15,8 +15,23 @@ impl Opcode for OpSetList {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "local A = inst.A
+        local C = inst.C
+        local len = inst.B
+        local tab = memory[A]
+        local offset
+
+        if len == 0 then len = top_index - A end
+
+        if C == 0 then
+            C = inst[pc].value
+            pc = pc + 1
+        end
+
+        offset = (C - 1) * 50 --FIELDS_PER_FLUSH
+
+        TableMove(memory, A + 1, A + len, offset + 1, tab)"
     }
 
     fn is_valid(&self) -> bool {

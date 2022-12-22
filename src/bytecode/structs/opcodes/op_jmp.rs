@@ -15,8 +15,8 @@ impl Opcode for OpJmp {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "pc = pc + inst.sBx"
     }
 
     fn is_valid(&self) -> bool {

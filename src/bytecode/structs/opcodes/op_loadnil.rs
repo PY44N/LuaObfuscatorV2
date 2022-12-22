@@ -15,8 +15,8 @@ impl Opcode for OpLoadNil {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "for i = inst.A, inst.B do memory[i] = nil end"
     }
 
     fn is_valid(&self) -> bool {

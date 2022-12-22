@@ -15,8 +15,9 @@ impl Opcode for OpTest {
         &self.instruction
     }
 
-    fn get_obfuscated(&self) -> String {
-        todo!()
+    fn get_obfuscated(&self) -> &str {
+        "if (not memory[inst.A]) ~= (inst.C ~= 0) then pc = pc + code[pc].sBx end
+        pc = pc + 1"
     }
 
     fn is_valid(&self) -> bool {
