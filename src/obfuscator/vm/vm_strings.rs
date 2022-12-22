@@ -1,3 +1,4 @@
+pub static VARIABLE_DECLARATION: &str = "
 local String = string
 local StringChar = String.char
 local StringByte = String.byte
@@ -95,7 +96,9 @@ local BitAnd, BitRShift, BitLShift = (function()
 
 	return band, brshift, blshift
 end)()
+";
 
+pub static DESERIALIZER: &str = "
 local lua_bc_to_state
 local lua_wrap_state
 local stm_lua_func
@@ -281,16 +284,9 @@ local function stm_sub_list(S, src)
 
 	return list
 end
+";
 
-local function stm_line_list(S)
-	local len = S:s_int()
-	local list = TableCreate(len)
-
-	for i = 1, len do list[i] = S:s_int() end
-
-	return list
-end
-
+pub static DESERIALIZER_2: &str = "
 function stm_lua_func(stream, psrc)
 	local proto = {}
 	local src = stm_lstring(stream) or psrc -- source is propagated
@@ -340,7 +336,70 @@ function lua_bc_to_state(src)
 
 	return stm_lua_func(stream, '@virtual')
 end
+";
 
+pub static DESERIALIZER_2_LI: &str = "
+local function stm_line_list(S)
+	local len = S:s_int()
+	local list = TableCreate(len)
+
+	for i = 1, len do list[i] = S:s_int() end
+
+	return list
+end
+
+function stm_lua_func(stream, psrc)
+	local proto = {}
+	local src = stm_lstring(stream) or psrc -- source is propagated
+
+	proto.source = src -- source name
+
+	-- stream:s_int() -- line defined
+	-- stream:s_int() -- last line defined
+
+	proto.num_upval = stm_byte(stream) -- num upvalues
+	proto.num_param = stm_byte(stream) -- num params
+
+
+	-- stm_byte(stream) -- vararg flag
+	-- proto.max_stack = stm_byte(stream) -- max stack size
+
+	proto.const = stm_const_list(stream)
+	proto.code = stm_inst_list(stream)
+	proto.subs = stm_sub_list(stream, src)
+	proto.lines = stm_line_list(stream)
+
+	-- post process optimization
+	for _, v in ipairs(proto.code) do
+		if v.is_K then
+			v.const = proto.const[v.Bx + 1] -- offset for 1 based index
+		else
+			if v.is_KB then v.const_B = proto.const[v.B - 0xFF] end
+
+			if v.is_KC then v.const_C = proto.const[v.C - 0xFF] end
+		end
+	end
+
+	return proto
+end
+
+function lua_bc_to_state(src)
+	-- stream object
+	local stream = {
+		-- data
+		index = 1,
+		source = src,
+		int16 = cst_int_rdr(2, rd_int_le),
+		int32 = cst_int_rdr(4, rd_int_le),
+		int64 = cst_int_rdr(8, rd_int_le),
+		s_num = cst_flt_rdr(8, rd_dbl_le)
+	}
+
+	return stm_lua_func(stream, '@virtual')
+end
+";
+
+pub static RUN_HELPERS: &str = "
 local function close_lua_upvalues(list, index)
 	for i, uv in pairs(list) do
 		if uv.index >= index then
@@ -371,7 +430,56 @@ local function on_lua_error(failed, err)
 
 	error(string.format('%s:%i: %s', src, line, err), 0)
 end
+";
 
+pub static RUN_HELPERS_LI: &str = "
+function lua_bc_to_state(src)
+	-- stream object
+	local stream = {
+		-- data
+		index = 1,
+		source = src,
+		int16 = cst_int_rdr(2, rd_int_le),
+		int32 = cst_int_rdr(4, rd_int_le),
+		int64 = cst_int_rdr(8, rd_int_le),
+		s_num = cst_flt_rdr(8, rd_dbl_le)
+	}
+
+	return stm_lua_func(stream, '@virtual')
+end
+
+local function close_lua_upvalues(list, index)
+	for i, uv in pairs(list) do
+		if uv.index >= index then
+			uv.value = uv.store[uv.index] -- store value
+			uv.store = uv
+			uv.index = 'value' -- self reference
+			list[i] = nil
+		end
+	end
+end
+
+local function open_lua_upvalue(list, index, memory)
+	local prev = list[index]
+
+	if not prev then
+		prev = {index = index, store = memory}
+		list[index] = prev
+	end
+
+	return prev
+end
+
+local function on_lua_error(failed, err)
+	local src = failed.source
+	-- TODO: Add line info for optional error reporting
+	local line = failed.lines[failed.pc - 1]
+
+	error(string.format('%s:%i: %s', src, line, err), 0)
+end
+";
+
+pub static RUN: &str = "
 local function run_lua_func(state, env, upvals)
 	local code = state.code
 	local subs = state.subs
@@ -857,8 +965,4 @@ function lua_wrap_state(proto, env, upval)
 
 	return wrapped
 end
-
-local bytecode = "\11\0\0\0\0\0\0\0\64\116\101\109\112\49\46\108\117\97\0\0\0\3\0\0\0\0\0\0\0\3\6\0\0\0\0\0\0\0\72\101\108\108\111\0\3\6\0\0\0\0\0\0\0\119\111\114\108\100\0\2\0\0\0\0\0\0\240\63\15\0\0\0\0\0\0\0\10\1\0\0\0\2\0\0\0\1\2\1\0\1\0\0\0\0\1\2\1\0\2\1\0\0\0\34\1\0\0\0\2\0\1\0\36\2\0\0\1\0\0\0\0\1\2\1\0\2\2\0\0\0\20\1\0\0\3\0\0\0\0\25\1\1\1\0\2\0\3\0\22\3\0\0\0\4\0\2\0\0\1\0\0\3\1\0\0\0\6\1\0\1\4\0\0\2\0\28\1\0\0\3\2\0\1\0\12\1\1\1\2\2\0\2\1\22\3\0\0\0\247\255\1\0\30\1\0\0\0\1\0\0\0\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\0\3\6\0\0\0\0\0\0\0\112\114\105\110\116\0\4\0\0\0\0\0\0\0\5\2\1\0\1\0\0\0\0\37\1\0\0\2\0\0\0\0\28\1\0\0\1\0\0\1\0\30\1\0\0\0\1\0\0\0\0\0\0\0\0\0\0\0"
-
-lua_wrap_state(lua_bc_to_state(bytecode))()
-
+";

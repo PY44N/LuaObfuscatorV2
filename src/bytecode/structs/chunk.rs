@@ -88,7 +88,6 @@ impl Chunk {
         write_stream.write_string(&self.source_name);
         write_stream.write_int8(self.upvalue_count);
         write_stream.write_int8(self.parameter_count);
-        write_stream.write_int8(self.max_stack_size);
 
         write_stream.write_int64(self.constants.len() as u64);
         for constant in &self.constants {
