@@ -25,7 +25,7 @@ pub struct Chunk {
 
 impl Chunk {
     pub fn new(memory_stream: &mut ReadStream) -> Self {
-        let mut new_self = Self {
+        Self {
             source_name: memory_stream.read_string(),
             line_defined: memory_stream.read_int(),
             last_line_defined: memory_stream.read_int(),
@@ -33,51 +33,31 @@ impl Chunk {
             parameter_count: memory_stream.read_int8(),
             vararg_flag: memory_stream.read_int8(),
             max_stack_size: memory_stream.read_int8(),
-            instructions: vec![],
-            constants: vec![],
-            protos: vec![],
-            source_lines: vec![],
-            locals: vec![],
-            upvalues: vec![],
-        };
-
-        let instruction_count = memory_stream.read_int();
-        for _ in 0..instruction_count {
-            //TODO: Instruction size support
-            let data = memory_stream.read_int32();
-            let instruction = Instruction::new(data);
-            new_self.instructions.push(OPCODE_MAP[OPCODE_TYPE_MAP
-                .into_iter()
-                .position(|v| v == instruction.opcode)
-                .unwrap() as usize](instruction))
+            instructions: (0..memory_stream.read_int())
+                .map(|_| {
+                    let instruction = Instruction::new(memory_stream.read_int32());
+                    OPCODE_MAP[OPCODE_TYPE_MAP
+                        .into_iter()
+                        .position(|v| v == instruction.opcode)
+                        .unwrap() as usize](instruction)
+                })
+                .collect(),
+            constants: (0..memory_stream.read_int())
+                .map(|_| Constant::new(memory_stream))
+                .collect(),
+            protos: (0..memory_stream.read_int())
+                .map(|_| Chunk::new(memory_stream))
+                .collect(),
+            source_lines: (0..memory_stream.read_int())
+                .map(|_| memory_stream.read_int())
+                .collect(),
+            locals: (0..memory_stream.read_int())
+                .map(|_| Local::new(memory_stream))
+                .collect(),
+            upvalues: (0..memory_stream.read_int())
+                .map(|_| memory_stream.read_string())
+                .collect(),
         }
-
-        let constant_count = memory_stream.read_int();
-        for _ in 0..constant_count {
-            new_self.constants.push(Constant::new(memory_stream));
-        }
-
-        let proto_count = memory_stream.read_int();
-        for _ in 0..proto_count {
-            new_self.protos.push(Chunk::new(memory_stream));
-        }
-
-        let source_line_count = memory_stream.read_int();
-        for _ in 0..source_line_count {
-            new_self.source_lines.push(memory_stream.read_int());
-        }
-
-        let local_count = memory_stream.read_int();
-        for _ in 0..local_count {
-            new_self.locals.push(Local::new(memory_stream));
-        }
-
-        let upvalue_count = memory_stream.read_int();
-        for _ in 0..upvalue_count {
-            new_self.upvalues.push(memory_stream.read_string());
-        }
-
-        new_self
     }
 
     pub fn serialize(
