@@ -6,6 +6,6 @@ end
 
 local i = 1
 while i <= #a do
-    log(b[i])
+    log(a[i])
     i = i + 1
 end

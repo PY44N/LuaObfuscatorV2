@@ -490,6 +490,14 @@ local function run_lua_func(state, env, upvals)
 	local memory = state.memory
 	local pc = state.pc
 
+	local function constantB(inst)
+		return inst.is_KB and inst.const_B or memory[inst.B]
+	end
+
+	local function constantC(inst)
+		return inst.is_KC and inst.const_C or memory[inst.C]
+	end
+
 	while true do
 		local inst = code[pc]
 		local op = inst.op
@@ -519,15 +527,7 @@ local function run_lua_func(state, env, upvals)
 			memory[inst.A] = env[inst.const]
 		elseif op == 6 then
 			--[[GETTABLE]]
-			local index
-
-			if inst.is_KC then
-				index = inst.const_C
-			else
-				index = memory[inst.C]
-			end
-
-			memory[inst.A] = memory[inst.B][index]
+			memory[inst.A] = memory[inst.B][constantC(inst)]
 		elseif op == 7 then
 			--[[SETGLOBAL]]
 			env[inst.const] = memory[inst.A]
@@ -538,140 +538,32 @@ local function run_lua_func(state, env, upvals)
 			uv.store[uv.index] = memory[inst.A]
 		elseif op == 9 then
 			--[[SETTABLE]]
-			local index, value
-
-			if inst.is_KB then
-				index = inst.const_B
-			else
-				index = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				value = inst.const_C
-			else
-				value = memory[inst.C]
-			end
-
-			memory[inst.A][index] = value
+			memory[inst.A][constantB(inst)] = constantC(inst)
 		elseif op == 10 then
 			--[[NEWTABLE]]
 			memory[inst.A] = {}
 		elseif op == 11 then
 			--[[SELF]]
-			local A = inst.A
-			local B = inst.B
-			local index
-
-			if inst.is_KC then
-				index = inst.const_C
-			else
-				index = memory[inst.C]
-			end
-
-			memory[A + 1] = memory[B]
-			memory[A] = memory[B][index]
+			memory[inst.A + 1] = memory[inst.B]
+			memory[inst.A] = memory[inst.B][constantC(inst)]
 		elseif op == 12 then
 			--[[ADD]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			memory[inst.A] = lhs + rhs
+			memory[inst.A] = constantB(inst) + constantC(inst)
 		elseif op == 13 then
 			--[[SUB]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			memory[inst.A] = lhs - rhs
+			memory[inst.A] = constantB(inst) - constantC(inst)
 		elseif op == 14 then
 			--[[MUL]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			memory[inst.A] = lhs * rhs
+			memory[inst.A] = constantB(inst) * constantC(inst)
 		elseif op == 15 then
 			--[[DIV]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			memory[inst.A] = lhs / rhs
+			memory[inst.A] = constantB(inst) / constantC()
 		elseif op == 16 then
 			--[[MOD]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			memory[inst.A] = lhs % rhs
+			memory[inst.A] = constantB(inst) % constantC(inst)
 		elseif op == 17 then
 			--[[POW]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			memory[inst.A] = lhs ^ rhs
+			memory[inst.A] = constantB(inst) ^ constantC(inst)
 		elseif op == 18 then
 			--[[UNM]]
 			memory[inst.A] = -memory[inst.B]
@@ -694,59 +586,17 @@ local function run_lua_func(state, env, upvals)
 			pc = pc + inst.sBx
 		elseif op == 23 then
 			--[[EQ]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			if (lhs == rhs) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
+			if (constantB(inst) == constantC(inst)) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
 
 			pc = pc + 1
 		elseif op == 24 then
 			--[[LT]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			if (lhs < rhs) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
+			if (constantB(inst) < constantC(inst)) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
 
 			pc = pc + 1
 		elseif op == 25 then
 			--[[LE]]
-			local lhs, rhs
-
-			if inst.is_KB then
-				lhs = inst.const_B
-			else
-				lhs = memory[inst.B]
-			end
-
-			if inst.is_KC then
-				rhs = inst.const_C
-			else
-				rhs = memory[inst.C]
-			end
-
-			if (lhs <= rhs) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
+			if (constantB(inst) <= constantC(inst)) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
 
 			pc = pc + 1
 		elseif op == 26 then
