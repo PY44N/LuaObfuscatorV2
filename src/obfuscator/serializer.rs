@@ -7,22 +7,22 @@ use super::obfuscation_context::ObfuscationContext;
 
 pub struct Serializer {
     main_chunk: Chunk,
-    obfuscation_context: ObfuscationContext,
 }
 
 impl Serializer {
-    pub fn new(main_chunk: Chunk, obfuscation_context: ObfuscationContext) -> Self {
-        Self {
-            main_chunk,
-            obfuscation_context,
-        }
+    pub fn new(main_chunk: Chunk) -> Self {
+        Self { main_chunk }
     }
 
-    pub fn serialze(&self, settings: &ObfuscationSettings) -> Vec<u8> {
+    pub fn serialze(
+        &self,
+        obfuscation_context: &ObfuscationContext,
+        settings: &ObfuscationSettings,
+    ) -> Vec<u8> {
         let mut write_stream = WriteStream::new();
 
         self.main_chunk
-            .serialize(&mut write_stream, &self.obfuscation_context, settings);
+            .serialize(&mut write_stream, obfuscation_context, settings);
 
         write_stream.bytes
     }

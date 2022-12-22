@@ -1,11 +1,10 @@
 use crate::{
-    bytecode::enums::{opcode_map::OPCODE_MAP, opcode_type::OPCODE_TYPE_MAP},
     obfuscation_settings::ObfuscationSettings,
     obfuscator::obfuscation_context::ObfuscationContext,
     util::{read_stream::ReadStream, write_stream::WriteStream},
 };
 
-use super::{constant::Constant, instruction::Instruction, local::Local, opcode::Opcode};
+use super::{constant::Constant, instruction::Instruction, local::Local};
 
 #[derive(Debug)]
 pub struct Chunk {
@@ -16,7 +15,7 @@ pub struct Chunk {
     pub parameter_count: u8,
     pub vararg_flag: u8,
     pub max_stack_size: u8,
-    pub instructions: Vec<Box<dyn Opcode>>,
+    pub instructions: Vec<Instruction>,
     pub constants: Vec<Constant>,
     pub protos: Vec<Chunk>,
     pub source_lines: Vec<u64>,
@@ -35,13 +34,7 @@ impl Chunk {
             vararg_flag: memory_stream.read_int8(),
             max_stack_size: memory_stream.read_int8(),
             instructions: (0..memory_stream.read_int())
-                .map(|_| {
-                    let instruction = Instruction::new(memory_stream.read_int32());
-                    OPCODE_MAP[OPCODE_TYPE_MAP
-                        .into_iter()
-                        .position(|v| v == instruction.opcode)
-                        .unwrap() as usize](instruction)
-                })
+                .map(|_| Instruction::new(memory_stream.read_int32()))
                 .collect(),
             constants: (0..memory_stream.read_int())
                 .map(|_| Constant::new(memory_stream))
@@ -78,9 +71,7 @@ impl Chunk {
 
         write_stream.write_int64(self.instructions.len() as u64);
         for instruction in &self.instructions {
-            instruction
-                .get_instruction()
-                .serialize(write_stream, obfuscation_context);
+            instruction.serialize(write_stream, obfuscation_context);
         }
 
         write_stream.write_int64(self.protos.len() as u64);

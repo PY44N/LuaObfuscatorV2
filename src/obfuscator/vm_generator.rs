@@ -7,7 +7,10 @@ use crate::{
     obfuscator::obfuscation_context::ObfuscationContext,
 };
 
-use super::{serializer::Serializer, vm::vm_strings};
+use super::{
+    serializer::Serializer,
+    vm::{opcode_strings, vm_strings},
+};
 
 fn create_context() -> ObfuscationContext {
     ObfuscationContext {
@@ -71,8 +74,8 @@ impl VMGenerator {
     pub fn generate(&self, main_chunk: Chunk, settings: &ObfuscationSettings) -> String {
         let obfuscation_context = create_context();
 
-        let serializer = Serializer::new(main_chunk, obfuscation_context);
-        let bytes = serializer.serialze(settings);
+        let serializer = Serializer::new(main_chunk);
+        let bytes = serializer.serialze(&obfuscation_context, settings);
 
         let bytecode_string: String = bytes
             .into_iter()
@@ -94,6 +97,15 @@ impl VMGenerator {
             vm_strings::RUN_HELPERS
         };
         vm_string += vm_strings::RUN;
+
+        for (i, opcode) in obfuscation_context.opcode_map.iter().enumerate() {
+            vm_string += if i == 0 { "if " } else { " elseif " };
+            vm_string += &format!("op == {} then --[[{:#?}]]", i, opcode);
+            vm_string += &opcode_strings::get_opcode_string(opcode);
+        }
+
+        vm_string += " end";
+
         vm_string += if settings.include_debug_line_info {
             vm_strings::RUN_2_LI
         } else {
