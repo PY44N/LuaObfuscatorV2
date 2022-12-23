@@ -100,7 +100,7 @@ impl VMGenerator {
 
         for (i, opcode) in obfuscation_context.opcode_map.iter().enumerate() {
             vm_string += if i == 0 { "if " } else { " elseif " };
-            vm_string += &format!("op == {} then --[[{:#?}]]", i, opcode);
+            vm_string += &format!("op == {} then --[[{:#?}]] ", i, opcode);
             vm_string += &opcode_strings::get_opcode_string(opcode);
         }
 
