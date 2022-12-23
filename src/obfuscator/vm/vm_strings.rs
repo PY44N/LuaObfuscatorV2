@@ -2,9 +2,11 @@ pub static VARIABLE_DECLARATION: &str = "
 local String = string
 local StringChar = String.char
 local StringByte = String.byte
+local StringSub = String.sub
 local Select = select
 local Table = table
 local Math = math
+local Error = error
 local TableCreate = function(...)
 	return {}
 end
@@ -162,13 +164,13 @@ local function rd_int_le(src, s, e) return rd_int_basic(src, s, e - 1, 1) end
 -- double rd_dbl_le(string src, int s)
 -- @src - Source binary string
 -- @s - Start index of little endian double
-local function rd_dbl_le(src, s) return rd_dbl_basic(string.byte(src, s, s + 7)) end
+local function rd_dbl_le(src, s) return rd_dbl_basic(StringByte(src, s, s + 7)) end
 
 -- byte stm_byte(Stream S)
 -- @S - Stream object to read from
 local function stm_byte(S)
 	local idx = S.index
-	local bt = string.byte(S.source, idx, idx)
+	local bt = StringByte(S.source, idx, idx)
 
 	S.index = idx + 1
 	return bt
@@ -179,7 +181,7 @@ end
 -- @len - Length of string being read
 local function stm_string(S, len)
 	local pos = S.index + len
-	local str = string.sub(S.source, S.index, pos - 1)
+	local str = StringSub(S.source, S.index, pos - 1)
 
 	S.index = pos
 	return str
@@ -191,7 +193,7 @@ local function stm_lstring(S)
 	local len = S:int64()
 	local str
 
-	if len ~= 0 then str = string.sub(stm_string(S, len), 1, -2) end
+	if len ~= 0 then str = StringSub(stm_string(S, len), 1, -2) end
 
 	return str
 end
@@ -428,7 +430,7 @@ local function on_lua_error(failed, err)
 	-- local line = failed.lines[failed.pc - 1]
 	local line = 0
 
-	error(string.format('%s:%i: %s', src, line, err), 0)
+	Error(src .. ':' .. line .. ':' .. err, 0)
 end
 ";
 
@@ -475,7 +477,7 @@ local function on_lua_error(failed, err)
 	-- TODO: Add line info for optional error reporting
 	local line = failed.lines[failed.pc - 1]
 
-	error(string.format('%s:%i: %s', src, line, err), 0)
+	Error(src .. ':' .. line .. ':' .. err, 0)
 end
 ";
 
