@@ -12,55 +12,35 @@ use super::{
     vm::{opcode_strings, vm_strings},
 };
 
-fn create_context() -> ObfuscationContext {
+fn get_used_opcodes(chunk: &Chunk) -> Vec<OpcodeType> {
+    let mut opcodes = vec![];
+
+    for instruction in &chunk.instructions {
+        if !opcodes.contains(&instruction.opcode) {
+            opcodes.push(instruction.opcode);
+        }
+    }
+
+    for proto in &chunk.protos {
+        for opcode in get_used_opcodes(proto) {
+            if !opcodes.contains(&opcode) {
+                opcodes.push(opcode);
+            }
+        }
+    }
+
+    opcodes
+}
+
+fn create_context(opcode_list: Vec<OpcodeType>) -> ObfuscationContext {
     ObfuscationContext {
-        debug_info: true,
         constant_type_map: [
             LuaType::NIL,
             LuaType::BOOLEAN,
             LuaType::NUMBER,
             LuaType::STRING,
         ],
-        opcode_map: [
-            OpcodeType::OpMove,
-            OpcodeType::OpLoadConst,
-            OpcodeType::OpLoadBool,
-            OpcodeType::OpLoadNil,
-            OpcodeType::OpGetUpval,
-            OpcodeType::OpGetGlobal,
-            OpcodeType::OpGetTable,
-            OpcodeType::OpSetGlobal,
-            OpcodeType::OpSetUpval,
-            OpcodeType::OpSetTable,
-            OpcodeType::OpNewTable,
-            OpcodeType::OpSelf,
-            OpcodeType::OpAdd,
-            OpcodeType::OpSub,
-            OpcodeType::OpMul,
-            OpcodeType::OpDiv,
-            OpcodeType::OpMod,
-            OpcodeType::OpPow,
-            OpcodeType::OpUnm,
-            OpcodeType::OpNot,
-            OpcodeType::OpLen,
-            OpcodeType::OpConcat,
-            OpcodeType::OpJmp,
-            OpcodeType::OpEq,
-            OpcodeType::OpLt,
-            OpcodeType::OpLe,
-            OpcodeType::OpTest,
-            OpcodeType::OpTestSet,
-            OpcodeType::OpCall,
-            OpcodeType::OpTailCall,
-            OpcodeType::OpReturn,
-            OpcodeType::OpForLoop,
-            OpcodeType::OpForPrep,
-            OpcodeType::OpTForLoop,
-            OpcodeType::OpSetList,
-            OpcodeType::OpClose,
-            OpcodeType::OpClosure,
-            OpcodeType::OpVarArg,
-        ],
+        opcode_map: opcode_list,
     }
 }
 
@@ -72,7 +52,9 @@ impl VMGenerator {
     }
 
     pub fn generate(&self, main_chunk: Chunk, settings: &ObfuscationSettings) -> String {
-        let obfuscation_context = create_context();
+        let opcode_list = get_used_opcodes(&main_chunk);
+
+        let obfuscation_context = create_context(opcode_list);
 
         let serializer = Serializer::new(main_chunk);
         let bytes = serializer.serialze(&obfuscation_context, settings);
