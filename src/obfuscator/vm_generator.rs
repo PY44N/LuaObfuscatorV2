@@ -1,3 +1,5 @@
+use rand::seq::SliceRandom;
+
 use crate::{
     bytecode::{
         enums::{lua_type::LuaType, opcode_type::OpcodeType},
@@ -52,7 +54,10 @@ impl VMGenerator {
     }
 
     pub fn generate(&self, main_chunk: Chunk, settings: &ObfuscationSettings) -> String {
-        let opcode_list = get_used_opcodes(&main_chunk);
+        let mut rand = rand::thread_rng();
+
+        let mut opcode_list = get_used_opcodes(&main_chunk);
+        opcode_list.shuffle(&mut rand);
 
         let obfuscation_context = create_context(opcode_list);
 
