@@ -254,28 +254,6 @@ local function stm_inst_list(S)
 	return list
 end
 
-local function stm_const_list(S)
-	local len = S:int64()
-	local list = TableCreate(len)
-
-	for i = 1, len do
-		local tt = stm_byte(S)
-		local k
-
-		if tt == 1 then
-			k = stm_byte(S) ~= 0
-		elseif tt == 2 then
-			k = S:s_num()
-		elseif tt == 3 then
-			k = stm_lstring(S)
-		end
-
-		list[i] = k -- offset +1 during instruction decode
-	end
-
-	return list
-end
-
 local function stm_sub_list(S, src)
 	local len = S:int64()
 	local list = TableCreate(len)

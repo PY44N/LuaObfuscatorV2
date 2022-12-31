@@ -34,16 +34,18 @@ fn get_used_opcodes(chunk: &Chunk) -> Vec<OpcodeType> {
     opcodes
 }
 
-fn create_context(opcode_list: Vec<OpcodeType>) -> ObfuscationContext {
+fn create_context(const_list: [LuaType; 4], opcode_list: Vec<OpcodeType>) -> ObfuscationContext {
     ObfuscationContext {
-        constant_type_map: [
-            LuaType::NIL,
-            LuaType::BOOLEAN,
-            LuaType::NUMBER,
-            LuaType::STRING,
-        ],
+        constant_type_map: const_list,
         opcode_map: opcode_list,
     }
+}
+
+fn index_of<T>(list: &[T], value: T) -> usize
+where
+    T: PartialEq<T>,
+{
+    list.iter().position(|v| *v == value).unwrap()
 }
 
 pub struct VMGenerator;
@@ -59,7 +61,15 @@ impl VMGenerator {
         let mut opcode_list = get_used_opcodes(&main_chunk);
         opcode_list.shuffle(&mut rand);
 
-        let obfuscation_context = create_context(opcode_list);
+        let mut constant_list = [
+            LuaType::NIL,
+            LuaType::BOOLEAN,
+            LuaType::NUMBER,
+            LuaType::STRING,
+        ];
+        constant_list.shuffle(&mut rand);
+
+        let obfuscation_context = create_context(constant_list, opcode_list);
 
         let serializer = Serializer::new(main_chunk);
         let bytes = serializer.serialze(&obfuscation_context, settings);
@@ -73,6 +83,34 @@ impl VMGenerator {
 
         vm_string += vm_strings::VARIABLE_DECLARATION;
         vm_string += vm_strings::DESERIALIZER;
+        vm_string += &format!(
+            "
+        local function stm_const_list(S)
+        local len = S:int64()
+        local list = TableCreate(len)
+    
+        for i = 1, len do
+            local tt = stm_byte(S)
+            local k
+    
+            if tt == {} then -- Bool
+                k = stm_byte(S) ~= 0
+            elseif tt == {} then -- Number
+                k = S:s_num()
+            elseif tt == {} then -- String
+                k = stm_lstring(S)
+            end
+    
+            list[i] = k -- offset +1 during instruction decode
+        end
+    
+        return list
+    end
+    ",
+            index_of(&obfuscation_context.constant_type_map, LuaType::BOOLEAN),
+            index_of(&obfuscation_context.constant_type_map, LuaType::NUMBER),
+            index_of(&obfuscation_context.constant_type_map, LuaType::STRING),
+        );
         vm_string += if settings.include_debug_line_info {
             vm_strings::DESERIALIZER_2_LI
         } else {
