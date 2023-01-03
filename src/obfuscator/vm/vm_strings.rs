@@ -26,7 +26,7 @@ local MathMax = Math.max
 local Pcall = pcall
 local MathAbs = Math.abs
 local Tonumber = tonumber
-local BitAnd, BitRShift, BitLShift = (function()
+local getBitwise = (function()
 	local function tobittable_r(x, ...)
 		if (x or 0) == 0 then
 			return ...
@@ -97,7 +97,8 @@ local BitAnd, BitRShift, BitLShift = (function()
 	end
 
 	return band, brshift, blshift
-end)()
+end)
+local BitAnd, BitRShift, BitLShift = getBitwise()
 ";
 
 pub static DESERIALIZER: &str = "

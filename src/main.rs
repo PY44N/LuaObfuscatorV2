@@ -58,6 +58,13 @@ fn main() {
 
     fs::write("temp/temp2.lua", vm).expect("Failed to write vm to file");
 
+    println!("[Obfuscator] Minifying...");
+
+    Command::new("node .")
+        .current_dir("minifier")
+        .output()
+        .expect("Failed to minify");
+
     println!("[Obfuscator] Running...");
 
     let output = Command::new(if cfg!(target_os = "windows") {
