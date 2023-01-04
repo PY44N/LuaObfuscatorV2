@@ -86,7 +86,7 @@ impl VMGenerator {
         vm_string += &format!(
             "
         local function stm_const_list(S)
-        local len = S:int64()
+        local len = stm_int64(S)
         local list = TableCreate(len)
     
         for i = 1, len do
@@ -96,7 +96,7 @@ impl VMGenerator {
             if tt == {} then -- Bool
                 k = stm_byte(S) ~= 0
             elseif tt == {} then -- Number
-                k = S:s_num()
+                k = stm_num(S)
             elseif tt == {} then -- String
                 k = stm_lstring(S)
             end

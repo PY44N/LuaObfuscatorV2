@@ -188,10 +188,41 @@ local function stm_string(S, len)
 	return str
 end
 
+local function stm_int16(S)
+	local pos = S.index + 2
+	local int = rd_int_le(S.source, S.index, pos)
+	S.index = pos
+
+	return int
+end
+
+local function stm_int32(S)
+	local pos = S.index + 4
+	local int = rd_int_le(S.source, S.index, pos)
+	S.index = pos
+
+	return int
+end
+
+local function stm_int64(S)
+	local pos = S.index + 8
+	local int = rd_int_le(S.source, S.index, pos)
+	S.index = pos
+
+	return int
+end
+
+local function stm_num(S)
+	local flt = rd_dbl_le(S.source, S.index)
+	S.index = S.index + 8
+
+	return flt
+end
+
 -- string stm_lstring(Stream S)
 -- @S - Stream object to read from
 local function stm_lstring(S)
-	local len = S:int64()
+	local len = stm_int64(S)
 	local str
 
 	if len ~= 0 then str = StringSub(stm_string(S, len), 1, -2) end
@@ -225,11 +256,11 @@ local function cst_flt_rdr(len, func)
 end
 
 local function stm_inst_list(S)
-	local len = S:int64()
+	local len = stm_int64(S)
 	local list = TableCreate(len)
 
 	for i = 1, len do
-		-- local ins = S:int16()
+		-- local ins = stm_int16(S)
 		local op = stm_byte(S)
 		local args = stm_byte(S)
 		local isConstantB = stm_byte(S) == 1
@@ -237,15 +268,15 @@ local function stm_inst_list(S)
 		local data = {op = op, A = stm_byte(S)}
 
 		if args == 1 then -- ABC
-			data.B = S:int16()
-			data.C = S:int16()
+			data.B = stm_int16(S)
+			data.C = stm_int16(S)
 			data.is_KB = isConstantB and data.B > 0xFF -- post process optimization
 			data.is_KC = isConstantC and data.C > 0xFF
 		elseif args == 2 then -- ABx
-			data.Bx = S:int32()
+			data.Bx = stm_int32(S)
 			data.is_K = isConstantB
 		elseif args == 3 then -- AsBx
-			data.sBx = S:int32() - 131071
+			data.sBx = stm_int32(S) - 131071
 		end
 
 		list[i] = data
@@ -256,7 +287,7 @@ local function stm_inst_list(S)
 end
 
 local function stm_sub_list(S, src)
-	local len = S:int64()
+	local len = stm_int64(S)
 	local list = TableCreate(len)
 
 	for i = 1, len do
@@ -308,11 +339,7 @@ function lua_bc_to_state(src)
 	local stream = {
 		-- data
 		index = 1,
-		source = src,
-		int16 = cst_int_rdr(2, rd_int_le),
-		int32 = cst_int_rdr(4, rd_int_le),
-		int64 = cst_int_rdr(8, rd_int_le),
-		s_num = cst_flt_rdr(8, rd_dbl_le)
+		source = src
 	}
 
 	return stm_lua_func(stream, '@virtual')
@@ -321,10 +348,10 @@ end
 
 pub static DESERIALIZER_2_LI: &str = "
 local function stm_line_list(S)
-	local len = S:int64()
+	local len = stm_int64(S)
 	local list = TableCreate(len)
 
-	for i = 1, len do list[i] = S:int64() end
+	for i = 1, len do list[i] = stm_int64(S) end
 
 	return list
 end
