@@ -1,1 +1,1 @@
-local a={a=1,b={a="hi"}}a.world="world"a.b.hey="hey"a.a=0;a.b.a="hello"for b=0,a.len do print(a.data.hi)print(a.world)print(a.data.hey)end
+local a={a=1,b={a="hi"}}a.a="world"a.b.a="hey"a.a=0;a.b.a="hello"for b=0,a.len do print(a.data.hi)print(a.world)print(a.data.hey)end

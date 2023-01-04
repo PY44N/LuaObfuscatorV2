@@ -87,8 +87,12 @@ function renameMemberExpression(expression) {
     expression.identifier.name = newName.slice(newName.lastIndexOf(".") + 1)
   } else {
     let newName = generateVariable(0)
-    const parentPath = tableRenameMap[fullName].slice(0, tableRenameMap[fullName].lastIndexOf("."))
-//TODO: Stopped here
+
+    //TODO: Table nesting with renamed tables doesn't wanna work
+    //TODO: Check if the variables already exist
+    console.log(fullName, fullName.slice(0, fullName.lastIndexOf(".")) + "." + newName)
+    tableRenameMap[fullName] = fullName.slice(0, fullName.lastIndexOf(".")) + "." + newName
+    expression.identifier.name = newName
   }
   
   if (expression.base.type == "MemberExpression") {
