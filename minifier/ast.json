@@ -80,6 +80,97 @@
       ]
     },
     {
+      "type": "AssignmentStatement",
+      "variables": [
+        {
+          "type": "MemberExpression",
+          "indexer": ".",
+          "identifier": {
+            "type": "Identifier",
+            "name": "hey"
+          },
+          "base": {
+            "type": "MemberExpression",
+            "indexer": ".",
+            "identifier": {
+              "type": "Identifier",
+              "name": "data"
+            },
+            "base": {
+              "type": "Identifier",
+              "name": "tbl",
+              "isLocal": true
+            }
+          }
+        }
+      ],
+      "init": [
+        {
+          "type": "StringLiteral",
+          "value": null,
+          "raw": "\"hey\""
+        }
+      ]
+    },
+    {
+      "type": "AssignmentStatement",
+      "variables": [
+        {
+          "type": "MemberExpression",
+          "indexer": ".",
+          "identifier": {
+            "type": "Identifier",
+            "name": "len"
+          },
+          "base": {
+            "type": "Identifier",
+            "name": "tbl",
+            "isLocal": true
+          }
+        }
+      ],
+      "init": [
+        {
+          "type": "NumericLiteral",
+          "value": 0,
+          "raw": "0"
+        }
+      ]
+    },
+    {
+      "type": "AssignmentStatement",
+      "variables": [
+        {
+          "type": "MemberExpression",
+          "indexer": ".",
+          "identifier": {
+            "type": "Identifier",
+            "name": "hi"
+          },
+          "base": {
+            "type": "MemberExpression",
+            "indexer": ".",
+            "identifier": {
+              "type": "Identifier",
+              "name": "data"
+            },
+            "base": {
+              "type": "Identifier",
+              "name": "tbl",
+              "isLocal": true
+            }
+          }
+        }
+      ],
+      "init": [
+        {
+          "type": "StringLiteral",
+          "value": null,
+          "raw": "\"hello\""
+        }
+      ]
+    },
+    {
       "type": "ForNumericStatement",
       "variable": {
         "type": "Identifier",
@@ -161,6 +252,40 @@
                   "type": "Identifier",
                   "name": "tbl",
                   "isLocal": true
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "CallStatement",
+          "expression": {
+            "type": "CallExpression",
+            "base": {
+              "type": "Identifier",
+              "name": "print",
+              "isLocal": false
+            },
+            "arguments": [
+              {
+                "type": "MemberExpression",
+                "indexer": ".",
+                "identifier": {
+                  "type": "Identifier",
+                  "name": "hey"
+                },
+                "base": {
+                  "type": "MemberExpression",
+                  "indexer": ".",
+                  "identifier": {
+                    "type": "Identifier",
+                    "name": "data"
+                  },
+                  "base": {
+                    "type": "Identifier",
+                    "name": "tbl",
+                    "isLocal": true
+                  }
                 }
               }
             ]

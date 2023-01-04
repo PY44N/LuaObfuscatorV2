@@ -1,5 +1,6 @@
 const fs = require('fs')
 const luaparse = require('luaparse');
+const { basename } = require('path');
 const minifier = require("./minify")
 
 let ast = luaparse.parse(fs.readFileSync("./input.lua", "utf8"));
@@ -41,19 +42,19 @@ function generateVariable(num) {
 
 let tableRenameMap = {}
 
-function renameTableConstruction(tableConstructionExpression, parentPath) {
+function renameTableConstruction(tableConstructionExpression, originalParentPath, renamedParentPath) {
   let varNum = 0;
   for (let v of tableConstructionExpression.fields) {
     const newName = generateVariable(varNum)
     varNum++
 
-    tableRenameMap[parentPath + "." + v.key.name] = parentPath + "." + newName
+    tableRenameMap[originalParentPath + "." + v.key.name] = renamedParentPath + "." + newName
+        
+    if (v.value.type == "TableConstructorExpression") {
+      renameTableConstruction(v.value, originalParentPath + "." + v.key.name, renamedParentPath + "." + newName)
+    }
     
     v.key.name = newName
-
-    if (v.value.type == "TableConstructorExpression") {
-      renameTableConstruction(v.value)
-    }
   }
 }
 
@@ -61,13 +62,49 @@ function renameTableConstruction(tableConstructionExpression, parentPath) {
 scan(ast, "LocalStatement", (localStatement) => {
     for (let i in localStatement.init) {
         if (localStatement.init[i].type == "TableConstructorExpression") {
-            renameTableConstruction(localStatement.init[i], localStatement.variables[i].name)
+            renameTableConstruction(localStatement.init[i], localStatement.variables[i].name, localStatement.variables[i].name)
         }
     }
 })
 
-scan(ast, "AssignmengtStatement", (assignmentStatement) => {
+function getFullMemberName(expression) {
+  let name = expression.identifier.name;
+
+  if (expression.base.type == "MemberExpression") {
+    name = getFullMemberName(expression.base) + "." + name
+  } else {
+    name = expression.base.name + "." + name
+  }
+
+  return name;
+}
+
+function renameMemberExpression(expression) {
+  const fullName = getFullMemberName(expression)
+
+  if (tableRenameMap[fullName]) {
+    const newName = tableRenameMap[fullName];
+    expression.identifier.name = newName.slice(newName.lastIndexOf(".") + 1)
+  } else {
+    let newName = generateVariable(0)
+    const parentPath = tableRenameMap[fullName].slice(0, tableRenameMap[fullName].lastIndexOf("."))
+//TODO: Stopped here
+  }
   
+  if (expression.base.type == "MemberExpression") {
+    renameMemberExpression(expression.base)
+  }
+
+}
+
+scan(ast, "AssignmentStatement", (assignmentStatement) => {
+  for (let i in assignmentStatement.variables) {
+    if (assignmentStatement.variables[i].type == "MemberExpression") {
+      renameMemberExpression(assignmentStatement.variables[i])
+    }
+  }
 })
+
+console.log(tableRenameMap)
 
 fs.writeFileSync("./out.lua", minifier.minify(ast))
