@@ -15,6 +15,8 @@ pub mod obfuscation_settings;
 pub mod obfuscator;
 pub mod util;
 
+static FINAL_FILE: &str = "temp3.lua";
+
 fn main() {
     let settings = ObfuscationSettings::new();
 
@@ -60,7 +62,8 @@ fn main() {
 
     println!("[Obfuscator] Minifying...");
 
-    Command::new("node .")
+    Command::new("node")
+        .arg(".")
         .current_dir("minifier")
         .output()
         .expect("Failed to minify");
@@ -72,10 +75,10 @@ fn main() {
     } else {
         "lua5.1"
     })
-    .arg("temp2.lua")
+    .arg(FINAL_FILE)
     .current_dir("temp")
     .output()
-    .expect("Failed to run temp2.lua");
+    .expect(&format!("Failed to run {}", FINAL_FILE));
 
     let output_string: String = output.stdout.into_iter().map(|v| v as char).collect();
     let output_error: String = output.stderr.into_iter().map(|v| v as char).collect();
