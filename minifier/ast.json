@@ -1,0 +1,179 @@
+{
+  "type": "Chunk",
+  "body": [
+    {
+      "type": "LocalStatement",
+      "variables": [
+        {
+          "type": "Identifier",
+          "name": "tbl",
+          "isLocal": true
+        }
+      ],
+      "init": [
+        {
+          "type": "TableConstructorExpression",
+          "fields": [
+            {
+              "type": "TableKeyString",
+              "key": {
+                "type": "Identifier",
+                "name": "len"
+              },
+              "value": {
+                "type": "NumericLiteral",
+                "value": 1,
+                "raw": "1"
+              }
+            },
+            {
+              "type": "TableKeyString",
+              "key": {
+                "type": "Identifier",
+                "name": "data"
+              },
+              "value": {
+                "type": "TableConstructorExpression",
+                "fields": [
+                  {
+                    "type": "TableKeyString",
+                    "key": {
+                      "type": "Identifier",
+                      "name": "hi"
+                    },
+                    "value": {
+                      "type": "StringLiteral",
+                      "value": null,
+                      "raw": "\"hi\""
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "AssignmentStatement",
+      "variables": [
+        {
+          "type": "MemberExpression",
+          "indexer": ".",
+          "identifier": {
+            "type": "Identifier",
+            "name": "world"
+          },
+          "base": {
+            "type": "Identifier",
+            "name": "tbl",
+            "isLocal": true
+          }
+        }
+      ],
+      "init": [
+        {
+          "type": "StringLiteral",
+          "value": null,
+          "raw": "\"world\""
+        }
+      ]
+    },
+    {
+      "type": "ForNumericStatement",
+      "variable": {
+        "type": "Identifier",
+        "name": "_",
+        "isLocal": true
+      },
+      "start": {
+        "type": "NumericLiteral",
+        "value": 0,
+        "raw": "0"
+      },
+      "end": {
+        "type": "MemberExpression",
+        "indexer": ".",
+        "identifier": {
+          "type": "Identifier",
+          "name": "len"
+        },
+        "base": {
+          "type": "Identifier",
+          "name": "tbl",
+          "isLocal": true
+        }
+      },
+      "step": null,
+      "body": [
+        {
+          "type": "CallStatement",
+          "expression": {
+            "type": "CallExpression",
+            "base": {
+              "type": "Identifier",
+              "name": "print",
+              "isLocal": false
+            },
+            "arguments": [
+              {
+                "type": "MemberExpression",
+                "indexer": ".",
+                "identifier": {
+                  "type": "Identifier",
+                  "name": "hi"
+                },
+                "base": {
+                  "type": "MemberExpression",
+                  "indexer": ".",
+                  "identifier": {
+                    "type": "Identifier",
+                    "name": "data"
+                  },
+                  "base": {
+                    "type": "Identifier",
+                    "name": "tbl",
+                    "isLocal": true
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "CallStatement",
+          "expression": {
+            "type": "CallExpression",
+            "base": {
+              "type": "Identifier",
+              "name": "print",
+              "isLocal": false
+            },
+            "arguments": [
+              {
+                "type": "MemberExpression",
+                "indexer": ".",
+                "identifier": {
+                  "type": "Identifier",
+                  "name": "world"
+                },
+                "base": {
+                  "type": "Identifier",
+                  "name": "tbl",
+                  "isLocal": true
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "globals": [
+    {
+      "type": "Identifier",
+      "name": "print",
+      "isLocal": false
+    }
+  ]
+}

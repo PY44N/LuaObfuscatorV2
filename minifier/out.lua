@@ -1,0 +1,1 @@
+local a={len=1,data={hi="hi"}}a.world="world"for b=0,a.len do print(a.data.hi)print(a.world)end
