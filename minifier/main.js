@@ -23,17 +23,51 @@ function scan(parentChunk, type, callback) {
     }
 }
 
-function renameTableConstruction(tableConstructionExpression, parentPath) {
+const letters = "abcdefghijklmnopqrstuvwxyz"
 
+function generateVariable(num) {
+  let ret = ""
+
+  ret += letters.charAt(num % letters.length)
+  num = Math.floor(num / letters.length)
+
+  while (num != 0) {
+    ret += letters.charAt(num % letters.length)
+    num = Math.floor(num / letters.length)
+  }
+
+  return ret
+}
+
+let tableRenameMap = {}
+
+function renameTableConstruction(tableConstructionExpression, parentPath) {
+  let varNum = 0;
+  for (let v of tableConstructionExpression.fields) {
+    const newName = generateVariable(varNum)
+    varNum++
+
+    tableRenameMap[parentPath + "." + v.key.name] = parentPath + "." + newName
+    
+    v.key.name = newName
+
+    if (v.value.type == "TableConstructorExpression") {
+      renameTableConstruction(v.value)
+    }
+  }
 }
 
 // We need to check for local statement here because we don't want to rename global table values
 scan(ast, "LocalStatement", (localStatement) => {
     for (let i in localStatement.init) {
         if (localStatement.init[i].type == "TableConstructorExpression") {
-            renameTableConstruction(v, localStatement.variables[i].name)
+            renameTableConstruction(localStatement.init[i], localStatement.variables[i].name)
         }
     }
+})
+
+scan(ast, "AssignmengtStatement", (assignmentStatement) => {
+  
 })
 
 fs.writeFileSync("./out.lua", minifier.minify(ast))
