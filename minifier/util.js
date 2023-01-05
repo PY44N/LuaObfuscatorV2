@@ -14,6 +14,23 @@ function scan(parentChunk, type, callback) {
   }
 }
 
+const letters = "abcdefghijklmnopqrstuvwxyz";
+
+function generateVariable(num) {
+  let ret = "";
+
+  ret += letters.charAt(num % letters.length);
+  num = Math.floor(num / letters.length);
+
+  while (num != 0) {
+    ret += letters.charAt(num % letters.length);
+    num = Math.floor(num / letters.length);
+  }
+
+  return ret;
+}
+
 module.exports = {
   scan,
+  generateVariable,
 };
