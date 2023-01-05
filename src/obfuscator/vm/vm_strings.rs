@@ -170,10 +170,10 @@ local function rd_dbl_le(src, s) return rd_dbl_basic(StringByte(src, s, s + 7)) 
 -- byte stm_byte(Stream S)
 -- @S - Stream object to read from
 local function stm_byte(S)
-	local idx = S.index
-	local bt = StringByte(S.source, idx, idx)
+	local idx = S[1]
+	local bt = StringByte(S[2], idx, idx)
 
-	S.index = idx + 1
+	S[1] = idx + 1
 	return bt
 end
 
@@ -181,40 +181,40 @@ end
 -- @S - Stream object to read from
 -- @len - Length of string being read
 local function stm_string(S, len)
-	local pos = S.index + len
-	local str = StringSub(S.source, S.index, pos - 1)
+	local pos = S[1] + len
+	local str = StringSub(S[2], S[1], pos - 1)
 
-	S.index = pos
+	S[1] = pos
 	return str
 end
 
 local function stm_int16(S)
-	local pos = S.index + 2
-	local int = rd_int_le(S.source, S.index, pos)
-	S.index = pos
+	local pos = S[1] + 2
+	local int = rd_int_le(S[2], S[1], pos)
+	S[1] = pos
 
 	return int
 end
 
 local function stm_int32(S)
-	local pos = S.index + 4
-	local int = rd_int_le(S.source, S.index, pos)
-	S.index = pos
+	local pos = S[1] + 4
+	local int = rd_int_le(S[2], S[1], pos)
+	S[1] = pos
 
 	return int
 end
 
 local function stm_int64(S)
-	local pos = S.index + 8
-	local int = rd_int_le(S.source, S.index, pos)
-	S.index = pos
+	local pos = S[1] + 8
+	local int = rd_int_le(S[2], S[1], pos)
+	S[1] = pos
 
 	return int
 end
 
 local function stm_num(S)
-	local flt = rd_dbl_le(S.source, S.index)
-	S.index = S.index + 8
+	local flt = rd_dbl_le(S[2], S[1])
+	S[1] = S[1] + 8
 
 	return flt
 end
@@ -314,11 +314,11 @@ function lua_bc_to_state(src)
 	-- stream object
 	local stream = {
 		-- data
-		index = 1,
-		source = src
+		1,
+		src
 	}
 
-	return stm_lua_func(stream, '@virtual')
+	return stm_lua_func(stream, '')
 end
 ";
 
@@ -372,8 +372,8 @@ function lua_bc_to_state(src)
 	-- stream object
 	local stream = {
 		-- data
-		index = 1,
-		source = src
+		1,
+		src
 	}
 
 	return stm_lua_func(stream, '@virtual')
@@ -483,7 +483,7 @@ function lua_wrap_state(proto, env, upval)
 	local function wrapped(...)
 		local passed = TablePack(...)
 		local memory = TableCreate()
-		local vararg = {len = 0, list = {}}
+		local vararg = {0, {}}
 
 		TableMove(passed, 1, proto[3], 0, memory)
 
@@ -491,8 +491,8 @@ function lua_wrap_state(proto, env, upval)
 			local start = proto[3] + 1
 			local len = passed.n - proto[3]
 
-			vararg.len = len
-			TableMove(passed, start, start + len - 1, 1, vararg.list)
+			vararg[1] = len
+			TableMove(passed, start, start + len - 1, 1, vararg[2])
 		end
 
 		local state = {vararg, memory, proto[5], proto[6], 1}
@@ -521,7 +521,7 @@ function lua_wrap_state(proto, env, upval)
 	local function wrapped(...)
 		local passed = TablePack(...)
 		local memory = TableCreate()
-		local vararg = {len = 0, list = {}}
+		local vararg = {0, {}}
 
 		TableMove(passed, 1, proto[3], 0, memory)
 
@@ -529,8 +529,8 @@ function lua_wrap_state(proto, env, upval)
 			local start = proto[3] + 1
 			local len = passed.n - proto[3]
 
-			vararg.len = len
-			TableMove(passed, start, start + len - 1, 1, vararg.list)
+			vararg[1] = len
+			TableMove(passed, start, start + len - 1, 1, vararg[2])
 		end
 
 		local state = {vararg, memory, proto[5], subs = proto[6], 1}
