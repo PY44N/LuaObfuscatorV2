@@ -137,8 +137,28 @@ impl VMGenerator {
             vm_strings::RUN_2
         };
 
-        vm_string += &format!("lua_wrap_state(lua_bc_to_state('{}'))()", bytecode_string);
+        let bytecode_final = if settings.compress_bytecode {
+            bytecode_string
+        } else {
+            bytecode_string
+        };
 
+        if settings.compress_bytecode {
+            vm_string += "
+        local functiton decompress(bytecode)
+            return bytecode
+        end
+        ";
+        }
+
+        if settings.compress_bytecode {
+            vm_string += &format!(
+                "lua_wrap_state(lua_bc_to_state(decompress('{}')))()",
+                bytecode_final
+            );
+        } else {
+            vm_string += &format!("lua_wrap_state(lua_bc_to_state('{}'))()", bytecode_final);
+        }
         vm_string
     }
 }
