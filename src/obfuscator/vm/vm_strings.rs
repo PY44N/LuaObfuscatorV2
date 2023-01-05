@@ -275,34 +275,35 @@ end
 
 pub static DESERIALIZER_2: &str = "
 function stm_lua_func(stream, psrc)
-	local proto = {}
 	local src = stm_lstring(stream) or psrc -- source is propagated
 
-	proto.source = src -- source name
+	local proto = {
+		src -- source name
+	}
 
 	-- stream:s_int() -- line defined
 	-- stream:s_int() -- last line defined
 
-	proto.num_upval = stm_byte(stream) -- num upvalues
-	proto.num_param = stm_byte(stream) -- num params
+	proto[2] = stm_byte(stream) -- num upvalues
+	proto[3] = stm_byte(stream) -- num params
 
 
 	-- stm_byte(stream) -- vararg flag
 	-- proto.max_stack = stm_byte(stream) -- max stack size
 
-	proto.const = stm_const_list(stream)
-	proto.code = stm_inst_list(stream)
-	proto.subs = stm_sub_list(stream, src)
+	proto[4] = stm_const_list(stream)
+	proto[5] = stm_inst_list(stream)
+	proto[6] = stm_sub_list(stream, src)
 	-- proto.lines = stm_line_list(stream)
 
 	-- post process optimization
-	for _, v in ipairs(proto.code) do
+	for _, v in ipairs(proto[5]) do
 		if v[5] then
-			v[8] = proto.const[v[3] + 1] -- offset for 1 based index
+			v[8] = proto[4][v[3] + 1] -- offset for 1 based index
 		else
-			if v[6] then v[9] = proto.const[v[3] - 0xFF] end
+			if v[6] then v[9] = proto[4][v[3] - 0xFF] end
 
-			if v[7] then v[10] = proto.const[v[4] - 0xFF] end
+			if v[7] then v[10] = proto[4][v[4] - 0xFF] end
 		end
 	end
 
@@ -332,34 +333,35 @@ local function stm_line_list(S)
 end
 
 function stm_lua_func(stream, psrc)
-	local proto = {}
 	local src = stm_lstring(stream) or psrc -- source is propagated
 
-	proto.source = src -- source name
+	local proto = {
+		src -- source name
+	}
 
 	-- stream:s_int() -- line defined
 	-- stream:s_int() -- last line defined
 
-	proto.num_upval = stm_byte(stream) -- num upvalues
-	proto.num_param = stm_byte(stream) -- num params
+	proto[2] = stm_byte(stream) -- num upvalues
+	proto[3] = stm_byte(stream) -- num params
 
 
 	-- stm_byte(stream) -- vararg flag
 	-- proto.max_stack = stm_byte(stream) -- max stack size
 
-	proto.const = stm_const_list(stream)
-	proto.code = stm_inst_list(stream)
-	proto.subs = stm_sub_list(stream, src)
-	proto.lines = stm_line_list(stream)
+	proto[4] = stm_const_list(stream)
+	proto[5] = stm_inst_list(stream)
+	proto[6] = stm_sub_list(stream, src)
+	proto[7] = stm_line_list(stream)
 
 	-- post process optimization
-	for _, v in ipairs(proto.code) do
+	for _, v in ipairs(proto[5]) do
 		if v[5] then
-			v[8] = proto.const[v[3] + 1] -- offset for 1 based index
+			v[8] = proto[4][v[3] + 1] -- offset for 1 based index
 		else
-			if v[6] then v[9] = proto.const[v[3] - 0xFF] end
+			if v[6] then v[9] = proto[4][v[3] - 0xFF] end
 
-			if v[7] then v[10] = proto.const[v[4] - 0xFF] end
+			if v[7] then v[10] = proto[4][v[4] - 0xFF] end
 		end
 	end
 
@@ -381,7 +383,8 @@ end
 pub static RUN_HELPERS: &str = "
 local function close_lua_upvalues(list, index)
 	for i, uv in pairs(list) do
-		if uv.index >= index then
+		if uv[1] >= index then
+			-- Replace with indexes if uncommenting
 			--uv.value = uv.store[uv.index] -- store value
 			--uv.store = uv
 			--uv.index = 'value' -- self reference
@@ -394,7 +397,7 @@ local function open_lua_upvalue(list, index, memory)
 	local prev = list[index]
 
 	if not prev then
-		prev = {index = index, store = memory}
+		prev = {index, memory}
 		list[index] = prev
 	end
 
@@ -402,7 +405,7 @@ local function open_lua_upvalue(list, index, memory)
 end
 
 local function on_lua_error(failed, err)
-	local src = failed.source
+	local src = failed[2]
 	-- TODO: Add line info for optional error reporting
 	-- local line = failed.lines[failed.pc - 1]
 	local line = 0
@@ -414,7 +417,7 @@ end
 pub static RUN_HELPERS_LI: &str = "
 local function close_lua_upvalues(list, index)
 	for i, uv in pairs(list) do
-		if uv.index >= index then
+		if uv[1] >= index then
 			--uv.value = uv.store[uv.index] -- store value
 			--uv.store = uv
 			--uv.index = 'value' -- self reference
@@ -427,7 +430,7 @@ local function open_lua_upvalue(list, index, memory)
 	local prev = list[index]
 
 	if not prev then
-		prev = {index = index, store = memory}
+		prev = {index, memory}
 		list[index] = prev
 	end
 
@@ -435,9 +438,9 @@ local function open_lua_upvalue(list, index, memory)
 end
 
 local function on_lua_error(failed, err)
-	local src = failed.source
+	local src = failed[2]
 	-- TODO: Add line info for optional error reporting
-	local line = failed.lines[failed.pc - 1]
+	local line = failed[3][failed[1] - 1]
 
 	Error(src .. ':' .. line .. ':' .. err, 0)
 end
@@ -445,14 +448,14 @@ end
 
 pub static RUN: &str = "
 local function run_lua_func(state, env, upvals)
-	local code = state.code
-	local subs = state.subs
-	local vararg = state.vararg
+	local code = state[3]
+	local subs = state[4]
+	local vararg = state[1]
 
 	local top_index = -1
 	local open_list = {}
-	local memory = state.memory
-	local pc = state.pc
+	local memory = state[2]
+	local pc = state[5]
 
 	local function constantB(inst)
 		return inst[6] and inst[9] or memory[inst[3]]
@@ -470,7 +473,7 @@ local function run_lua_func(state, env, upvals)
 ";
 
 pub static RUN_2: &str = "
-	state.pc = pc
+	state[5] = pc
 	end
 end
 
@@ -482,24 +485,24 @@ function lua_wrap_state(proto, env, upval)
 		local memory = TableCreate()
 		local vararg = {len = 0, list = {}}
 
-		TableMove(passed, 1, proto.num_param, 0, memory)
+		TableMove(passed, 1, proto[3], 0, memory)
 
-		if proto.num_param < passed.n then
-			local start = proto.num_param + 1
-			local len = passed.n - proto.num_param
+		if proto[3] < passed.n then
+			local start = proto[3] + 1
+			local len = passed.n - proto[3]
 
 			vararg.len = len
 			TableMove(passed, start, start + len - 1, 1, vararg.list)
 		end
 
-		local state = {vararg = vararg, memory = memory, code = proto.code, subs = proto.subs, pc = 1}
+		local state = {vararg, memory, proto[5], proto[6], 1}
 
 		local result = TablePack(Pcall(run_lua_func, state, env, upval))
 
 		if result[1] then
 			return TableUnpack(result, 2, result.n)
 		else
-			local failed = {pc = state.pc, source = proto.source --[[,lines = proto.lines]]}
+			local failed = {state[5], proto[1] --[[,lines = proto.lines]]}
 
 			on_lua_error(failed, result[2])
 
@@ -520,24 +523,24 @@ function lua_wrap_state(proto, env, upval)
 		local memory = TableCreate()
 		local vararg = {len = 0, list = {}}
 
-		TableMove(passed, 1, proto.num_param, 0, memory)
+		TableMove(passed, 1, proto[3], 0, memory)
 
-		if proto.num_param < passed.n then
-			local start = proto.num_param + 1
-			local len = passed.n - proto.num_param
+		if proto[3] < passed.n then
+			local start = proto[3] + 1
+			local len = passed.n - proto[3]
 
 			vararg.len = len
 			TableMove(passed, start, start + len - 1, 1, vararg.list)
 		end
 
-		local state = {vararg = vararg, memory = memory, code = proto.code, subs = proto.subs, pc = 1}
+		local state = {vararg, memory, proto[5], subs = proto[6], 1}
 
 		local result = TablePack(Pcall(run_lua_func, state, env, upval))
 
 		if result[1] then
 			return TableUnpack(result, 2, result.n)
 		else
-			local failed = {pc = state.pc, source = proto.source, lines = proto.lines}
+			local failed = {state[5], proto[1], proto[7]}
 
 			on_lua_error(failed, result[2])
 

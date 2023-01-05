@@ -13,7 +13,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         OpcodeType::OpGetUpval => {
             "local uv = upvals[inst[3]]
 
-        memory[inst[2]] = uv.store[uv.index]"
+        memory[inst[2]] = uv[2][uv.index]"
         }
         OpcodeType::OpGetGlobal => "memory[inst[2]] = env[inst[8]]",
         OpcodeType::OpGetTable => "memory[inst[2]] = memory[inst[3]][constantC(inst)]",
@@ -21,7 +21,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         OpcodeType::OpSetUpval => {
             "local uv = upvals[inst[3]]
 
-        uv.store[uv.index] = memory[inst[2]]"
+        uv[2][uv[1]] = memory[inst[2]]"
         }
         OpcodeType::OpSetTable => "memory[inst[2]][constantB(inst)] = constantC(inst)",
         OpcodeType::OpNewTable => "memory[inst[2]] = {}",
@@ -177,8 +177,8 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
 
         TableMove(memory, A + 1, A + len, offset + 1, tab)",
         OpcodeType::OpClose => "close_lua_upvalues(open_list, inst[2])",
-        OpcodeType::OpClosure => "local sub = subs[inst[3]x + 1] -- offset for 1 based index
-        local nups = sub.num_upval
+        OpcodeType::OpClosure => "local sub = subs[inst[3] + 1] -- offset for 1 based index
+        local nups = sub[2]
         local uvlist
 
         if nups ~= 0 then
@@ -188,9 +188,9 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
                 local pseudo = code[pc + i - 1]
 
                 if pseudo.op == 0 then -- @MOVE
-                    uvlist[i - 1] = open_lua_upvalue(open_list, pseudo.B, memory)
+                    uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[3], memory)
                 elseif pseudo.op == 4 then -- @GETUPVAL
-                    uvlist[i - 1] = upvals[pseudo.B]
+                    uvlist[i - 1] = upvals[pseudo[3]]
                 end
             end
 
