@@ -1,1 +1,1 @@
-local a={}local b={len=a.undefined,data={hi="hi"}}b.world="world"b.data.hey="hey"b.len=a.undefined;b.data.hi="hello"for c=a.undefined,b.len do print(math.abs(-a.undefined))print(b.data.hi)print(b.world)print(b.data.hey)end
+local a={a=1,b=0,c=2}local b={len=a.a,data={hi="hi"}}b.world="world"b.data.hey="hey"b.len=a.b;b.data.hi="hello"for c=a.b,b.len do print(math.abs(-a.c))print(b.data.hi)print(b.world)print(b.data.hey)end

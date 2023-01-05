@@ -3,23 +3,23 @@ const luaparse = require("luaparse");
 const minifier = require("./minify");
 const { scan, generateVariable } = require("./util");
 
-let ast = luaparse.parse(fs.readFileSync("./input.lua", "utf8"));
+let ast = luaparse.parse(fs.readFileSync("../temp/temp2.lua", "utf8"));
 
 // fs.writeFileSync("ast.json", JSON.stringify(ast, null, 2));
 
-let numerics = {};
+let numerics = [];
 
 scan(ast, "NumericLiteral", (numeric) => {
-  if (numerics[numeric.value] == undefined) {
-    numerics[numeric.value] = generateVariable(numerics.length);
+  if (!numerics.includes(numeric.value)) {
+    numerics.push(numeric.value);
   }
-  numeric.raw = `numerics.${numerics[numeric.value]}`;
+  numeric.raw = `numerics.${generateVariable(numerics.indexOf(numeric.value))}`;
 });
 
-let numericString = "local numerics = {";
+let numericString = "{";
 
 for (let i in numerics) {
-  numericString += `${i == 0 ? "" : ","}${Object.keys(numerics)[i]} = ${
+  numericString += `${i != 0 ? "," : ""}${generateVariable(i)} = ${
     numerics[i]
   }`;
 }
@@ -27,6 +27,10 @@ for (let i in numerics) {
 numericString += "}";
 
 fs.writeFileSync(
-  "./out.lua",
-  minifier.minify(numericString + minifier.minify(ast))
+  "../temp/temp3.lua",
+  minifier.minify(
+    `local main = function(numerics) ${minifier.minify(
+      ast
+    )} end main(${numericString})`
+  )
 );
