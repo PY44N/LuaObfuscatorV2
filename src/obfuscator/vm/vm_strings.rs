@@ -230,31 +230,6 @@ local function stm_lstring(S)
 	return str
 end
 
--- fn cst_int_rdr(string src, int len, fn func)
--- @len - Length of type for reader
--- @func - Reader callback
-local function cst_int_rdr(len, func)
-	return function(S)
-		local pos = S.index + len
-		local int = func(S.source, S.index, pos)
-		S.index = pos
-
-		return int
-	end
-end
-
--- fn cst_flt_rdr(string src, int len, fn func)
--- @len - Length of type for reader
--- @func - Reader callback
-local function cst_flt_rdr(len, func)
-	return function(S)
-		local flt = func(S.source, S.index)
-		S.index = S.index + len
-
-		return flt
-	end
-end
-
 local function stm_inst_list(S)
 	local len = stm_int64(S)
 	local list = TableCreate(len)
@@ -265,18 +240,18 @@ local function stm_inst_list(S)
 		local args = stm_byte(S)
 		local isConstantB = stm_byte(S) == 1
 		local isConstantC = stm_byte(S) == 1
-		local data = {op = op, A = stm_byte(S)}
+		local data = {op, stm_byte(S)}
 
 		if args == 1 then -- ABC
-			data.B = stm_int16(S)
-			data.C = stm_int16(S)
-			data.is_KB = isConstantB and data.B > 0xFF -- post process optimization
-			data.is_KC = isConstantC and data.C > 0xFF
+			data[3] = stm_int16(S)
+			data[4] = stm_int16(S)
+			data[6] = isConstantB and data[3] > 0xFF -- post process optimization
+			data[7] = isConstantC and data[4] > 0xFF
 		elseif args == 2 then -- ABx
-			data.Bx = stm_int32(S)
-			data.is_K = isConstantB
+			data[3] = stm_int32(S)
+			data[5] = isConstantB
 		elseif args == 3 then -- AsBx
-			data.sBx = stm_int32(S) - 131071
+			data[3] = stm_int32(S) - 131071
 		end
 
 		list[i] = data
@@ -322,12 +297,12 @@ function stm_lua_func(stream, psrc)
 
 	-- post process optimization
 	for _, v in ipairs(proto.code) do
-		if v.is_K then
-			v.const = proto.const[v.Bx + 1] -- offset for 1 based index
+		if v[5] then
+			v[8] = proto.const[v[3] + 1] -- offset for 1 based index
 		else
-			if v.is_KB then v.const_B = proto.const[v.B - 0xFF] end
+			if v[6] then v[9] = proto.const[v[3] - 0xFF] end
 
-			if v.is_KC then v.const_C = proto.const[v.C - 0xFF] end
+			if v[7] then v[10] = proto.const[v[4] - 0xFF] end
 		end
 	end
 
@@ -379,12 +354,12 @@ function stm_lua_func(stream, psrc)
 
 	-- post process optimization
 	for _, v in ipairs(proto.code) do
-		if v.is_K then
-			v.const = proto.const[v.Bx + 1] -- offset for 1 based index
+		if v[5] then
+			v[8] = proto.const[v[3] + 1] -- offset for 1 based index
 		else
-			if v.is_KB then v.const_B = proto.const[v.B - 0xFF] end
+			if v[6] then v[9] = proto.const[v[3] - 0xFF] end
 
-			if v.is_KC then v.const_C = proto.const[v.C - 0xFF] end
+			if v[7] then v[10] = proto.const[v[4] - 0xFF] end
 		end
 	end
 
@@ -396,11 +371,7 @@ function lua_bc_to_state(src)
 	local stream = {
 		-- data
 		index = 1,
-		source = src,
-		int16 = cst_int_rdr(2, rd_int_le),
-		int32 = cst_int_rdr(4, rd_int_le),
-		int64 = cst_int_rdr(8, rd_int_le),
-		s_num = cst_flt_rdr(8, rd_dbl_le)
+		source = src
 	}
 
 	return stm_lua_func(stream, '@virtual')
@@ -441,21 +412,6 @@ end
 ";
 
 pub static RUN_HELPERS_LI: &str = "
-function lua_bc_to_state(src)
-	-- stream object
-	local stream = {
-		-- data
-		index = 1,
-		source = src,
-		int16 = cst_int_rdr(2, rd_int_le),
-		int32 = cst_int_rdr(4, rd_int_le),
-		int64 = cst_int_rdr(8, rd_int_le),
-		s_num = cst_flt_rdr(8, rd_dbl_le)
-	}
-
-	return stm_lua_func(stream, '@virtual')
-end
-
 local function close_lua_upvalues(list, index)
 	for i, uv in pairs(list) do
 		if uv.index >= index then
@@ -499,16 +455,16 @@ local function run_lua_func(state, env, upvals)
 	local pc = state.pc
 
 	local function constantB(inst)
-		return inst.is_KB and inst.const_B or memory[inst.B]
+		return inst[6] and inst[9] or memory[inst[3]]
 	end
 
 	local function constantC(inst)
-		return inst.is_KC and inst.const_C or memory[inst.C]
+		return inst[7] and inst[10] or memory[inst[4]]
 	end
 
 	while true do
 		local inst = code[pc]
-		local op = inst.op
+		local op = inst[1]
 		pc = pc + 1
 
 ";

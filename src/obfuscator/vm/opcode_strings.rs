@@ -2,73 +2,73 @@ use crate::bytecode::enums::opcode_type::OpcodeType;
 
 pub fn get_opcode_string(opcode: &OpcodeType) -> String {
     match opcode {
-        OpcodeType::OpMove => "memory[inst.A] = memory[inst.B]",
-        OpcodeType::OpLoadConst => "memory[inst.A] = inst.const",
+        OpcodeType::OpMove => "memory[inst[2]] = memory[inst[3]]",
+        OpcodeType::OpLoadConst => "memory[inst[2]] = inst[8]",
         OpcodeType::OpLoadBool => {
-            "memory[inst.A] = inst.B ~= 0
+            "memory[inst[2]] = inst[3] ~= 0
 
-        if inst.C ~= 0 then pc = pc + 1 end"
+        if inst[4] ~= 0 then pc = pc + 1 end"
         }
-        OpcodeType::OpLoadNil => "for i = inst.A, inst.B do memory[i] = nil end",
+        OpcodeType::OpLoadNil => "for i = inst[2], inst[3] do memory[i] = nil end",
         OpcodeType::OpGetUpval => {
-            "local uv = upvals[inst.B]
+            "local uv = upvals[inst[3]]
 
-        memory[inst.A] = uv.store[uv.index]"
+        memory[inst[2]] = uv.store[uv.index]"
         }
-        OpcodeType::OpGetGlobal => "memory[inst.A] = env[inst.const]",
-        OpcodeType::OpGetTable => "memory[inst.A] = memory[inst.B][constantC(inst)]",
-        OpcodeType::OpSetGlobal => "env[inst.const] = memory[inst.A]",
+        OpcodeType::OpGetGlobal => "memory[inst[2]] = env[inst[8]]",
+        OpcodeType::OpGetTable => "memory[inst[2]] = memory[inst[3]][constantC(inst)]",
+        OpcodeType::OpSetGlobal => "env[inst[8]] = memory[inst[2]]",
         OpcodeType::OpSetUpval => {
-            "local uv = upvals[inst.B]
+            "local uv = upvals[inst[3]]
 
-        uv.store[uv.index] = memory[inst.A]"
+        uv.store[uv.index] = memory[inst[2]]"
         }
-        OpcodeType::OpSetTable => "memory[inst.A][constantB(inst)] = constantC(inst)",
-        OpcodeType::OpNewTable => "memory[inst.A] = {}",
+        OpcodeType::OpSetTable => "memory[inst[2]][constantB(inst)] = constantC(inst)",
+        OpcodeType::OpNewTable => "memory[inst[2]] = {}",
         OpcodeType::OpSelf => {
-            "memory[inst.A + 1] = memory[inst.B]
-        memory[inst.A] = memory[inst.B][constantC(inst)]"
+            "memory[inst[2] + 1] = memory[inst[3]]
+        memory[inst[2]] = memory[inst[3]][constantC(inst)]"
         }
-        OpcodeType::OpAdd => "memory[inst.A] = constantB(inst) + constantC(inst)",
-        OpcodeType::OpSub => "memory[inst.A] = constantB(inst) - constantC(inst)",
-        OpcodeType::OpMul => "memory[inst.A] = constantB(inst) * constantC(inst)",
-        OpcodeType::OpDiv => "memory[inst.A] = constantB(inst) / constantC(inst)",
-        OpcodeType::OpMod => "memory[inst.A] = constantB(inst) % constantC(inst)",
-        OpcodeType::OpPow => "memory[inst.A] = constantB(inst) ^ constantC(inst)",
-        OpcodeType::OpUnm => "memory[inst.A] = -memory[inst.B]",
-        OpcodeType::OpNot => "memory[inst.A] = not memory[inst.B]",
-        OpcodeType::OpLen => "memory[inst.A] = #memory[inst.B]",
+        OpcodeType::OpAdd => "memory[inst[2]] = constantB(inst) + constantC(inst)",
+        OpcodeType::OpSub => "memory[inst[2]] = constantB(inst) - constantC(inst)",
+        OpcodeType::OpMul => "memory[inst[2]] = constantB(inst) * constantC(inst)",
+        OpcodeType::OpDiv => "memory[inst[2]] = constantB(inst) / constantC(inst)",
+        OpcodeType::OpMod => "memory[inst[2]] = constantB(inst) % constantC(inst)",
+        OpcodeType::OpPow => "memory[inst[2]] = constantB(inst) ^ constantC(inst)",
+        OpcodeType::OpUnm => "memory[inst[2]] = -memory[inst[3]]",
+        OpcodeType::OpNot => "memory[inst[2]] = not memory[inst[3]]",
+        OpcodeType::OpLen => "memory[inst[2]] = #memory[inst[3]]",
         OpcodeType::OpConcat => {
-            "local B = inst.B
+            "local B = inst[3]
         local str = memory[B]
 
-        for i = B + 1, inst.C do str = str .. memory[i] end
+        for i = B + 1, inst[4] do str = str .. memory[i] end
 
-        memory[inst.A] = str"
+        memory[inst[2]] = str"
         }
-        OpcodeType::OpJmp => "pc = pc + inst.sBx",
-        OpcodeType::OpEq => "if (constantB(inst) == constantC(inst)) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
+        OpcodeType::OpJmp => "pc = pc + inst[3]",
+        OpcodeType::OpEq => "if (constantB(inst) == constantC(inst)) == (inst[2] ~= 0) then pc = pc + code[pc][3] end
 
         pc = pc + 1",
-        OpcodeType::OpLt => "if (constantB(inst) < constantC(inst)) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
+        OpcodeType::OpLt => "if (constantB(inst) < constantC(inst)) == (inst[2] ~= 0) then pc = pc + code[pc][3] end
 
         pc = pc + 1",
-        OpcodeType::OpLe => "if (constantB(inst) <= constantC(inst)) == (inst.A ~= 0) then pc = pc + code[pc].sBx end
+        OpcodeType::OpLe => "if (constantB(inst) <= constantC(inst)) == (inst[2] ~= 0) then pc = pc + code[pc][3] end
 
         pc = pc + 1",
-        OpcodeType::OpTest => "if (not memory[inst.A]) ~= (inst.C ~= 0) then pc = pc + code[pc].sBx end
+        OpcodeType::OpTest => "if (not memory[inst[2]]) ~= (inst[4] ~= 0) then pc = pc + code[pc][3] end
         pc = pc + 1",
-        OpcodeType::OpTestSet => "local A = inst.A
-        local B = inst.B
+        OpcodeType::OpTestSet => "local A = inst[2]
+        local B = inst[3]
 
-        if (not memory[B]) ~= (inst.C ~= 0) then
+        if (not memory[B]) ~= (inst[4] ~= 0) then
             memory[A] = memory[B]
-            pc = pc + code[pc].sBx
+            pc = pc + code[pc][3]
         end
         pc = pc + 1",
-        OpcodeType::OpCall => "local A = inst.A
-        local B = inst.B
-        local C = inst.C
+        OpcodeType::OpCall => "local A = inst[2]
+        local B = inst[3]
+        local C = inst[4]
         local params
 
         if B == 0 then
@@ -87,8 +87,8 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         end
 
         TableMove(ret_list, 1, ret_num, A, memory)",
-        OpcodeType::OpTailCall => "local A = inst.A
-        local B = inst.B
+        OpcodeType::OpTailCall => "local A = inst[2]
+        local B = inst[3]
         local params
 
         if B == 0 then
@@ -100,8 +100,8 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         close_lua_upvalues(open_list, 0)
 
         return memory[A](TableUnpack(memory, A + 1, A + params))",
-        OpcodeType::OpReturn => "local A = inst.A
-        local B = inst.B
+        OpcodeType::OpReturn => "local A = inst[2]
+        local B = inst[3]
         local len
 
         if B == 0 then
@@ -113,7 +113,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         close_lua_upvalues(open_list, 0)
 
         return TableUnpack(memory, A, A + len - 1)",
-        OpcodeType::OpForLoop => "local A = inst.A
+        OpcodeType::OpForLoop => "local A = inst[2]
         local step = memory[A + 2]
         local index = memory[A] + step
         local limit = memory[A + 1]
@@ -128,9 +128,9 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         if loops then
             memory[A] = index
             memory[A + 3] = index
-            pc = pc + inst.sBx
+            pc = pc + inst[3]
         end",
-        OpcodeType::OpForPrep => "local A = inst.A
+        OpcodeType::OpForPrep => "local A = inst[2]
         -- local init, limit, step
 
         -- *: Possible additional error checking
@@ -146,23 +146,23 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         memory[A + 1] = limit
         memory[A + 2] = step
 
-        pc = pc + inst.sBx",
-        OpcodeType::OpTForLoop => "local A = inst.A
+        pc = pc + inst[3]",
+        OpcodeType::OpTForLoop => "local A = inst[2]
         local base = A + 3
 
         local vals = {memory[A](memory[A + 1], memory[A + 2])}
 
-        TableMove(vals, 1, inst.C, base, memory)
+        TableMove(vals, 1, inst[4], base, memory)
 
         if memory[base] ~= nil then
             memory[A + 2] = memory[base]
-            pc = pc + code[pc].sBx
+            pc = pc + code[pc][3]
         end
 
         pc = pc + 1",
-        OpcodeType::OpSetList => "local A = inst.A
-        local C = inst.C
-        local len = inst.B
+        OpcodeType::OpSetList => "local A = inst[2]
+        local C = inst[4]
+        local len = inst[3]
         local tab = memory[A]
         local offset
 
@@ -176,8 +176,8 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         offset = (C - 1) * 50 --FIELDS_PER_FLUSH
 
         TableMove(memory, A + 1, A + len, offset + 1, tab)",
-        OpcodeType::OpClose => "close_lua_upvalues(open_list, inst.A)",
-        OpcodeType::OpClosure => "local sub = subs[inst.Bx + 1] -- offset for 1 based index
+        OpcodeType::OpClose => "close_lua_upvalues(open_list, inst[2])",
+        OpcodeType::OpClosure => "local sub = subs[inst[3]x + 1] -- offset for 1 based index
         local nups = sub.num_upval
         local uvlist
 
@@ -197,9 +197,9 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             pc = pc + nups
         end
 
-        memory[inst.A] = lua_wrap_state(sub, env, uvlist)",
-        OpcodeType::OpVarArg => "local A = inst.A
-        local len = inst.B
+        memory[inst[2]] = lua_wrap_state(sub, env, uvlist)",
+        OpcodeType::OpVarArg => "local A = inst[2]
+        local len = inst[3]
 
         if len == 0 then
             len = vararg.len
