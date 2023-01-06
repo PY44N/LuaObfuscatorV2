@@ -56,7 +56,7 @@ fn to_base36(value: u64) -> String {
     let mut value: usize = value.try_into().unwrap();
 
     loop {
-        ret.push(BASE64_CHARS.chars().nth(value & 36).unwrap());
+        ret.push(BASE64_CHARS.chars().nth(value % 36).unwrap());
         value /= 36;
 
         if value == 0 {
@@ -64,7 +64,7 @@ fn to_base36(value: u64) -> String {
         }
     }
 
-    String::new()
+    ret
 }
 
 pub struct VMGenerator;
@@ -97,14 +97,8 @@ impl VMGenerator {
             bytes
                 .into_iter()
                 .map(|v| {
-                    let mut byte_str = String::new();
-                    write!(&mut byte_str, "{:X}", v.to_string().as_bytes().len())
-                        .expect("Unable to write");
-                    for &byte in v.to_string().as_bytes() {
-                        write!(&mut byte_str, "{:X}", byte).expect("Unable to write");
-                    }
-
-                    byte_str
+                    let byte_str = to_base36(v as u64);
+                    to_base36(byte_str.len() as u64) + &byte_str
                 })
                 .collect()
         } else {
@@ -178,15 +172,10 @@ impl VMGenerator {
             local ret = ''
             local i = 1
             while i <= #bytecode do
-                local len = Tonumber(StringSub(bytecode, i, i))
+                local len = Tonumber(StringSub(bytecode, i, i), 36)
                 i = i + 1
-                local currentNum = ''
-                for i = 1, len do
-                    currentNum = currentNum .. StringChar(StringSub(bytecode, i, i))
-                    i = i + 1
-                end
-
-                ret = ret .. Tonumber(currentNum)
+                ret = ret .. StringChar(Tonumber(StringSub(bytecode, i, i + len - 1), 36))
+                i = i + len
             end
 
             return ret
