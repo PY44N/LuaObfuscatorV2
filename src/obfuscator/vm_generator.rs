@@ -1,4 +1,5 @@
 use rand::seq::SliceRandom;
+use std::fmt::Write;
 
 use crate::{
     bytecode::{
@@ -74,10 +75,26 @@ impl VMGenerator {
         let serializer = Serializer::new(main_chunk);
         let bytes = serializer.serialze(&obfuscation_context, settings);
 
-        let bytecode_string: String = bytes
-            .into_iter()
-            .map(|v| String::from("\\") + &v.to_string())
-            .collect();
+        let bytecode_string: String = if settings.compress_bytecode {
+            bytes
+                .into_iter()
+                .map(|v| {
+                    let mut byte_str = String::new();
+                    write!(&mut byte_str, "{:X}", v.to_string().as_bytes().len())
+                        .expect("Unable to write");
+                    for &byte in v.to_string().as_bytes() {
+                        write!(&mut byte_str, "{:X}", byte).expect("Unable to write");
+                    }
+
+                    byte_str
+                })
+                .collect()
+        } else {
+            bytes
+                .into_iter()
+                .map(|v| String::from("\\") + &v.to_string())
+                .collect()
+        };
 
         let mut vm_string = String::new();
 
@@ -137,16 +154,24 @@ impl VMGenerator {
             vm_strings::RUN_2
         };
 
-        let bytecode_final = if settings.compress_bytecode {
-            bytecode_string
-        } else {
-            bytecode_string
-        };
-
         if settings.compress_bytecode {
             vm_string += "
-        local functiton decompress(bytecode)
-            return bytecode
+        local function decompress(bytecode)
+            local ret = ''
+            local i = 1
+            while i <= #bytecode do
+                local len = Tonumber(StringSub(bytecode, i, i))
+                i = i + 1
+                local currentNum = ''
+                for i = 1, len do
+                    currentNum = currentNum .. StringChar(StringSub(bytecode, i, i))
+                    i = i + 1
+                end
+
+                ret = ret .. Tonumber(currentNum)
+            end
+
+            return ret
         end
         ";
         }
@@ -154,10 +179,10 @@ impl VMGenerator {
         if settings.compress_bytecode {
             vm_string += &format!(
                 "lua_wrap_state(lua_bc_to_state(decompress('{}')))()",
-                bytecode_final
+                bytecode_string
             );
         } else {
-            vm_string += &format!("lua_wrap_state(lua_bc_to_state('{}'))()", bytecode_final);
+            vm_string += &format!("lua_wrap_state(lua_bc_to_state('{}'))()", bytecode_string);
         }
         vm_string
     }
