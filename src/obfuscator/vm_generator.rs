@@ -49,6 +49,24 @@ where
     list.iter().position(|v| *v == value).unwrap()
 }
 
+static BASE64_CHARS: &str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+fn to_base36(value: u64) -> String {
+    let mut ret = String::new();
+    let mut value: usize = value.try_into().unwrap();
+
+    loop {
+        ret.push(BASE64_CHARS.chars().nth(value & 36).unwrap());
+        value /= 36;
+
+        if value == 0 {
+            break;
+        }
+    }
+
+    String::new()
+}
+
 pub struct VMGenerator;
 
 impl VMGenerator {
