@@ -1,5 +1,4 @@
 use rand::seq::SliceRandom;
-use std::fmt::Write;
 
 use crate::{
     bytecode::{
@@ -64,7 +63,7 @@ fn to_base36(value: u64) -> String {
         }
     }
 
-    ret
+    ret.chars().rev().collect()
 }
 
 pub struct VMGenerator;
@@ -92,6 +91,14 @@ impl VMGenerator {
 
         let serializer = Serializer::new(main_chunk);
         let bytes = serializer.serialze(&obfuscation_context, settings);
+
+        let nfiowniofw: String = bytes
+            .clone()
+            .into_iter()
+            .map(|v| String::from("\\") + &v.to_string())
+            .collect();
+
+        println!("{}", nfiowniofw);
 
         let bytecode_string: String = if settings.compress_bytecode {
             bytes
