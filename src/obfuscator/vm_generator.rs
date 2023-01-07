@@ -50,13 +50,18 @@ where
 
 static BASE64_CHARS: &str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-fn to_base36(value: u64) -> String {
+fn to_base64(value: u64) -> String {
     let mut ret = String::new();
     let mut value: usize = value.try_into().unwrap();
 
     loop {
-        ret.push(BASE64_CHARS.chars().nth(value % 36).unwrap());
-        value /= 36;
+        ret.push(
+            BASE64_CHARS
+                .chars()
+                .nth(value % BASE64_CHARS.len())
+                .unwrap(),
+        );
+        value /= BASE64_CHARS.len();
 
         if value == 0 {
             break;
@@ -92,20 +97,12 @@ impl VMGenerator {
         let serializer = Serializer::new(main_chunk);
         let bytes = serializer.serialze(&obfuscation_context, settings);
 
-        let nfiowniofw: String = bytes
-            .clone()
-            .into_iter()
-            .map(|v| String::from("\\") + &v.to_string())
-            .collect();
-
-        println!("{}", nfiowniofw);
-
         let bytecode_string: String = if settings.compress_bytecode {
             bytes
                 .into_iter()
                 .map(|v| {
-                    let byte_str = to_base36(v as u64);
-                    to_base36(byte_str.len() as u64) + &byte_str
+                    let byte_str = to_base64(v as u64);
+                    to_base64(byte_str.len() as u64) + &byte_str
                 })
                 .collect()
         } else {
@@ -175,13 +172,25 @@ impl VMGenerator {
 
         if settings.compress_bytecode {
             vm_string += "
+        local base36Chars = StringChar(TableUnpack(TableMerge(RangeGen(48, 57), RangeGen(65, 90))))
+
+        local function base36Decode(inputStr)
+            local num, str = 0, StringReverse(inputStr)
+
+            for i = 1, #str do
+                num = num + StringFind(base36Chars, StringSub(str, i, i)) * 36 ^ (i - 1)
+            end
+
+            return num
+        end
+
         local function decompress(bytecode)
             local ret = ''
             local i = 1
             while i <= #bytecode do
-                local len = Tonumber(StringSub(bytecode, i, i), 36)
+                local len = base36Decode(StringSub(bytecode, i, i))
                 i = i + 1
-                ret = ret .. StringChar(Tonumber(StringSub(bytecode, i, i + len - 1), 36))
+                ret = ret .. StringChar(base36Decode(StringSub(bytecode, i, i + len - 1)))
                 i = i + len
             end
 

@@ -3,10 +3,27 @@ local String = string
 local StringChar = String.char
 local StringByte = String.byte
 local StringSub = String.sub
+local StringReverse = String.reverse
+local StringFindReal = String.find
+-- I had to do this BS because lua returns start and end index and I didn't want to deal with that
+local StringFind = function(str, val) local a, _ = StringFindReal(str, val) return a - 1 end
+local StringConcat = function(...)
+	local str = ''
+	local strs = {...}
+	for i = 1, #strs do
+		str = str .. strs[i]
+	end
+
+	return str
+end
 local Select = select
 local Table = table
 local Math = math
 local Error = error
+local Pairs = pairs
+local IPairs = ipairs
+local TableConcat = Table.concat
+local TableInsert = Table.insert
 local TableCreate = function(...)
 	return {}
 end
@@ -19,13 +36,38 @@ local TableMove = function(src, first, last, offset, dst)
 		dst[offset + i] = src[first + i]
 	end
 end
-local TableConcat = Table.concat
+local TableMerge = function(...)
+	local newTable = {}
+	local tbls = {...}
+	for i = 1, #tbls do
+		for j = 1, #(tbls[i]) do
+			TableInsert(newTable, tbls[i][j])
+		end
+	end
+
+	return newTable
+end
 local Getfenv = getfenv
 local MathFloor = Math.floor
 local MathMax = Math.max
 local Pcall = pcall
 local MathAbs = Math.abs
 local Tonumber = tonumber
+
+local RangeGen = function(inputStart, finish, step)
+	step = step or 1
+	local start = finish and inputStart or 1
+	finish = finish or inputStart
+
+	local a = {}
+
+	for i = start, finish, step do
+		TableInsert(a, i)
+	end
+
+	return a
+end
+
 local getBitwise = (function()
 	local function tobittable_r(x, ...)
 		if (x or 0) == 0 then
@@ -297,7 +339,7 @@ function stm_lua_func(stream, psrc)
 	-- proto.lines = stm_line_list(stream)
 
 	-- post process optimization
-	for _, v in ipairs(proto[5]) do
+	for _, v in IPairs(proto[5]) do
 		if v[5] then
 			v[8] = proto[4][v[3] + 1] -- offset for 1 based index
 		else
@@ -355,7 +397,7 @@ function stm_lua_func(stream, psrc)
 	proto[7] = stm_line_list(stream)
 
 	-- post process optimization
-	for _, v in ipairs(proto[5]) do
+	for _, v in IPairs(proto[5]) do
 		if v[5] then
 			v[8] = proto[4][v[3] + 1] -- offset for 1 based index
 		else
@@ -382,7 +424,7 @@ end
 
 pub static RUN_HELPERS: &str = "
 local function close_lua_upvalues(list, index)
-	for i, uv in pairs(list) do
+	for i, uv in Pairs(list) do
 		if uv[1] >= index then
 			-- Replace with indexes if uncommenting
 			--uv.value = uv.store[uv.index] -- store value
@@ -410,13 +452,13 @@ local function on_lua_error(failed, err)
 	-- local line = failed.lines[failed.pc - 1]
 	local line = 0
 
-	Error(src .. ':' .. line .. ':' .. err, 0)
+	Error(StringConcat(src, ':', line, ':', err), 0)
 end
 ";
 
 pub static RUN_HELPERS_LI: &str = "
 local function close_lua_upvalues(list, index)
-	for i, uv in pairs(list) do
+	for i, uv in Pairs(list) do
 		if uv[1] >= index then
 			--uv.value = uv.store[uv.index] -- store value
 			--uv.store = uv
@@ -442,7 +484,7 @@ local function on_lua_error(failed, err)
 	-- TODO: Add line info for optional error reporting
 	local line = failed[3][failed[1] - 1]
 
-	Error(src .. ':' .. line .. ':' .. err, 0)
+	Error(StringConcat(src, ':', line, ':', err), 0)
 end
 ";
 
