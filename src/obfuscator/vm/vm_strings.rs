@@ -557,6 +557,10 @@ end
 ";
 
 pub static RUN_2_LI: &str = "
+	state[5] = pc
+	end
+end
+
 function lua_wrap_state(proto, env, upval)
 	env = env or Getfenv(0)
 
@@ -575,7 +579,7 @@ function lua_wrap_state(proto, env, upval)
 			TableMove(passed, start, start + len - 1, 1, vararg[2])
 		end
 
-		local state = {vararg, memory, proto[5], subs = proto[6], 1}
+		local state = {vararg, memory, proto[5], proto[6], 1}
 
 		local result = TablePack(Pcall(run_lua_func, state, env, upval))
 
