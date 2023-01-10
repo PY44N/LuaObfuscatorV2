@@ -277,11 +277,11 @@ local function stm_inst_list(S)
 	local list = TableCreate(len)
 
 	for i = 1, len do
-		-- local ins = stm_int16(S)
-		local op = stm_byte(S)
-		local args = stm_byte(S)
-		local isConstantB = stm_byte(S) == 1
-		local isConstantC = stm_byte(S) == 1
+		local ins = stm_int16(S)
+		local op = BitAnd(BitRShift(ins, 4), 0x3f)
+		local args = BitAnd(BitRShift(ins, 2), 3)
+		local isConstantB = BitAnd(BitRShift(ins, 1), 1) == 1
+		local isConstantC = BitAnd(ins, 1) == 1
 		local data = {op, stm_byte(S)}
 
 		if args == 1 then -- ABC

@@ -6,7 +6,7 @@ pub struct ObfuscationSettings {
 impl ObfuscationSettings {
     pub fn new() -> Self {
         Self {
-            include_debug_line_info: true,
+            include_debug_line_info: false,
             compress_bytecode: true,
         }
     }
