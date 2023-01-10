@@ -418,7 +418,7 @@ function lua_bc_to_state(src)
 		src
 	}
 
-	return stm_lua_func(stream, '@virtual')
+	return stm_lua_func(stream, '')
 end
 ";
 
