@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use rand::seq::SliceRandom;
 
 use crate::{
@@ -46,6 +48,41 @@ where
     T: PartialEq<T>,
 {
     list.iter().position(|v| *v == value).unwrap()
+}
+
+// From: https://rosettacode.org/wiki/LZW_compression#Rust
+fn compress(data: Vec<u8>) -> Vec<u32> {
+    // Build initial dictionary.
+    let mut dictionary: HashMap<Vec<u8>, u32> = (0u32..=255)
+        .map(|i| (vec![i as u8], i))
+        .collect();
+
+    let mut w = Vec::new();
+    let mut compressed = Vec::new();
+
+    for b in data {
+        let mut wc = w.clone();
+        wc.push(b);
+
+        if dictionary.contains_key(&wc) {
+            w = wc;
+        } else {
+            // Write w to output.
+            compressed.push(dictionary[&w]);
+
+            // wc is a new sequence; add it to the dictionary.
+            dictionary.insert(wc, dictionary.len() as u32);
+            w.clear();
+            w.push(b);
+        }
+    }
+
+    // Write remaining output if necessary.
+    if !w.is_empty() {
+        compressed.push(dictionary[&w]);
+    }
+
+    compressed
 }
 
 static BASE64_CHARS: &str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -98,7 +135,7 @@ impl VMGenerator {
         let bytes = serializer.serialze(&obfuscation_context, settings);
 
         let bytecode_string: String = if settings.compress_bytecode {
-            bytes
+            compress(bytes)
                 .into_iter()
                 .map(|v| {
                     let byte_str = to_base64(v as u64);
@@ -184,24 +221,48 @@ impl VMGenerator {
             return num
         end
 
-        local function decompress(bytecode)
-            local ret = ''
+        -- From https://rosettacode.org/wiki/LZW_compression#Lua
+        local function decompress(compressed) -- table
+            local dictionary, dictSize, entry, w, k = {}, 256, '', StringChar(compressed[1])
+            local result = {w}
+            for i = 0, 255 do
+                dictionary[i] = StringChar(i)
+            end
+            for i = 2, #compressed do
+                k = compressed[i]
+                if dictionary[k] then
+                    entry = dictionary[k]
+                elseif k == dictSize then
+                    entry = w .. StringSub(w, 1, 1)
+                else
+                    return nil, i
+                end
+                TableInsert(result, entry)
+                dictionary[dictSize] = w .. StringSub(entry, 1, 1)
+                dictSize = dictSize + 1
+                w = entry
+            end
+            return TableConcat(result)
+        end
+
+        local function decode(bytecode)
+            local ret = {}
             local i = 1
             while i <= #bytecode do
                 local len = base36Decode(StringSub(bytecode, i, i))
                 i = i + 1
-                ret = ret .. StringChar(base36Decode(StringSub(bytecode, i, i + len - 1)))
+                TableInsert(ret, base36Decode(StringSub(bytecode, i, i + len - 1)))
                 i = i + len
             end
 
-            return ret
+            return decompress(ret)
         end
         ";
         }
 
         if settings.compress_bytecode {
             vm_string += &format!(
-                "lua_wrap_state(lua_bc_to_state(decompress('{}')))()",
+                "lua_wrap_state(lua_bc_to_state(decode('{}')))()",
                 bytecode_string
             );
         } else {
