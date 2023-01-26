@@ -53,9 +53,7 @@ where
 // From: https://rosettacode.org/wiki/LZW_compression#Rust
 fn compress(data: Vec<u8>) -> Vec<u32> {
     // Build initial dictionary.
-    let mut dictionary: HashMap<Vec<u8>, u32> = (0u32..=255)
-        .map(|i| (vec![i as u8], i))
-        .collect();
+    let mut dictionary: HashMap<Vec<u8>, u32> = (0u32..=255).map(|i| (vec![i as u8], i)).collect();
 
     let mut w = Vec::new();
     let mut compressed = Vec::new();
