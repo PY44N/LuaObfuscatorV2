@@ -448,7 +448,6 @@ end
 
 local function on_lua_error(failed, err)
 	local src = failed[2]
-	-- TODO: Add line info for optional error reporting
 	-- local line = failed.lines[failed.pc - 1]
 	local line = 0
 
@@ -481,7 +480,6 @@ end
 
 local function on_lua_error(failed, err)
 	local src = failed[2]
-	-- TODO: Add line info for optional error reporting
 	local line = failed[3][failed[1] - 1]
 
 	Error(StringConcat(src, ':', line, ':', err), 0)

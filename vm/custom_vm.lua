@@ -365,7 +365,6 @@ end
 
 local function on_lua_error(failed, err)
 	local src = failed.source
-	-- TODO: Add line info for optional error reporting
 	-- local line = failed.lines[failed.pc - 1]
 	local line = 0
 
