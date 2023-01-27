@@ -4,7 +4,7 @@ use rand::seq::SliceRandom;
 
 use crate::{
     bytecode::{
-        enums::{lua_type::LuaType, opcode_type::OpcodeType},
+        enums::{chunk_components::ChunkComponents, lua_type::LuaType, opcode_type::OpcodeType},
         structs::chunk::Chunk,
     },
     obfuscation_settings::ObfuscationSettings,
@@ -36,10 +36,15 @@ fn get_used_opcodes(chunk: &Chunk) -> Vec<OpcodeType> {
     opcodes
 }
 
-fn create_context(const_list: [LuaType; 4], opcode_list: Vec<OpcodeType>) -> ObfuscationContext {
+fn create_context(
+    const_list: [LuaType; 4],
+    opcode_list: Vec<OpcodeType>,
+    chunk_component_list: [ChunkComponents; 3],
+) -> ObfuscationContext {
     ObfuscationContext {
         constant_type_map: const_list,
         opcode_map: opcode_list,
+        chunk_component_map: chunk_component_list,
     }
 }
 
@@ -127,7 +132,14 @@ impl VMGenerator {
         ];
         constant_list.shuffle(&mut rand);
 
-        let obfuscation_context = create_context(constant_list, opcode_list);
+        let mut chunk_component_list = [
+            ChunkComponents::CONSTANTS,
+            ChunkComponents::INSTRUCTIONS,
+            ChunkComponents::PROTOS,
+        ];
+        chunk_component_list.shuffle(&mut rand);
+
+        let obfuscation_context = create_context(constant_list, opcode_list, chunk_component_list);
 
         let serializer = Serializer::new(main_chunk);
         let bytes = serializer.serialze(&obfuscation_context, settings);
@@ -179,11 +191,23 @@ impl VMGenerator {
             index_of(&obfuscation_context.constant_type_map, LuaType::NUMBER),
             index_of(&obfuscation_context.constant_type_map, LuaType::STRING),
         );
-        vm_string += if settings.include_debug_line_info {
-            vm_strings::DESERIALIZER_2_LI
-        } else {
-            vm_strings::DESERIALIZER_2
-        };
+        vm_string += vm_strings::DESERIALIZER_2;
+
+        for component in &obfuscation_context.chunk_component_map {
+            vm_string += match component {
+                ChunkComponents::CONSTANTS => "proto[4] = stm_const_list(stream)",
+                ChunkComponents::INSTRUCTIONS => "proto[5] = stm_inst_list(stream)",
+                ChunkComponents::PROTOS => "proto[6] = stm_sub_list(stream, src)",
+            };
+            vm_string += "\n";
+        }
+
+        if settings.include_debug_line_info {
+            vm_string += "proto[7] = stm_line_list(stream)";
+        }
+
+        vm_string += vm_strings::DESERIALIZER_3;
+
         vm_string += if settings.include_debug_line_info {
             vm_strings::RUN_HELPERS_LI
         } else {

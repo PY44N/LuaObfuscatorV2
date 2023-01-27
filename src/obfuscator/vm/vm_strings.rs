@@ -332,93 +332,32 @@ function stm_lua_func(stream, psrc)
 
 	-- stm_byte(stream) -- vararg flag
 	-- proto.max_stack = stm_byte(stream) -- max stack size
-
-	proto[4] = stm_const_list(stream)
-	proto[5] = stm_inst_list(stream)
-	proto[6] = stm_sub_list(stream, src)
-	-- proto.lines = stm_line_list(stream)
-
-	-- post process optimization
-	for _, v in IPairs(proto[5]) do
-		if v[5] then
-			v[8] = proto[4][v[3] + 1] -- offset for 1 based index
-		else
-			if v[6] then v[9] = proto[4][v[3] - 0xFF] end
-
-			if v[7] then v[10] = proto[4][v[4] - 0xFF] end
-		end
-	end
-
-	return proto
-end
-
-function lua_bc_to_state(src)
-	-- stream object
-	local stream = {
-		-- data
-		1,
-		src
-	}
-
-	return stm_lua_func(stream, '')
-end
 ";
 
-pub static DESERIALIZER_2_LI: &str = "
-local function stm_line_list(S)
-	local len = stm_int64(S)
-	local list = TableCreate(len)
+pub static DESERIALIZER_3: &str = "
+-- post process optimization
+for _, v in IPairs(proto[5]) do
+	if v[5] then
+		v[8] = proto[4][v[3] + 1] -- offset for 1 based index
+	else
+		if v[6] then v[9] = proto[4][v[3] - 0xFF] end
 
-	for i = 1, len do list[i] = stm_int64(S) end
-
-	return list
+		if v[7] then v[10] = proto[4][v[4] - 0xFF] end
+	end
 end
 
-function stm_lua_func(stream, psrc)
-	local src = stm_lstring(stream) or psrc -- source is propagated
-
-	local proto = {
-		src -- source name
-	}
-
-	-- stream:s_int() -- line defined
-	-- stream:s_int() -- last line defined
-
-	proto[2] = stm_byte(stream) -- num upvalues
-	proto[3] = stm_byte(stream) -- num params
-
-
-	-- stm_byte(stream) -- vararg flag
-	-- proto.max_stack = stm_byte(stream) -- max stack size
-
-	proto[4] = stm_const_list(stream)
-	proto[5] = stm_inst_list(stream)
-	proto[6] = stm_sub_list(stream, src)
-	proto[7] = stm_line_list(stream)
-
-	-- post process optimization
-	for _, v in IPairs(proto[5]) do
-		if v[5] then
-			v[8] = proto[4][v[3] + 1] -- offset for 1 based index
-		else
-			if v[6] then v[9] = proto[4][v[3] - 0xFF] end
-
-			if v[7] then v[10] = proto[4][v[4] - 0xFF] end
-		end
-	end
-
-	return proto
+return proto
 end
 
 function lua_bc_to_state(src)
-	-- stream object
-	local stream = {
-		-- data
-		1,
-		src
-	}
+-- stream object
+local stream = {
+	-- data
+	1,
+	src
+}
 
-	return stm_lua_func(stream, '')
+return stm_lua_func(stream, '')
 end
 ";
 

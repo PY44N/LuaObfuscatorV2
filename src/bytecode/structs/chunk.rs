@@ -1,4 +1,5 @@
 use crate::{
+    bytecode::enums::chunk_components::ChunkComponents,
     obfuscation_settings::ObfuscationSettings,
     obfuscator::obfuscation_context::ObfuscationContext,
     util::{read_stream::ReadStream, write_stream::WriteStream},
@@ -64,19 +65,27 @@ impl Chunk {
         write_stream.write_int8(self.upvalue_count);
         write_stream.write_int8(self.parameter_count);
 
-        write_stream.write_int64(self.constants.len() as u64);
-        for constant in &self.constants {
-            constant.serialize(write_stream, obfuscation_context);
-        }
-
-        write_stream.write_int64(self.instructions.len() as u64);
-        for instruction in &self.instructions {
-            instruction.serialize(write_stream, obfuscation_context);
-        }
-
-        write_stream.write_int64(self.protos.len() as u64);
-        for proto in &self.protos {
-            proto.serialize(write_stream, obfuscation_context, settings);
+        for component in &obfuscation_context.chunk_component_map {
+            match component {
+                ChunkComponents::CONSTANTS => {
+                    write_stream.write_int64(self.constants.len() as u64);
+                    for constant in &self.constants {
+                        constant.serialize(write_stream, obfuscation_context);
+                    }
+                }
+                ChunkComponents::INSTRUCTIONS => {
+                    write_stream.write_int64(self.instructions.len() as u64);
+                    for instruction in &self.instructions {
+                        instruction.serialize(write_stream, obfuscation_context);
+                    }
+                }
+                ChunkComponents::PROTOS => {
+                    write_stream.write_int64(self.protos.len() as u64);
+                    for proto in &self.protos {
+                        proto.serialize(write_stream, obfuscation_context, settings);
+                    }
+                }
+            }
         }
 
         if settings.include_debug_line_info {
