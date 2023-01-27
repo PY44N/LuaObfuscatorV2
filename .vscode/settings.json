@@ -1,5 +1,5 @@
 {
-  "editor.defaultFormatter": "rust-lang.rust-analyzer",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[lua]": {
     "editor.defaultFormatter": "Koihik.vscode-lua-format"
   }

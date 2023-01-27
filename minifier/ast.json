@@ -1,0 +1,184 @@
+{
+  "type": "Chunk",
+  "body": [
+    {
+      "type": "LocalStatement",
+      "variables": [
+        {
+          "type": "Identifier",
+          "name": "a",
+          "isLocal": true
+        }
+      ],
+      "init": [
+        {
+          "type": "TableConstructorExpression",
+          "fields": [
+            {
+              "type": "TableValue",
+              "value": {
+                "type": "StringLiteral",
+                "value": null,
+                "raw": "\"Hello\""
+              }
+            },
+            {
+              "type": "TableValue",
+              "value": {
+                "type": "StringLiteral",
+                "value": null,
+                "raw": "\"World\""
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "LocalStatement",
+      "variables": [
+        {
+          "type": "Identifier",
+          "name": "i",
+          "isLocal": true
+        }
+      ],
+      "init": [
+        {
+          "type": "NumericLiteral",
+          "value": 1,
+          "raw": "1"
+        }
+      ]
+    },
+    {
+      "type": "WhileStatement",
+      "condition": {
+        "type": "BinaryExpression",
+        "operator": "<=",
+        "left": {
+          "type": "Identifier",
+          "name": "i",
+          "isLocal": true
+        },
+        "right": {
+          "type": "UnaryExpression",
+          "operator": "#",
+          "argument": {
+            "type": "Identifier",
+            "name": "a",
+            "isLocal": true
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "IfStatement",
+          "clauses": [
+            {
+              "type": "IfClause",
+              "condition": {
+                "type": "BinaryExpression",
+                "operator": "~=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "a",
+                  "isLocal": true
+                },
+                "right": {
+                  "type": "StringLiteral",
+                  "value": null,
+                  "raw": "\"Hello\""
+                }
+              },
+              "body": [
+                {
+                  "type": "CallStatement",
+                  "expression": {
+                    "type": "CallExpression",
+                    "base": {
+                      "type": "Identifier",
+                      "name": "print",
+                      "isLocal": false
+                    },
+                    "arguments": [
+                      {
+                        "type": "StringLiteral",
+                        "value": null,
+                        "raw": "\"World\""
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "type": "ElseClause",
+              "body": [
+                {
+                  "type": "CallStatement",
+                  "expression": {
+                    "type": "CallExpression",
+                    "base": {
+                      "type": "Identifier",
+                      "name": "print",
+                      "isLocal": false
+                    },
+                    "arguments": [
+                      {
+                        "type": "IndexExpression",
+                        "base": {
+                          "type": "Identifier",
+                          "name": "a",
+                          "isLocal": true
+                        },
+                        "index": {
+                          "type": "Identifier",
+                          "name": "i",
+                          "isLocal": true
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "AssignmentStatement",
+          "variables": [
+            {
+              "type": "Identifier",
+              "name": "i",
+              "isLocal": true
+            }
+          ],
+          "init": [
+            {
+              "type": "BinaryExpression",
+              "operator": "+",
+              "left": {
+                "type": "Identifier",
+                "name": "i",
+                "isLocal": true
+              },
+              "right": {
+                "type": "NumericLiteral",
+                "value": 1,
+                "raw": "1"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "globals": [
+    {
+      "type": "Identifier",
+      "name": "print",
+      "isLocal": false
+    }
+  ]
+}
