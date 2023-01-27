@@ -1,1 +1,0 @@
-local a=function(b,c)local d={c.a,c.b}local e=b.a;while e<=#d do if d==c.a then print(c.b)else print(d[e])end;e=e+-b.b+b.c end end;a({a=1,b=46,c=47},{a=[[Hello]],b=[[World]]})
