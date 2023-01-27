@@ -282,18 +282,20 @@ local function stm_inst_list(S)
 		local args = BitAnd(BitRShift(ins, 2), 3)
 		local isConstantB = BitAnd(BitRShift(ins, 1), 1) == 1
 		local isConstantC = BitAnd(ins, 1) == 1
-		local data = {op, stm_byte(S)}
+		local data = {}
+		data[$OPCODE$] = op
+		data[$A_REGISTER$] = stm_byte(S)
 
 		if args == 1 then -- ABC
-			data[3] = stm_int16(S)
-			data[4] = stm_int16(S)
-			data[6] = isConstantB and data[3] > 0xFF -- post process optimization
-			data[7] = isConstantC and data[4] > 0xFF
+			data[$B_REGISTER$] = stm_int16(S)
+			data[$C_REGISTER$] = stm_int16(S)
+			data[$IS_KB$] = isConstantB and data[$B_REGISTER$] > 0xFF -- post process optimization
+			data[$IS_KC$] = isConstantC and data[$C_REGISTER$] > 0xFF
 		elseif args == 2 then -- ABx
-			data[3] = stm_int32(S)
-			data[5] = isConstantB
+			data[$B_REGISTER$] = stm_int32(S)
+			data[$IS_KB$] = isConstantB
 		elseif args == 3 then -- AsBx
-			data[3] = stm_int32(S) - 131071
+			data[$B_REGISTER$] = stm_int32(S) - 131071
 		end
 
 		list[i] = data
@@ -319,15 +321,14 @@ pub static DESERIALIZER_2: &str = "
 function stm_lua_func(stream, psrc)
 	local src = stm_lstring(stream) or psrc -- source is propagated
 
-	local proto = {
-		src -- source name
-	}
+	local proto = {}
+	proto[$SOURCE_NAME$] = src
 
 	-- stream:s_int() -- line defined
 	-- stream:s_int() -- last line defined
 
-	proto[2] = stm_byte(stream) -- num upvalues
-	proto[3] = stm_byte(stream) -- num params
+	proto[$UPVALUE_COUNT$] = stm_byte(stream) -- num upvalues
+	proto[$PARAMETER_COUNT$] = stm_byte(stream) -- num params
 
 
 	-- stm_byte(stream) -- vararg flag
@@ -336,13 +337,13 @@ function stm_lua_func(stream, psrc)
 
 pub static DESERIALIZER_3: &str = "
 -- post process optimization
-for _, v in IPairs(proto[5]) do
-	if v[5] then
-		v[8] = proto[4][v[3] + 1] -- offset for 1 based index
+for _, v in IPairs(proto[$OPCODE_LIST$]) do
+	if v[$IS_K$] then
+		v[$CONST$] = proto[$CONSTANT_LIST$][v[$B_REGISTER$] + 1] -- offset for 1 based index
 	else
-		if v[6] then v[9] = proto[4][v[3] - 0xFF] end
+		if v[$IS_KB$] then v[$CONST_B$] = proto[$CONSTANT_LIST$][v[$B_REGISTER$] - 0xFF] end
 
-		if v[7] then v[10] = proto[4][v[4] - 0xFF] end
+		if v[$IS_KC$] then v[$CONST_C$] = proto[$CONSTANT_LIST$][v[$C_REGISTER$] - 0xFF] end
 	end
 end
 
@@ -437,11 +438,11 @@ local function run_lua_func(state, env, upvals)
 	local pc = state[5]
 
 	local function constantB(inst)
-		return inst[6] and inst[9] or memory[inst[3]]
+		return inst[$IS_KB$] and inst[$CONST_B$] or memory[inst[$B_REGISTER$]]
 	end
 
 	local function constantC(inst)
-		return inst[7] and inst[10] or memory[inst[4]]
+		return inst[$IS_KC$] and inst[$CONST_C$] or memory[inst[$C_REGISTER$]]
 	end
 
 	while true do
@@ -464,24 +465,24 @@ function lua_wrap_state(proto, env, upval)
 		local memory = TableCreate()
 		local vararg = {0, {}}
 
-		TableMove(passed, 1, proto[3], 0, memory)
+		TableMove(passed, 1, proto[$PARAMETER_COUNT$], 0, memory)
 
-		if proto[3] < passed.n then
-			local start = proto[3] + 1
-			local len = passed.n - proto[3]
+		if proto[$PARAMETER_COUNT$] < passed.n then
+			local start = proto[$PARAMETER_COUNT$] + 1
+			local len = passed.n - proto[$PARAMETER_COUNT$]
 
 			vararg[1] = len
 			TableMove(passed, start, start + len - 1, 1, vararg[2])
 		end
 
-		local state = {vararg, memory, proto[5], proto[6], 1}
+		local state = {vararg, memory, proto[$OPCODE_LIST$], proto[$PROTO_LIST$], 1}
 
 		local result = TablePack(Pcall(run_lua_func, state, env, upval))
 
 		if result[1] then
 			return TableUnpack(result, 2, result.n)
 		else
-			local failed = {state[5], proto[1] --[[,lines = proto.lines]]}
+			local failed = {state[5], proto[$SOURCE_NAME$] --[[,lines = proto.lines]]}
 
 			on_lua_error(failed, result[2])
 
@@ -506,24 +507,24 @@ function lua_wrap_state(proto, env, upval)
 		local memory = TableCreate()
 		local vararg = {0, {}}
 
-		TableMove(passed, 1, proto[3], 0, memory)
+		TableMove(passed, 1, proto[$PARAMETER_COUNT$], 0, memory)
 
-		if proto[3] < passed.n then
-			local start = proto[3] + 1
-			local len = passed.n - proto[3]
+		if proto[$PARAMETER_COUNT$] < passed.n then
+			local start = proto[$PARAMETER_COUNT$] + 1
+			local len = passed.n - proto[$PARAMETER_COUNT$]
 
 			vararg[1] = len
 			TableMove(passed, start, start + len - 1, 1, vararg[2])
 		end
 
-		local state = {vararg, memory, proto[5], proto[6], 1}
+		local state = {vararg, memory, proto[$OPCODE_LIST$], proto[$PROTO_LIST$], 1}
 
 		local result = TablePack(Pcall(run_lua_func, state, env, upval))
 
 		if result[1] then
 			return TableUnpack(result, 2, result.n)
 		else
-			local failed = {state[5], proto[1], proto[7]}
+			local failed = {state[5], proto[$SOURCE_NAME$], proto[$LINE_LIST$]}
 
 			on_lua_error(failed, result[2])
 

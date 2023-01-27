@@ -195,15 +195,15 @@ impl VMGenerator {
 
         for component in &obfuscation_context.chunk_component_map {
             vm_string += match component {
-                ChunkComponents::CONSTANTS => "proto[4] = stm_const_list(stream)",
-                ChunkComponents::INSTRUCTIONS => "proto[5] = stm_inst_list(stream)",
-                ChunkComponents::PROTOS => "proto[6] = stm_sub_list(stream, src)",
+                ChunkComponents::CONSTANTS => "proto[$CONSTANT_LIST$] = stm_const_list(stream)",
+                ChunkComponents::INSTRUCTIONS => "proto[$OPCODE_LIST$] = stm_inst_list(stream)",
+                ChunkComponents::PROTOS => "proto[$PROTO_LIST$] = stm_sub_list(stream, src)",
             };
             vm_string += "\n";
         }
 
         if settings.include_debug_line_info {
-            vm_string += "proto[7] = stm_line_list(stream)";
+            vm_string += "proto[$LINE_LIST$] = stm_line_list(stream)";
         }
 
         vm_string += vm_strings::DESERIALIZER_3;
@@ -290,6 +290,31 @@ impl VMGenerator {
         } else {
             vm_string += &format!("lua_wrap_state(lua_bc_to_state('{}'))()", bytecode_string);
         }
+
+        let rename_map = [
+            "OPCODE",
+            "A_REGISTER",
+            "B_REGISTER",
+            "C_REGISTER",
+            "IS_K",
+            "IS_KB",
+            "IS_KC",
+            "CONST",
+            "CONST_B",
+            "CONST_C",
+            "SOURCE_NAME",
+            "UPVALUE_COUNT",
+            "PARAMETER_COUNT",
+            "CONSTANT_LIST",
+            "OPCODE_LIST",
+            "PROTO_LIST",
+            "LINE_LIST",
+        ];
+
+        for (i, rename) in rename_map.iter().enumerate() {
+            vm_string = vm_string.replace(&format!("${}$", *rename), &i.to_string());
+        }
+
         vm_string
     }
 }
