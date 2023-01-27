@@ -169,7 +169,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         if len == 0 then len = top_index - A end
 
         if C == 0 then
-            C = inst[pc].value
+            C = inst[pc][2] -- used to be .value (I think that this is a upvalue but idk so the index might be wrong)
             pc = pc + 1
         end
 
