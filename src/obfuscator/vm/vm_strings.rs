@@ -447,7 +447,7 @@ local function run_lua_func(state, env, upvals)
 
 	while true do
 		local inst = code[pc]
-		local op = inst[1]
+		local op = inst[$OPCODE$]
 		pc = pc + 1
 
 ";
