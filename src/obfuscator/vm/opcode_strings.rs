@@ -47,23 +47,23 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         memory[inst[$A_REGISTER$]] = str"
         }
         OpcodeType::OpJmp => "pc = pc + inst[$B_REGISTER$]",
-        OpcodeType::OpEq => "if (constantB(inst) == constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][3] end
+        OpcodeType::OpEq => "if (constantB(inst) == constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
         pc = pc + 1",
-        OpcodeType::OpLt => "if (constantB(inst) < constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][3] end
+        OpcodeType::OpLt => "if (constantB(inst) < constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
         pc = pc + 1",
-        OpcodeType::OpLe => "if (constantB(inst) <= constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][3] end
+        OpcodeType::OpLe => "if (constantB(inst) <= constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
         pc = pc + 1",
-        OpcodeType::OpTest => "if (not memory[inst[$A_REGISTER$]]) ~= (inst[$C_REGISTER$] ~= 0) then pc = pc + code[pc][3] end
+        OpcodeType::OpTest => "if (not memory[inst[$A_REGISTER$]]) ~= (inst[$C_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
         pc = pc + 1",
         OpcodeType::OpTestSet => "local A = inst[$A_REGISTER$]
         local B = inst[$B_REGISTER$]
 
         if (not memory[B]) ~= (inst[$C_REGISTER$] ~= 0) then
             memory[A] = memory[B]
-            pc = pc + code[pc][3]
+            pc = pc + code[pc][$B_REGISTER$]
         end
         pc = pc + 1",
         OpcodeType::OpCall => "local A = inst[$A_REGISTER$]
