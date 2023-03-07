@@ -27,11 +27,7 @@ fn main() {
 
     fs::copy("Input.lua", "temp/temp1.lua").unwrap();
 
-    let luac_command = if cfg!(target_os = "windows") {
-        "luac"
-    } else {
-        "luac5.1"
-    };
+    let luac_command = "luac";
 
     println!("[Obfuscator] Compiling...");
 
@@ -70,11 +66,7 @@ fn main() {
 
     println!("[Obfuscator] Running...");
 
-    let output = Command::new(if cfg!(target_os = "windows") {
-        "lua"
-    } else {
-        "lua5.1"
-    })
+    let output = Command::new("lua")
     .arg(FINAL_FILE)
     .current_dir("temp")
     .output()
