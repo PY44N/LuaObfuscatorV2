@@ -296,10 +296,10 @@ impl VMGenerator {
             "A_REGISTER",
             "B_REGISTER",
             "C_REGISTER",
-            "IS_K",
+            "IS_CONST",
             "IS_KB",
             "IS_KC",
-            "CONST",
+            "CONSTANT",
             "CONST_B",
             "CONST_C",
             "SOURCE_NAME",
@@ -312,7 +312,7 @@ impl VMGenerator {
         ];
 
         for (i, rename) in rename_map.iter().enumerate() {
-            vm_string = vm_string.replace(&format!("${}$", *rename), &i.to_string());
+            vm_string = vm_string.replace(&format!("${}$", *rename), &(i + 1).to_string());
         }
 
         vm_string

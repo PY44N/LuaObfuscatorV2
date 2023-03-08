@@ -1,3 +1,81 @@
+function print_table(node)
+    local cache, stack, output = {}, {}, {}
+    local depth = 1
+    local output_str = "{\n"
+
+    while true do
+        local size = 0
+        for k, v in pairs(node) do
+            size = size + 1
+        end
+
+        local cur_index = 1
+        for k, v in pairs(node) do
+            if (cache[node] == nil) or (cur_index >= cache[node]) then
+                if (string.find(output_str, "}", output_str:len())) then
+                    output_str = output_str .. ",\n"
+                elseif not (string.find(output_str, "\n", output_str:len())) then
+                    output_str = output_str .. "\n"
+                end
+
+                -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+                table.insert(output, output_str)
+                output_str = ""
+
+                local key
+                if (type(k) == "number" or type(k) == "boolean") then
+                    key = "[" .. tostring(k) .. "]"
+                else
+                    key = "['" .. tostring(k) .. "']"
+                end
+
+                if (type(v) == "number" or type(v) == "boolean") then
+                    output_str = output_str .. string.rep("\t", depth) .. key .. " = " .. tostring(v)
+                elseif (type(v) == "table") then
+                    output_str = output_str .. string.rep("\t", depth) .. key .. " = {\n"
+                    table.insert(stack, node)
+                    table.insert(stack, v)
+                    cache[node] = cur_index + 1
+                    break
+                else
+                    output_str = output_str .. string.rep("\t", depth) .. key .. " = '" .. tostring(v) .. "'"
+                end
+
+                if (cur_index == size) then
+                    output_str = output_str .. "\n" .. string.rep("\t", depth - 1) .. "}"
+                else
+                    output_str = output_str .. ","
+                end
+            else
+                -- close the table
+                if (cur_index == size) then
+                    output_str = output_str .. "\n" .. string.rep("\t", depth - 1) .. "}"
+                end
+            end
+
+            cur_index = cur_index + 1
+        end
+
+        if (size == 0) then
+            output_str = output_str .. "\n" .. string.rep("\t", depth - 1) .. "}"
+        end
+
+        if (#stack > 0) then
+            node = stack[#stack]
+            stack[#stack] = nil
+            depth = cache[node] == nil and depth + 1 or depth - 1
+        else
+            break
+        end
+    end
+
+    -- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+    table.insert(output, output_str)
+    output_str = table.concat(output)
+
+    print(output_str)
+end
+
 local String = string
 local StringChar = String.char
 local StringByte = String.byte
@@ -292,19 +370,19 @@ local function stm_inst_list(S)
         local isConstantB = BitAnd(BitRShift(ins, 1), 1) == 1
         local isConstantC = BitAnd(ins, 1) == 1
         local data = {}
-        data[0] = op
-        data[1] = stm_byte(S)
+        data[1] = op
+        data[2] = stm_byte(S)
 
         if args == 1 then -- ABC
-            data[2] = stm_int16(S)
             data[3] = stm_int16(S)
-            data[5] = isConstantB and data[2] > 0xFF -- post process optimization
-            data[6] = isConstantC and data[3] > 0xFF
+            data[4] = stm_int16(S)
+            data[6] = isConstantB and data[3] > 0xFF -- post process optimization
+            data[5] = isConstantC and data[4] > 0xFF
         elseif args == 2 then -- ABx
-            data[2] = stm_int32(S)
+            data[3] = stm_int32(S)
             data[5] = isConstantB
         elseif args == 3 then -- AsBx
-            data[2] = stm_int32(S) - 131071
+            data[3] = stm_int32(S) - 131071
         end
 
         list[i] = data
@@ -332,11 +410,11 @@ local function stm_const_list(S)
         local tt = stm_byte(S)
         local k
 
-        if tt == 2 then -- Bool
+        if tt == 0 then -- Bool
             k = stm_byte(S) ~= 0
-        elseif tt == 0 then -- Number
+        elseif tt == 3 then -- Number
             k = stm_num(S)
-        elseif tt == 3 then -- String
+        elseif tt == 1 then -- String
             k = stm_lstring(S)
         end
 
@@ -350,31 +428,31 @@ function stm_lua_func(stream, psrc)
     local src = stm_lstring(stream) or psrc -- source is propagated
 
     local proto = {}
-    proto[10] = src
+    proto[11] = src
 
     -- stream:s_int() -- line defined
     -- stream:s_int() -- last line defined
 
-    proto[11] = stm_byte(stream) -- num upvalues
-    proto[12] = stm_byte(stream) -- num params
+    proto[12] = stm_byte(stream) -- num upvalues
+    proto[13] = stm_byte(stream) -- num params
 
     -- stm_byte(stream) -- vararg flag
     -- proto.max_stack = stm_byte(stream) -- max stack size
-    proto[15] = stm_sub_list(stream, src)
-    proto[13] = stm_const_list(stream)
-    proto[14] = stm_inst_list(stream)
+    proto[15] = stm_inst_list(stream)
+    proto[14] = stm_const_list(stream)
+    proto[16] = stm_sub_list(stream, src)
 
     -- post process optimization
-    for _, v in IPairs(proto[14]) do
-        if v[4] then
-            v[7] = proto[13][v[2] + 1] -- offset for 1 based index
+    for _, v in IPairs(proto[15]) do
+        if v[5] then
+            v[8] = proto[14][v[3] + 1] -- offset for 1 based index
         else
-            if v[5] then
-                v[8] = proto[13][v[2] - 0xFF]
+            if v[6] then
+                v[9] = proto[14][v[3] - 0xFF]
             end
 
-            if v[6] then
-                v[9] = proto[13][v[3] - 0xFF]
+            if v[7] then
+                v[10] = proto[14][v[4] - 0xFF]
             end
         end
     end
@@ -435,43 +513,50 @@ local function run_lua_func(state, env, upvals)
     local pc = state[5]
 
     local function constantB(inst)
-        return inst[5] and inst[8] or memory[inst[2]]
+        return inst[6] and inst[9] or memory[inst[3]]
     end
 
     local function constantC(inst)
-        return inst[6] and inst[9] or memory[inst[3]]
+        return inst[7] and inst[10] or memory[inst[4]]
     end
 
     while true do
         local inst = code[pc]
-        local op = inst[0]
+        local op = inst[1]
         pc = pc + 1
 
         if op == 0 --[[OpLoadConst]] then
-            memory[inst[1]] = inst[7]
-        elseif op == 1 --[[OpLen]] then
-            memory[inst[1]] = #memory[inst[2]]
-        elseif op == 2 --[[OpAdd]] then
-            memory[inst[1]] = constantB(inst) + constantC(inst)
-        elseif op == 3 --[[OpGetTable]] then
-            memory[inst[1]] = memory[inst[2]][constantC(inst)]
-        elseif op == 4 --[[OpNewTable]] then
-            memory[inst[1]] = {}
-        elseif op == 5 --[[OpLe]] then
-			print(constantB(inst))
-            if (constantB(inst) <= constantC(inst)) == (inst[1] ~= 0) then
-                pc = pc + code[pc][2]
+            memory[inst[2]] = inst[8]
+        elseif op == 1 --[[OpLe]] then
+            if (constantB(inst) <= constantC(inst)) == (inst[2] ~= 0) then
+                pc = pc + code[pc][3]
             end
 
             pc = pc + 1
-        elseif op == 6 --[[OpGetGlobal]] then
-            memory[inst[1]] = env[inst[7]]
-        elseif op == 7 --[[OpJmp]] then
-            pc = pc + inst[2]
-        elseif op == 8 --[[OpCall]] then
-            local A = inst[1]
-            local B = inst[2]
-            local C = inst[3]
+        elseif op == 2 --[[OpJmp]] then
+            pc = pc + inst[3]
+        elseif op == 3 --[[OpGetTable]] then
+            memory[inst[2]] = memory[inst[3]][constantC(inst)]
+        elseif op == 4 --[[OpLen]] then
+            memory[inst[2]] = #memory[inst[3]]
+        elseif op == 5 --[[OpReturn]] then
+            local A = inst[2]
+            local B = inst[3]
+            local len
+
+            if B == 0 then
+                len = top_index - A + 1
+            else
+                len = B - 1
+            end
+
+            close_lua_upvalues(open_list, 0)
+
+            return TableUnpack(memory, A, A + len - 1)
+        elseif op == 6 --[[OpCall]] then
+            local A = inst[2]
+            local B = inst[3]
+            local C = inst[4]
             local params
 
             if B == 0 then
@@ -490,10 +575,10 @@ local function run_lua_func(state, env, upvals)
             end
 
             TableMove(ret_list, 1, ret_num, A, memory)
-        elseif op == 9 --[[OpSetList]] then
-            local A = inst[1]
-            local C = inst[3]
-            local len = inst[2]
+        elseif op == 7 --[[OpSetList]] then
+            local A = inst[2]
+            local C = inst[4]
+            local len = inst[3]
             local tab = memory[A]
             local offset
 
@@ -509,20 +594,14 @@ local function run_lua_func(state, env, upvals)
             offset = (C - 1) * 50 --FIELDS_PER_FLUSH
 
             TableMove(memory, A + 1, A + len, offset + 1, tab)
-        elseif op == 10 --[[OpReturn]] then
-            local A = inst[1]
-            local B = inst[2]
-            local len
-
-            if B == 0 then
-                len = top_index - A + 1
-            else
-                len = B - 1
-            end
-
-            close_lua_upvalues(open_list, 0)
-
-            return TableUnpack(memory, A, A + len - 1)
+        elseif op == 8 --[[OpNewTable]] then
+            memory[inst[2]] = {}
+        elseif op == 9 --[[OpGetGlobal]] then
+            memory[inst[2]] = env[inst[8]]
+        elseif op == 10 --[[OpAdd]] then
+		print_table(memory)
+		print_table(inst)
+            memory[inst[2]] = constantB(inst) + constantC(inst)
         end
         state[5] = pc
     end
@@ -536,24 +615,24 @@ function lua_wrap_state(proto, env, upval)
         local memory = TableCreate()
         local vararg = {0, {}}
 
-        TableMove(passed, 1, proto[12], 0, memory)
+        TableMove(passed, 1, proto[13], 0, memory)
 
-        if proto[12] < passed.n then
-            local start = proto[12] + 1
-            local len = passed.n - proto[12]
+        if proto[13] < passed.n then
+            local start = proto[13] + 1
+            local len = passed.n - proto[13]
 
             vararg[1] = len
             TableMove(passed, start, start + len - 1, 1, vararg[2])
         end
 
-        local state = {vararg, memory, proto[14], proto[15], 1}
+        local state = {vararg, memory, proto[15], proto[16], 1}
 
         local result = TablePack(Pcall(run_lua_func, state, env, upval))
 
         if result[1] then
             return TableUnpack(result, 2, result.n)
         else
-            local failed = {state[5], proto[10] --[[,lines = proto.lines]]}
+            local failed = {state[5], proto[11] --[[,lines = proto.lines]]}
 
             on_lua_error(failed, result[2])
 
@@ -615,7 +694,7 @@ end
 lua_wrap_state(
     lua_bc_to_state(
         decode(
-            "1B102752761021S23822T23123421D21A23023922P27727J2751427K10131627N22022T23023023327O27Q27K23B23323623022S27N1026O21R27P27N23423622X232238101E27N21W275122761A101127728N1228P27524428K28O1028N1128L2751K1029127522F27528P28L23G27L2941022Y2941327621H27O2981023O29428L28P21328O2991129B1026V27328P24K29L275"
+            "1B102752761021S23822T23123421D21A23023922P2761E27727623O275122761A101127727R1227T27523827O27S1027R1127P27521W102852751N27527T27P218275142881024A2881327621H1028M28122S28827P27T24N27S28D1128F1026V27327T22C28C27628H27L27S162991022022T23023023329A29C23B23323623028S28Q27726O21R1129B29923423622X23227Z29C10"
         )
     )
 )()

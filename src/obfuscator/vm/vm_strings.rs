@@ -290,10 +290,10 @@ local function stm_inst_list(S)
 			data[$B_REGISTER$] = stm_int16(S)
 			data[$C_REGISTER$] = stm_int16(S)
 			data[$IS_KB$] = isConstantB and data[$B_REGISTER$] > 0xFF -- post process optimization
-			data[$IS_KC$] = isConstantC and data[$C_REGISTER$] > 0xFF
+			data[$IS_CONST$] = isConstantC and data[$C_REGISTER$] > 0xFF
 		elseif args == 2 then -- ABx
 			data[$B_REGISTER$] = stm_int32(S)
-			data[$IS_KB$] = isConstantB
+			data[$IS_CONST$] = isConstantB
 		elseif args == 3 then -- AsBx
 			data[$B_REGISTER$] = stm_int32(S) - 131071
 		end
@@ -338,8 +338,8 @@ function stm_lua_func(stream, psrc)
 pub static DESERIALIZER_3: &str = "
 -- post process optimization
 for _, v in IPairs(proto[$OPCODE_LIST$]) do
-	if v[$IS_K$] then
-		v[$CONST$] = proto[$CONSTANT_LIST$][v[$B_REGISTER$] + 1] -- offset for 1 based index
+	if v[$IS_CONST$] then
+		v[$CONSTANT$] = proto[$CONSTANT_LIST$][v[$B_REGISTER$] + 1] -- offset for 1 based index
 	else
 		if v[$IS_KB$] then v[$CONST_B$] = proto[$CONSTANT_LIST$][v[$B_REGISTER$] - 0xFF] end
 

@@ -3,7 +3,7 @@ use crate::bytecode::enums::opcode_type::OpcodeType;
 pub fn get_opcode_string(opcode: &OpcodeType) -> String {
     match opcode {
         OpcodeType::OpMove => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]]",
-        OpcodeType::OpLoadConst => "memory[inst[$A_REGISTER$]] = inst[$CONST$]",
+        OpcodeType::OpLoadConst => "memory[inst[$A_REGISTER$]] = inst[$CONSTANT$]",
         OpcodeType::OpLoadBool => {
             "memory[inst[$A_REGISTER$]] = inst[$B_REGISTER$] ~= 0
 
@@ -15,9 +15,9 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
 
         memory[inst[$A_REGISTER$]] = uv[2][uv.index]"
         }
-        OpcodeType::OpGetGlobal => "memory[inst[$A_REGISTER$]] = env[inst[$CONST$]]",
+        OpcodeType::OpGetGlobal => "memory[inst[$A_REGISTER$]] = env[inst[$CONSTANT$]]",
         OpcodeType::OpGetTable => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]",
-        OpcodeType::OpSetGlobal => "env[inst[$CONST$]] = memory[inst[$A_REGISTER$]]",
+        OpcodeType::OpSetGlobal => "env[inst[$CONSTANT$]] = memory[inst[$A_REGISTER$]]",
         OpcodeType::OpSetUpval => {
             "local uv = upvals[inst[$B_REGISTER$]]
 
