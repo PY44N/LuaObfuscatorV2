@@ -290,7 +290,7 @@ local function stm_inst_list(S)
 			data[$B_REGISTER$] = stm_int16(S)
 			data[$C_REGISTER$] = stm_int16(S)
 			data[$IS_KB$] = isConstantB and data[$B_REGISTER$] > 0xFF -- post process optimization
-			data[$IS_CONST$] = isConstantC and data[$C_REGISTER$] > 0xFF
+			data[$IS_KC$] = isConstantC and data[$C_REGISTER$] > 0xFF
 		elseif args == 2 then -- ABx
 			data[$B_REGISTER$] = stm_int32(S)
 			data[$IS_CONST$] = isConstantB

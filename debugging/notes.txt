@@ -1,8 +1,0 @@
-Instructions 
-4 - OpNewTable
-0 - OpLoadConst
-0 - OpLoadConst
-9 - OpSetList
-0 - OpLoadConst
-1 - OpLen
-5 - OpLe (error)
