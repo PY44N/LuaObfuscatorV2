@@ -67,10 +67,10 @@ fn main() {
     println!("[Obfuscator] Running...");
 
     let output = Command::new("lua")
-    .arg(FINAL_FILE)
-    .current_dir("temp")
-    .output()
-    .expect(&format!("Failed to run {}", FINAL_FILE));
+        .arg(FINAL_FILE)
+        .current_dir("temp")
+        .output()
+        .expect(&format!("Failed to run {}", FINAL_FILE));
 
     let output_string: String = output.stdout.into_iter().map(|v| v as char).collect();
     let output_error: String = output.stderr.into_iter().map(|v| v as char).collect();
