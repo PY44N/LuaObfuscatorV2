@@ -10,5 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "luaparse": "^0.3.1"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
   }
 }
