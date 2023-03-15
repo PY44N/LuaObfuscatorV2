@@ -291,7 +291,7 @@ impl VMGenerator {
             vm_string += &format!("lua_wrap_state(lua_bc_to_state('{}'))()", bytecode_string);
         }
 
-        let rename_map = [
+        let mut rename_map = [
             "OPCODE",
             "A_REGISTER",
             "B_REGISTER",
@@ -310,6 +310,7 @@ impl VMGenerator {
             "PROTO_LIST",
             "LINE_LIST",
         ];
+        rename_map.shuffle(&mut rand);
 
         for (i, rename) in rename_map.iter().enumerate() {
             vm_string = vm_string.replace(&format!("${}$", *rename), &(i + 1).to_string());
