@@ -1,5 +1,5 @@
 use std::{
-    fs::{self, File},
+    fs::{self, write, File},
     io::{BufReader, Read},
     path::Path,
     process::Command,
@@ -8,14 +8,17 @@ use std::{
 use obfuscator::vm_generator::VMGenerator;
 use util::read_stream::ReadStream;
 
-use crate::{bytecode::deserializer::Deserializer, obfuscation_settings::ObfuscationSettings};
+use crate::{
+    bytecode::deserializer::Deserializer, obfuscation_settings::ObfuscationSettings,
+    obfuscator::encryption::constant_encryption,
+};
 
 pub mod bytecode;
 pub mod obfuscation_settings;
 pub mod obfuscator;
 pub mod util;
 
-static FINAL_FILE: &str = "temp3.lua";
+static FINAL_FILE: &str = "temp4.lua";
 
 fn main() {
     let settings = ObfuscationSettings::new();
@@ -29,10 +32,18 @@ fn main() {
 
     let luac_command = "luac";
 
+    println!("[Obfuscator] Encrypting Constants...");
+
+    let mut initial_code =
+        fs::read_to_string("temp/temp1.lua").expect("Failed to read file temp1.lua");
+    constant_encryption::encrypt(&mut initial_code);
+
+    fs::write("temp/temp2.lua", initial_code).expect("Failed to write to file temp2.lua");
+
     println!("[Obfuscator] Compiling...");
 
     Command::new(luac_command)
-        .arg("temp1.lua")
+        .arg("temp2.lua")
         .current_dir("temp")
         .output()
         .expect("Failed to compile lua binary");
@@ -54,7 +65,7 @@ fn main() {
     let vm_generator = VMGenerator::new();
     let vm = vm_generator.generate(main_chunk, &settings);
 
-    fs::write("temp/temp2.lua", vm).expect("Failed to write vm to file");
+    fs::write("temp/temp3.lua", vm).expect("Failed to write vm to file");
 
     println!("[Obfuscator] Minifying...");
 

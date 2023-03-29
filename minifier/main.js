@@ -3,7 +3,7 @@ const luaparse = require("luaparse");
 const minifier = require("./minify");
 const { scan, generateVariable } = require("./util");
 
-let ast = luaparse.parse(fs.readFileSync("../temp/temp2.lua", "utf8"));
+let ast = luaparse.parse(fs.readFileSync("../temp/temp3.lua", "utf8"));
 // let ast = luaparse.parse(fs.readFileSync("Input.lua", "utf8"));
 
 // fs.writeFileSync("ast.json", JSON.stringify(ast, null, 2));
@@ -64,7 +64,7 @@ let funcArgNames = ["numericsList", "stringsList"]
   .map(({ value }) => value);
 
 fs.writeFileSync(
-  "../temp/temp3.lua",
+  "../temp/temp4.lua",
   minifier.minify(
     `local main = function(${funcArgNames.toString(",")}) ${minifier.minify(
       ast
