@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 regex = "1.7.3"
-lua_deserializer = { path = "./lua_deserializer"}
+lua_deserializer = { git = "https://github.com/PY44N/LuaDeserializer" }
