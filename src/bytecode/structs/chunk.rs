@@ -54,46 +54,4 @@ impl Chunk {
                 .collect(),
         }
     }
-
-    pub fn serialize(
-        &self,
-        write_stream: &mut WriteStream,
-        obfuscation_context: &ObfuscationContext,
-        settings: &ObfuscationSettings,
-    ) {
-        write_stream.write_string(&self.source_name);
-        write_stream.write_int8(self.upvalue_count);
-        write_stream.write_int8(self.parameter_count);
-
-        for component in &obfuscation_context.chunk_component_map {
-            match component {
-                ChunkComponents::CONSTANTS => {
-                    write_stream.write_int64(self.constants.len() as u64);
-                    for constant in &self.constants {
-                        constant.serialize(write_stream, obfuscation_context);
-                    }
-                }
-                ChunkComponents::INSTRUCTIONS => {
-                    write_stream.write_int64(self.instructions.len() as u64);
-                    for instruction in &self.instructions {
-                        instruction.serialize(write_stream, obfuscation_context);
-                    }
-                }
-                ChunkComponents::PROTOS => {
-                    write_stream.write_int64(self.protos.len() as u64);
-                    for proto in &self.protos {
-                        proto.serialize(write_stream, obfuscation_context, settings);
-                    }
-                }
-            }
-        }
-
-        if settings.include_debug_line_info {
-            write_stream.write_int64(self.source_lines.len() as u64);
-
-            for line in &self.source_lines {
-                write_stream.write_int64(*line);
-            }
-        }
-    }
 }

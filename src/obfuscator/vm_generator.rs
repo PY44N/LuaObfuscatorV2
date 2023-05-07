@@ -118,7 +118,7 @@ impl VMGenerator {
         Self {}
     }
 
-    pub fn generate(&self, main_chunk: Chunk, settings: &ObfuscationSettings) -> String {
+    pub fn generate(&self, main_chunk: Chunk, settings: ObfuscationSettings) -> String {
         let mut rand = rand::thread_rng();
 
         let mut opcode_list = get_used_opcodes(&main_chunk);
@@ -141,8 +141,8 @@ impl VMGenerator {
 
         let obfuscation_context = create_context(constant_list, opcode_list, chunk_component_list);
 
-        let serializer = Serializer::new(main_chunk);
-        let bytes = serializer.serialze(&obfuscation_context, settings);
+        let mut serializer = Serializer::new(obfuscation_context.clone(), settings.clone());
+        let bytes = serializer.serialze(main_chunk);
 
         let bytecode_string: String = if settings.compress_bytecode {
             compress(bytes)

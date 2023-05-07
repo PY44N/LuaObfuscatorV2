@@ -63,7 +63,7 @@ fn main() {
     println!("[Obfuscator] Generating VM...");
 
     let vm_generator = VMGenerator::new();
-    let vm = vm_generator.generate(main_chunk, &settings);
+    let vm = vm_generator.generate(main_chunk, settings);
 
     fs::write("temp/temp3.lua", vm).expect("Failed to write vm to file");
 

@@ -50,38 +50,4 @@ impl Instruction {
 
         new_self
     }
-
-    pub fn serialize(
-        &self,
-        write_stream: &mut WriteStream,
-        obfuscation_context: &ObfuscationContext,
-    ) {
-        let opcode_num = obfuscation_context
-            .opcode_map
-            .iter()
-            .position(|&v| v == self.opcode)
-            .unwrap();
-
-        let mut instruction_data: u16 = 0;
-        instruction_data |= ((opcode_num as u16) & 0x3f) << 4;
-        instruction_data |= (match self.instruction_type {
-            InstructionType::ABC => 0b01,
-            InstructionType::ABx => 0b10,
-            InstructionType::AsBx => 0b11,
-        }) << 2;
-        instruction_data |= if self.is_constant_b { 1 << 1 } else { 0 };
-        instruction_data |= if self.is_constant_c { 1 } else { 0 };
-
-        write_stream.write_int16(instruction_data);
-        write_stream.write_int8(self.data_a);
-
-        match self.instruction_type {
-            InstructionType::ABC => {
-                write_stream.write_int16(self.data_b as u16);
-                write_stream.write_int16(self.data_c as u16);
-            }
-            InstructionType::ABx => write_stream.write_int32(self.data_b as u32),
-            InstructionType::AsBx => write_stream.write_int32((self.data_b + 131071) as u32),
-        }
-    }
 }
