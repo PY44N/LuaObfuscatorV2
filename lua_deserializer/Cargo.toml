@@ -1,11 +1,8 @@
 [package]
-name = "lua_obfuscator"
+name = "lua_deserializer"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8.5"
-regex = "1.7.3"
-lua_deserializer = { path = "./lua_deserializer"}

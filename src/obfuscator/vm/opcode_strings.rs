@@ -1,4 +1,4 @@
-use crate::bytecode::enums::opcode_type::OpcodeType;
+use lua_deserializer::enums::opcode_type::OpcodeType;
 
 pub fn get_opcode_string(opcode: &OpcodeType) -> String {
     match opcode {

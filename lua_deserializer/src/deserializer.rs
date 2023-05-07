@@ -1,4 +1,4 @@
-use crate::{bytecode::structs::chunk::Chunk, ReadStream};
+use crate::{structs::chunk::Chunk, util::read_stream::ReadStream};
 
 pub struct Deserializer {
     memory_stream: ReadStream,

@@ -1,9 +1,4 @@
-use crate::{
-    bytecode::enums::chunk_components::ChunkComponents,
-    obfuscation_settings::ObfuscationSettings,
-    obfuscator::obfuscation_context::ObfuscationContext,
-    util::{read_stream::ReadStream, write_stream::WriteStream},
-};
+use crate::util::read_stream::ReadStream;
 
 use super::{constant::Constant, instruction::Instruction, local::Local};
 

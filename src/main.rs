@@ -1,22 +1,19 @@
 use std::{
-    fs::{self, write, File},
+    fs::{self, File},
     io::{BufReader, Read},
     path::Path,
     process::Command,
 };
 
+use lua_deserializer::deserializer::Deserializer;
 use obfuscator::vm_generator::VMGenerator;
-use util::read_stream::ReadStream;
 
 use crate::{
-    bytecode::deserializer::Deserializer, obfuscation_settings::ObfuscationSettings,
-    obfuscator::encryption::constant_encryption,
+    obfuscation_settings::ObfuscationSettings, obfuscator::encryption::constant_encryption,
 };
 
-pub mod bytecode;
 pub mod obfuscation_settings;
 pub mod obfuscator;
-pub mod util;
 
 static FINAL_FILE: &str = "temp4.lua";
 

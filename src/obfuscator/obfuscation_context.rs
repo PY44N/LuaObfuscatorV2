@@ -1,4 +1,4 @@
-use crate::bytecode::enums::{
+use lua_deserializer::enums::{
     chunk_components::ChunkComponents, lua_type::LuaType, opcode_type::OpcodeType,
 };
 

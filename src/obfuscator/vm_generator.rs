@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 
+use lua_deserializer::{
+    enums::{chunk_components::ChunkComponents, lua_type::LuaType, opcode_type::OpcodeType},
+    structs::chunk::Chunk,
+};
 use rand::seq::SliceRandom;
 
 use crate::{
-    bytecode::{
-        enums::{chunk_components::ChunkComponents, lua_type::LuaType, opcode_type::OpcodeType},
-        structs::chunk::Chunk,
-    },
-    obfuscation_settings::ObfuscationSettings,
-    obfuscator::obfuscation_context::ObfuscationContext,
+    obfuscation_settings::ObfuscationSettings, obfuscator::obfuscation_context::ObfuscationContext,
 };
 
 use super::{

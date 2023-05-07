@@ -1,11 +1,7 @@
-use crate::{
-    bytecode::enums::{
-        constant_instruction_type::{ConstantInstructionType, CONSTANT_INSTRUCTION_MAP},
-        instruction_type::{InstructionType, INSTRUCTION_TYPE_MAP},
-        opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
-    },
-    obfuscator::obfuscation_context::ObfuscationContext,
-    util::write_stream::WriteStream,
+use crate::enums::{
+    constant_instruction_type::{ConstantInstructionType, CONSTANT_INSTRUCTION_MAP},
+    instruction_type::{InstructionType, INSTRUCTION_TYPE_MAP},
+    opcode_type::{OpcodeType, OPCODE_TYPE_MAP},
 };
 
 #[derive(Debug)]

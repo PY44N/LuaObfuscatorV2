@@ -1,13 +1,12 @@
-use crate::{
-    bytecode::{
-        enums::{
-            chunk_components::ChunkComponents, instruction_type::InstructionType, lua_type::LuaType,
-        },
-        structs::{chunk::Chunk, constant::Constant, instruction::Instruction},
+use lua_deserializer::{
+    enums::{
+        chunk_components::ChunkComponents, instruction_type::InstructionType, lua_type::LuaType,
     },
-    obfuscation_settings::ObfuscationSettings,
+    structs::{chunk::Chunk, constant::Constant, instruction::Instruction},
     util::write_stream::WriteStream,
 };
+
+use crate::obfuscation_settings::ObfuscationSettings;
 
 use super::obfuscation_context::ObfuscationContext;
 
