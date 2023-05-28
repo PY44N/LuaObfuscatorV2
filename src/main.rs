@@ -6,6 +6,7 @@ use std::{
 };
 
 use lua_deserializer::deserializer::Deserializer;
+use lua_minifier::minifier::minify;
 use obfuscator::vm_generator::VMGenerator;
 
 use crate::{
@@ -66,11 +67,13 @@ fn main() {
 
     println!("[Obfuscator] Minifying...");
 
-    Command::new("node")
-        .arg(".")
-        .current_dir("minifier")
-        .output()
-        .expect("Failed to minify");
+    // Command::new("node")
+    //     .arg(".")
+    //     .current_dir("minifier")
+    //     .output()
+    //     .expect("Failed to minify");
+    let minified = minify("temp/temp3.lua").expect("Failed to minify");
+    fs::write("temp/temp4.lua", minified).expect("Failed to write minified to file");
 
     println!("[Obfuscator] Running...");
 

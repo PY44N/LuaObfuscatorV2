@@ -9,3 +9,5 @@ edition = "2021"
 rand = "0.8.5"
 regex = "1.7.3"
 lua_deserializer = { git = "https://github.com/PY44N/LuaDeserializer" }
+lua_minifier = { git = "https://github.com/PY44N/LuaMinifier" }
+lua_parser = { git = "https://github.com/PY44N/LuaParser" }

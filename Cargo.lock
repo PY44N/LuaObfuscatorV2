@@ -12,6 +12,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "bytes"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e4cec68f03f32e44924783795810fa50a7035d8c8ebe78580ad7e6c703fba38"
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -29,6 +35,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "lazy_static"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+
+[[package]]
 name = "libc"
 version = "0.2.139"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -40,12 +52,31 @@ version = "0.1.0"
 source = "git+https://github.com/PY44N/LuaDeserializer#421dfc40fa187497116e8d6cb828562237d458c5"
 
 [[package]]
+name = "lua_minifier"
+version = "0.1.0"
+source = "git+https://github.com/PY44N/LuaMinifier#afc228725f19de412d0675fb6475a5f4e3cfa0b8"
+dependencies = [
+ "lazy_static",
+ "lua_parser",
+]
+
+[[package]]
 name = "lua_obfuscator"
 version = "0.1.0"
 dependencies = [
  "lua_deserializer",
+ "lua_minifier",
+ "lua_parser",
  "rand",
  "regex",
+]
+
+[[package]]
+name = "lua_parser"
+version = "0.1.0"
+source = "git+https://github.com/PY44N/LuaParser#0ded8b959321a2cb269c0f9300b67da46e2adb64"
+dependencies = [
+ "bytes",
 ]
 
 [[package]]
