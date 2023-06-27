@@ -5,6 +5,7 @@ use lua_deserializer::{
     structs::{chunk::Chunk, constant::Constant, instruction::Instruction},
     util::write_stream::WriteStream,
 };
+use magic_crypt::{new_magic_crypt, MagicCrypt128, MagicCryptTrait};
 
 use crate::obfuscation_settings::ObfuscationSettings;
 
@@ -43,7 +44,15 @@ impl Serializer {
             }
             LuaType::INVALID => todo!(),
             LuaType::NUMBER => self.write_stream.write_double(constant.number_data),
-            LuaType::STRING => self.write_stream.write_string(&constant.string_data),
+            LuaType::STRING => {
+                let encryptor = new_magic_crypt!("nfkenofwnfewflspnfkenofwnfewflsp", 256);
+                let encrypted = encryptor.encrypt_str_to_base64(constant.string_data.clone());
+                let decrypted = encryptor
+                    .decrypt_base64_to_string(encrypted.clone())
+                    .unwrap();
+                println!("{} {} {}", constant.string_data, encrypted, decrypted);
+                self.write_stream.write_string(&constant.string_data)
+            }
         }
     }
 
