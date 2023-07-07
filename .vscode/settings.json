@@ -1,5 +1,5 @@
 {
-  "editor.defaultFormatter": "Nightrains.robloxlsp",
+  "editor.defaultFormatter": "rust-lang.rust-analyzer",
   "[lua]": {
     "editor.defaultFormatter": "Koihik.vscode-lua-format"
   }

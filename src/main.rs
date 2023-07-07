@@ -87,4 +87,6 @@ fn main() {
     if output_error != "" {
         println!("Program Error:\n{}", output_error);
     }
+
+    fs::copy("temp/".to_owned() + FINAL_FILE, "Out.lua").expect("Failed to copy final file");
 }
