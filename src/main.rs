@@ -1,8 +1,10 @@
 use std::{
+    env,
     fs::{self, File},
     io::{BufReader, Read},
     path::Path,
     process::Command,
+    thread::panicking,
 };
 
 use lua_deserializer::deserializer::Deserializer;
@@ -25,7 +27,21 @@ fn main() {
     }
     fs::create_dir("temp").unwrap();
 
-    fs::copy("Input.lua", "temp/temp1.lua").unwrap();
+    let args: Vec<String> = env::args().collect();
+
+    println!("{:?}", args);
+
+    if args.len() < 2 {
+        println!("No file given, please pass in a file name");
+        return;
+    }
+
+    if !Path::new(&args[1]).exists() {
+        println!("File {} does not exist", args[1]);
+        return;
+    }
+
+    fs::copy(&args[1], "temp/temp1.lua").unwrap();
 
     let luac_command = "luac";
 
@@ -89,4 +105,6 @@ fn main() {
     }
 
     fs::copy("temp/".to_owned() + FINAL_FILE, "Out.lua").expect("Failed to copy final file");
+
+    println!("Your obfuscated program has been written to Out.lua");
 }
