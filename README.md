@@ -24,9 +24,11 @@ cd LuaObfuscator
 cd minifier && npm i && cd ..
 ```
 
+4) Put the code you wish to obfuscate into a file
+
 4) Run the project using cargo
 ```
-cargo run
+cargo run YOURFILE.lua
 ```
 
 ## Related Repos
