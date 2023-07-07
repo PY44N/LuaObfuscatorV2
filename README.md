@@ -1,4 +1,4 @@
-# Lua Obfuscator
+# Lua Obfuscator V2
 
 This project is still a work in progress, so things may not work
 
@@ -8,7 +8,7 @@ This project is still a work in progress, so things may not work
 ### Required programs
 - [Rust](https://www.rust-lang.org/)
 - [Nodejs](https://nodejs.org/en)
-- Lua 5.1 [windows](https://github.com/rjpcomputing/luaforwindows/releases/), [macos (with homebrew)](https://formulae.brew.sh/formula/lua@5.1#default), linux (lua5.1 on most package managers)
+- Lua 5.1 [windows](https://github.com/rjpcomputing/luaforwindows/releases/), [macos (with homebrew)](https://formulae.brew.sh/formula/lua@5.1#default), Linux (lua5.1 on most package managers)
 
 1) Clone the repo
 ```
