@@ -1,3 +1,7 @@
 /target
 /temp
 /build
+
+# Files used for input and output when testing
+Input.lua
+Out.lua
