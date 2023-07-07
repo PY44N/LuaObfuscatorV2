@@ -14,17 +14,17 @@ This project is still a work in progress, so things may not work
 ```
 git clone https://github.com/PY44N/LuaObfuscator/
 ```
-1) Enter the directory
+2) Enter the directory
 ```
 cd LuaObfuscator
 ```
 
-1) Install the required nodejs packages
+3) Install the required nodejs packages
 ```
 cd minifier && npm i && cd ..
 ```
 
-1) Run the project using cargo
+4) Run the project using cargo
 ```
 cargo run
 ```
