@@ -187,10 +187,10 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             for i = 1, nups do
                 local pseudo = code[pc + i - 1]
 
-                if pseudo.op == 0 then -- @MOVE
-                    uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[3], memory)
-                elseif pseudo.op == 4 then -- @GETUPVAL
-                    uvlist[i - 1] = upvals[pseudo[3]]
+                if pseudo[$OPCODE$] == $MOVE_OPCODE$ then -- @MOVE
+                    uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[$B_REGISTER$], memory)
+                elseif pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
+                    uvlist[i - 1] = upvals[pseudo[$B_REGISTER$]]
                 end
             end
 

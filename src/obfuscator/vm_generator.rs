@@ -138,7 +138,7 @@ impl VMGenerator {
         ];
         chunk_component_list.shuffle(&mut rand);
 
-        let obfuscation_context = create_context(constant_list, opcode_list, chunk_component_list);
+        let obfuscation_context = create_context(constant_list, opcode_list.clone(), chunk_component_list);
 
         let mut serializer = Serializer::new(obfuscation_context.clone(), settings.clone());
         let bytes = serializer.serialze(main_chunk);
@@ -313,6 +313,20 @@ impl VMGenerator {
 
         for (i, rename) in rename_map.iter().enumerate() {
             vm_string = vm_string.replace(&format!("${}$", *rename), &(i + 1).to_string());
+        }
+
+        //todo: banish this to hell (aka find a better implementation)
+        let move_opcode = opcode_list.iter().position(|&r| r == OpcodeType::OpMove);
+        let getuv_opcode = opcode_list.iter().position(|&r| r == OpcodeType::OpGetUpval);
+        if move_opcode != None {
+            vm_string = vm_string.replace("$MOVE_OPCODE$", &move_opcode.unwrap().to_string())
+        } else {
+            vm_string = vm_string.replace("$MOVE_OPCODE$", "-1") //idk anymore
+        }
+        if getuv_opcode != None {
+            vm_string = vm_string.replace("$GETUPVAL_OPCODE$", &getuv_opcode.unwrap().to_string());
+        } else {
+            vm_string = vm_string.replace("$GETUPVAL_OPCODE$", "-1");
         }
 
         vm_string
