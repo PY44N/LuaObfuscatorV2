@@ -178,7 +178,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         TableMove(memory, A + 1, A + len, offset + 1, tab)",
         OpcodeType::OpClose => "close_lua_upvalues(open_list, inst[$A_REGISTER$])",
         OpcodeType::OpClosure => "local sub = subs[inst[$B_REGISTER$] + 1] -- offset for 1 based index
-        local nups = sub[2]
+        local nups = sub[$UPVALUE_COUNT$]
         local uvlist
 
         if nups ~= 0 then
