@@ -13,7 +13,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         OpcodeType::OpGetUpval => {
             "local uv = upvals[inst[$B_REGISTER$]]
 
-        memory[inst[$A_REGISTER$]] = uv[2][uv.index]"
+        memory[inst[$A_REGISTER$]] = uv[2][uv[1]]"
         }
         OpcodeType::OpGetGlobal => "memory[inst[$A_REGISTER$]] = env[inst[$CONSTANT$]]",
         OpcodeType::OpGetTable => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]",
