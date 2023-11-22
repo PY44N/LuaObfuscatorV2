@@ -1,63 +1,63 @@
 use lua_deserializer::enums::opcode_type::OpcodeType;
 
-pub fn get_opcode_string(opcode: &OpcodeType) -> String {
+pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> String {
     match opcode {
-        OpcodeType::OpMove => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]]",
-        OpcodeType::OpLoadConst => "memory[inst[$A_REGISTER$]] = inst[$CONSTANT$]",
+        OpcodeType::OpMove => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]]".to_string(),
+        OpcodeType::OpLoadConst => "memory[inst[$A_REGISTER$]] = inst[$CONSTANT$]".to_string(),
         OpcodeType::OpLoadBool => {
             "memory[inst[$A_REGISTER$]] = inst[$B_REGISTER$] ~= 0
 
-        if inst[$C_REGISTER$] ~= 0 then pc = pc + 1 end"
+        if inst[$C_REGISTER$] ~= 0 then pc = pc + 1 end".to_string()
         }
-        OpcodeType::OpLoadNil => "for i = inst[$A_REGISTER$], inst[$B_REGISTER$] do memory[i] = nil end",
+        OpcodeType::OpLoadNil => "for i = inst[$A_REGISTER$], inst[$B_REGISTER$] do memory[i] = nil end".to_string(),
         OpcodeType::OpGetUpval => {
             "local uv = upvals[inst[$B_REGISTER$]]
 
-        memory[inst[$A_REGISTER$]] = uv[2][uv[1]]"
+        memory[inst[$A_REGISTER$]] = uv[2][uv[1]]".to_string()
         }
-        OpcodeType::OpGetGlobal => "memory[inst[$A_REGISTER$]] = env[inst[$CONSTANT$]]",
-        OpcodeType::OpGetTable => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]",
-        OpcodeType::OpSetGlobal => "env[inst[$CONSTANT$]] = memory[inst[$A_REGISTER$]]",
+        OpcodeType::OpGetGlobal => "memory[inst[$A_REGISTER$]] = env[inst[$CONSTANT$]]".to_string(),
+        OpcodeType::OpGetTable => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]".to_string(),
+        OpcodeType::OpSetGlobal => "env[inst[$CONSTANT$]] = memory[inst[$A_REGISTER$]]".to_string(),
         OpcodeType::OpSetUpval => {
             "local uv = upvals[inst[$B_REGISTER$]]
 
-        uv[2][uv[1]] = memory[inst[$A_REGISTER$]]"
+        uv[2][uv[1]] = memory[inst[$A_REGISTER$]]".to_string()
         }
-        OpcodeType::OpSetTable => "memory[inst[$A_REGISTER$]][constantB(inst)] = constantC(inst)",
-        OpcodeType::OpNewTable => "memory[inst[$A_REGISTER$]] = {}",
+        OpcodeType::OpSetTable => "memory[inst[$A_REGISTER$]][constantB(inst)] = constantC(inst)".to_string(),
+        OpcodeType::OpNewTable => "memory[inst[$A_REGISTER$]] = {}".to_string(),
         OpcodeType::OpSelf => {
             "memory[inst[$A_REGISTER$] + 1] = memory[inst[$B_REGISTER$]]
-        memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]"
+        memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]".to_string()
         }
-        OpcodeType::OpAdd => "memory[inst[$A_REGISTER$]] = constantB(inst) + constantC(inst)",
-        OpcodeType::OpSub => "memory[inst[$A_REGISTER$]] = constantB(inst) - constantC(inst)",
-        OpcodeType::OpMul => "memory[inst[$A_REGISTER$]] = constantB(inst) * constantC(inst)",
-        OpcodeType::OpDiv => "memory[inst[$A_REGISTER$]] = constantB(inst) / constantC(inst)",
-        OpcodeType::OpMod => "memory[inst[$A_REGISTER$]] = constantB(inst) % constantC(inst)",
-        OpcodeType::OpPow => "memory[inst[$A_REGISTER$]] = constantB(inst) ^ constantC(inst)",
-        OpcodeType::OpUnm => "memory[inst[$A_REGISTER$]] = -memory[inst[$B_REGISTER$]]",
-        OpcodeType::OpNot => "memory[inst[$A_REGISTER$]] = not memory[inst[$B_REGISTER$]]",
-        OpcodeType::OpLen => "memory[inst[$A_REGISTER$]] = #memory[inst[$B_REGISTER$]]",
+        OpcodeType::OpAdd => "memory[inst[$A_REGISTER$]] = constantB(inst) + constantC(inst)".to_string(),
+        OpcodeType::OpSub => "memory[inst[$A_REGISTER$]] = constantB(inst) - constantC(inst)".to_string(),
+        OpcodeType::OpMul => "memory[inst[$A_REGISTER$]] = constantB(inst) * constantC(inst)".to_string(),
+        OpcodeType::OpDiv => "memory[inst[$A_REGISTER$]] = constantB(inst) / constantC(inst)".to_string(),
+        OpcodeType::OpMod => "memory[inst[$A_REGISTER$]] = constantB(inst) % constantC(inst)".to_string(),
+        OpcodeType::OpPow => "memory[inst[$A_REGISTER$]] = constantB(inst) ^ constantC(inst)".to_string(),
+        OpcodeType::OpUnm => "memory[inst[$A_REGISTER$]] = -memory[inst[$B_REGISTER$]]".to_string(),
+        OpcodeType::OpNot => "memory[inst[$A_REGISTER$]] = not memory[inst[$B_REGISTER$]]".to_string(),
+        OpcodeType::OpLen => "memory[inst[$A_REGISTER$]] = #memory[inst[$B_REGISTER$]]".to_string(),
         OpcodeType::OpConcat => {
             "local B = inst[$B_REGISTER$]
         local str = memory[B]
 
         for i = B + 1, inst[$C_REGISTER$] do str = str .. memory[i] end
 
-        memory[inst[$A_REGISTER$]] = str"
+        memory[inst[$A_REGISTER$]] = str".to_string()
         }
-        OpcodeType::OpJmp => "pc = pc + inst[$B_REGISTER$]",
+        OpcodeType::OpJmp => "pc = pc + inst[$B_REGISTER$]".to_string(),
         OpcodeType::OpEq => "if (constantB(inst) == constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
-        pc = pc + 1",
+        pc = pc + 1".to_string(),
         OpcodeType::OpLt => "if (constantB(inst) < constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
-        pc = pc + 1",
+        pc = pc + 1".to_string(),
         OpcodeType::OpLe => "if (constantB(inst) <= constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
-        pc = pc + 1",
+        pc = pc + 1".to_string(),
         OpcodeType::OpTest => "if (not memory[inst[$A_REGISTER$]]) ~= (inst[$C_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
-        pc = pc + 1",
+        pc = pc + 1".to_string(),
         OpcodeType::OpTestSet => "local A = inst[$A_REGISTER$]
         local B = inst[$B_REGISTER$]
 
@@ -65,7 +65,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             memory[A] = memory[B]
             pc = pc + code[pc][$B_REGISTER$]
         end
-        pc = pc + 1",
+        pc = pc + 1".to_string(),
         OpcodeType::OpCall => "local A = inst[$A_REGISTER$]
         local B = inst[$B_REGISTER$]
         local C = inst[$C_REGISTER$]
@@ -86,7 +86,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             ret_num = C - 1
         end
 
-        TableMove(ret_list, 1, ret_num, A, memory)",
+        TableMove(ret_list, 1, ret_num, A, memory)".to_string(),
         OpcodeType::OpTailCall => "local A = inst[$A_REGISTER$]
         local B = inst[$B_REGISTER$]
         local params
@@ -99,7 +99,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
 
         close_lua_upvalues(open_list, 0)
 
-        return memory[A](TableUnpack(memory, A + 1, A + params))",
+        return memory[A](TableUnpack(memory, A + 1, A + params))".to_string(),
         OpcodeType::OpReturn => "local A = inst[$A_REGISTER$]
         local B = inst[$B_REGISTER$]
         local len
@@ -112,7 +112,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
 
         close_lua_upvalues(open_list, 0)
 
-        return TableUnpack(memory, A, A + len - 1)",
+        return TableUnpack(memory, A, A + len - 1)".to_string(),
         OpcodeType::OpForLoop => "local A = inst[$A_REGISTER$]
         local step = memory[A + 2]
         local index = memory[A] + step
@@ -129,7 +129,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             memory[A] = index
             memory[A + 3] = index
             pc = pc + inst[$B_REGISTER$]
-        end",
+        end".to_string(),
         OpcodeType::OpForPrep => "local A = inst[$A_REGISTER$]
         -- local init, limit, step
 
@@ -146,7 +146,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         memory[A + 1] = limit
         memory[A + 2] = step
 
-        pc = pc + inst[$B_REGISTER$]",
+        pc = pc + inst[$B_REGISTER$]".to_string(),
         OpcodeType::OpTForLoop => "local A = inst[$A_REGISTER$]
         local base = A + 3
 
@@ -159,7 +159,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             pc = pc + code[pc][3]
         end
 
-        pc = pc + 1",
+        pc = pc + 1".to_string(),
         OpcodeType::OpSetList => "local A = inst[$A_REGISTER$]
         local C = inst[$C_REGISTER$]
         local len = inst[$B_REGISTER$]
@@ -175,29 +175,42 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
 
         offset = (C - 1) * 50 --FIELDS_PER_FLUSH
 
-        TableMove(memory, A + 1, A + len, offset + 1, tab)",
-        OpcodeType::OpClose => "close_lua_upvalues(open_list, inst[$A_REGISTER$])",
-        OpcodeType::OpClosure => "local sub = subs[inst[$B_REGISTER$] + 1] -- offset for 1 based index
+        TableMove(memory, A + 1, A + len, offset + 1, tab)".to_string(),
+        OpcodeType::OpClose => "close_lua_upvalues(open_list, inst[$A_REGISTER$])".to_string(),
+        OpcodeType::OpClosure => {
+            let mut opcode_string = "local sub = subs[inst[$B_REGISTER$] + 1] -- offset for 1 based index
         local nups = sub[$UPVALUE_COUNT$]
         local uvlist
 
         if nups ~= 0 then
-            uvlist = {}
+            uvlist = {}".to_string();
 
-            for i = 1, nups do
-                local pseudo = code[pc + i - 1]
+            if opcode_list.contains(&OpcodeType::OpMove) || opcode_list.contains(&OpcodeType::OpGetUpval) {
+                opcode_string += "for i = 1, nups do
+                local pseudo = code[pc + i - 1]";
 
-                if pseudo[$OPCODE$] == $MOVE_OPCODE$ then -- @MOVE
-                    uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[$B_REGISTER$], memory)
-                elseif pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
-                    uvlist[i - 1] = upvals[pseudo[$B_REGISTER$]]
-                end
-            end
+                if opcode_list.contains(&OpcodeType::OpMove) {
+                    opcode_string += "if pseudo[$OPCODE$] == $MOVE_OPCODE$ then -- @MOVE
+                                        uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[$B_REGISTER$], memory)
+                                      end";
+                }
+                
+                if opcode_list.contains(&OpcodeType::OpGetUpval) {
+                    opcode_string += "if pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
+                                        uvlist[i - 1] = upvals[pseudo[$B_REGISTER$]]
+                                      end";
+                }
+                
+                opcode_string += " end
 
-            pc = pc + nups
-        end
+            pc = pc + nups";
+            }
 
-        memory[inst[$A_REGISTER$]] = lua_wrap_state(sub, env, uvlist)",
+            
+
+        opcode_string += " end; memory[inst[$A_REGISTER$]] = lua_wrap_state(sub, env, uvlist)";
+    
+    opcode_string},
         OpcodeType::OpVarArg => "local A = inst[$A_REGISTER$]
         local len = inst[$B_REGISTER$]
 
@@ -206,7 +219,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             top_index = A + len - 1
         end
 
-        TableMove(vararg.list, 1, len, A, memory)",
+        TableMove(vararg.list, 1, len, A, memory)".to_string(),
     }
-    .to_string()
+    
 }

@@ -218,7 +218,7 @@ impl VMGenerator {
         for (i, opcode) in obfuscation_context.opcode_map.iter().enumerate() {
             vm_string += if i == 0 { "if " } else { " elseif " };
             vm_string += &format!("op == {} then --[[{:#?}]] ", i, opcode);
-            vm_string += &opcode_strings::get_opcode_string(opcode);
+            vm_string += &opcode_strings::get_opcode_string(opcode, &opcode_list);
         }
 
         vm_string += " end";
@@ -316,17 +316,19 @@ impl VMGenerator {
             vm_string = vm_string.replace(&format!("${}$", *rename), &(i + 1).to_string());
         }
 
-        let move_opcode = opcode_list
-            .iter()
-            .position(|&r| r == OpcodeType::OpMove)
-            .expect("Move Opcode index cannot be found");
+        let move_opcode = opcode_list.iter().position(|&r| r == OpcodeType::OpMove);
         let getupval_opcode = opcode_list
             .iter()
-            .position(|&r| r == OpcodeType::OpGetUpval)
-            .expect("Get Upval Opcode index cannot be found");
+            .position(|&r| r == OpcodeType::OpGetUpval);
 
-        vm_string = vm_string.replace("$MOVE_OPCODE$", &move_opcode.to_string());
-        vm_string = vm_string.replace("$GETUPVAL_OPCODE$", &getupval_opcode.to_string());
+        if move_opcode != None {
+            vm_string = vm_string.replace("$MOVE_OPCODE$", &move_opcode.unwrap().to_string());
+        }
+
+        if getupval_opcode != None {
+            vm_string =
+                vm_string.replace("$GETUPVAL_OPCODE$", &getupval_opcode.unwrap().to_string());
+        }
 
         vm_string
     }
