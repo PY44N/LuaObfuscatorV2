@@ -106,5 +106,8 @@ fn main() {
 
     fs::copy("temp/".to_owned() + FINAL_FILE, "Out.lua").expect("Failed to copy final file");
 
+    if cfg!(not(debug_assertions)) {
+        fs::remove_dir_all("temp").expect("Failed to delete temp directory");
+    }
     println!("Your obfuscated program has been written to Out.lua");
 }
