@@ -13,7 +13,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         OpcodeType::OpGetUpval => {
             "local uv = upvals[inst[$B_REGISTER$]]
 
-        memory[inst[$A_REGISTER$]] = uv[2][uv.index]"
+        memory[inst[$A_REGISTER$]] = uv[2][uv[1]]"
         }
         OpcodeType::OpGetGlobal => "memory[inst[$A_REGISTER$]] = env[inst[$CONSTANT$]]",
         OpcodeType::OpGetTable => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]",
@@ -178,7 +178,7 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
         TableMove(memory, A + 1, A + len, offset + 1, tab)",
         OpcodeType::OpClose => "close_lua_upvalues(open_list, inst[$A_REGISTER$])",
         OpcodeType::OpClosure => "local sub = subs[inst[$B_REGISTER$] + 1] -- offset for 1 based index
-        local nups = sub[2]
+        local nups = sub[$UPVALUE_COUNT$]
         local uvlist
 
         if nups ~= 0 then
@@ -187,10 +187,10 @@ pub fn get_opcode_string(opcode: &OpcodeType) -> String {
             for i = 1, nups do
                 local pseudo = code[pc + i - 1]
 
-                if pseudo.op == 0 then -- @MOVE
-                    uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[3], memory)
-                elseif pseudo.op == 4 then -- @GETUPVAL
-                    uvlist[i - 1] = upvals[pseudo[3]]
+                if pseudo[$OPCODE$] == $MOVE_OPCODE$ then -- @MOVE
+                    uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[$B_REGISTER$], memory)
+                elseif pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
+                    uvlist[i - 1] = upvals[pseudo[$B_REGISTER$]]
                 end
             end
 
