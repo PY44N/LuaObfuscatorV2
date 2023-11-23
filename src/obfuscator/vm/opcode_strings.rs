@@ -156,7 +156,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
 
         if memory[base] ~= nil then
             memory[A + 2] = memory[base]
-            pc = pc + code[pc][3]
+            pc = pc + code[pc][$B_REGISTER$]
         end
 
         pc = pc + 1".to_string(),
