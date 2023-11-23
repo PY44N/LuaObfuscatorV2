@@ -196,7 +196,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
                 }
                 
                 if opcode_list.contains(&OpcodeType::OpGetUpval) {
-                    opcode_string += "if pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
+                    opcode_string += " if pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
                                         uvlist[i - 1] = upvals[pseudo[$B_REGISTER$]]
                                       end";
                 }
