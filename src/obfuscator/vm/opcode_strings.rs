@@ -215,11 +215,11 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
         local len = inst[$B_REGISTER$]
 
         if len == 0 then
-            len = vararg.len
+            len = vararg[1]
             top_index = A + len - 1
         end
 
-        TableMove(vararg.list, 1, len, A, memory)".to_string(),
+        TableMove(vararg[2], 1, len, A, memory)".to_string(),
     }
     
 }
