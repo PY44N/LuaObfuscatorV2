@@ -24,10 +24,10 @@ local Pairs = pairs
 local IPairs = ipairs
 local TableConcat = Table.concat
 local TableInsert = Table.insert
-local TableCreate = function(...)
-	return {}
-end
 local TableUnpack = Table.unpack or unpack
+local TableCreate = function(len)
+	return {TableUnpack({}, 1, len or 1)}
+end
 local TablePack = function(...)
 	return { n = Select(StringChar(35), ...), ... }
 end

@@ -24,7 +24,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
         uv[2][uv[1]] = memory[inst[$A_REGISTER$]]".to_string()
         }
         OpcodeType::OpSetTable => "memory[inst[$A_REGISTER$]][constantB(inst)] = constantC(inst)".to_string(),
-        OpcodeType::OpNewTable => "memory[inst[$A_REGISTER$]] = {}".to_string(),
+        OpcodeType::OpNewTable => "memory[inst[$A_REGISTER$]] = TableCreate(inst[$B_REGISTER$])".to_string(),
         OpcodeType::OpSelf => {
             "memory[inst[$A_REGISTER$] + 1] = memory[inst[$B_REGISTER$]]
         memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]".to_string()
