@@ -24,7 +24,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
         uv[2][uv[1]] = memory[inst[$A_REGISTER$]]".to_string()
         }
         OpcodeType::OpSetTable => "memory[inst[$A_REGISTER$]][constantB(inst)] = constantC(inst)".to_string(),
-        OpcodeType::OpNewTable => "memory[inst[$A_REGISTER$]] = {}".to_string(),
+        OpcodeType::OpNewTable => "memory[inst[$A_REGISTER$]] = TableCreate(inst[$B_REGISTER$])".to_string(),
         OpcodeType::OpSelf => {
             "memory[inst[$A_REGISTER$] + 1] = memory[inst[$B_REGISTER$]]
         memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]".to_string()
@@ -156,7 +156,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
 
         if memory[base] ~= nil then
             memory[A + 2] = memory[base]
-            pc = pc + code[pc][3]
+            pc = pc + code[pc][$B_REGISTER$]
         end
 
         pc = pc + 1".to_string(),
@@ -196,7 +196,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
                 }
                 
                 if opcode_list.contains(&OpcodeType::OpGetUpval) {
-                    opcode_string += "if pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
+                    opcode_string += " if pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
                                         uvlist[i - 1] = upvals[pseudo[$B_REGISTER$]]
                                       end";
                 }
@@ -215,11 +215,11 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
         local len = inst[$B_REGISTER$]
 
         if len == 0 then
-            len = vararg.len
+            len = vararg[1]
             top_index = A + len - 1
         end
 
-        TableMove(vararg.list, 1, len, A, memory)".to_string(),
+        TableMove(vararg[2], 1, len, A, memory)".to_string(),
     }
     
 }
