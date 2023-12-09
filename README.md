@@ -4,6 +4,14 @@ This project is still a work in progress, so things may not work
 
 [Roadmap](https://pyan.notion.site/014c3553be6b45d1989e1e133ec2c424?v=acc453043e2844728d3db628693c100d)
 
+## Example
+Input
+```lua
+print("Hello World")
+```
+
+[Output](https://raw.githubusercontent.com/PY44N/LuaObfuscatorV2/master/Example.lua)
+
 ## How to use
 ### Required programs
 - [Nodejs](https://nodejs.org/en)
