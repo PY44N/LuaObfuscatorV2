@@ -1,3 +1,5 @@
+-- Based on FiOne https://github.com/Rerumu/FiOne/blob/master/source.lua
+
 local String = string
 local StringChar = String.char
 local StringByte = String.byte
