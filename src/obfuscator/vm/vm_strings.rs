@@ -24,7 +24,16 @@ local Pairs = pairs
 local IPairs = ipairs
 local TableConcat = Table.concat
 local TableInsert = Table.insert
-local TableUnpack = Table.unpack or unpack
+local function TableUnpack(tbl, i, remaining)
+    remaining = remaining or #tbl
+    i = i or 1
+    if remaining >= 10 then
+        return tbl[i], tbl[i + 1], tbl[i + 2], tbl[i + 3], tbl[i + 4],
+               tbl[i + 5], tbl[i + 6], tbl[i + 7], tbl[i + 8], tbl[i + 9],
+               TableUnpack(tbl, i + 10, remaining - 10)
+    end
+    if i <= #tbl then return tbl[i], TableUnpack(tbl, i + 1, remaining - 1) end
+end
 local TableCreate = function(len)
 	return {TableUnpack({}, 1, len or 1)}
 end

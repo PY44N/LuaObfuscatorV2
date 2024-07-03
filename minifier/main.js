@@ -19,12 +19,18 @@ scan(ast, "NumericLiteral", (numeric) => {
   )}`;
 });
 
-let numericString = "{";
+let numericCombinations = []
 
 for (let i in numerics) {
-  numericString += `${i != 0 ? "," : ""}${generateVariable(i)} = ${
-    numerics[i]
-  }`;
+  numericCombinations.push(`${generateVariable(i)} = ${numerics[i]}`)
+}
+
+numericCombinations.sort(() => Math.random() - 0.5)
+
+let numericString = "{";
+
+for (let i in numericCombinations) {
+  numericString += `${i != 0 ? "," : ""}${numericCombinations[i]}`;
 }
 
 numericString += "}";
@@ -58,10 +64,7 @@ const stringMap = {
   ["stringsList"]: stringString,
 };
 
-let funcArgNames = ["numericsList", "stringsList"]
-  .map((value) => ({ value, sort: Math.random() }))
-  .sort((a, b) => a.sort - b.sort)
-  .map(({ value }) => value);
+let funcArgNames = ["numericsList", "stringsList"].sort(() => Math.random() - 0.5)
 
 fs.writeFileSync(
   "../temp/temp4.lua",
