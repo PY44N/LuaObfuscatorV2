@@ -15,6 +15,14 @@ use super::{
     vm::{opcode_strings, vm_strings},
 };
 
+#[derive(Clone, PartialEq, Eq)]
+pub enum ConstantType {
+    NIL,
+    BOOLEAN,
+    NUMBER,
+    STRING,
+}
+
 fn get_used_opcodes(chunk: &Chunk) -> Vec<OpcodeType> {
     let mut opcodes = vec![];
 
@@ -36,7 +44,7 @@ fn get_used_opcodes(chunk: &Chunk) -> Vec<OpcodeType> {
 }
 
 fn create_context(
-    const_list: [LuaType; 4],
+    const_list: [ConstantType; 4],
     opcode_list: Vec<OpcodeType>,
     chunk_component_list: [ChunkComponents; 3],
 ) -> ObfuscationContext {
@@ -124,10 +132,10 @@ impl VMGenerator {
         opcode_list.shuffle(&mut rand);
 
         let mut constant_list = [
-            LuaType::NIL,
-            LuaType::BOOLEAN,
-            LuaType::NUMBER,
-            LuaType::STRING,
+            ConstantType::NIL,
+            ConstantType::BOOLEAN,
+            ConstantType::NUMBER,
+            ConstantType::STRING,
         ];
         constant_list.shuffle(&mut rand);
 
@@ -187,9 +195,12 @@ impl VMGenerator {
         return list
     end
     ",
-            index_of(&obfuscation_context.constant_type_map, LuaType::BOOLEAN),
-            index_of(&obfuscation_context.constant_type_map, LuaType::NUMBER),
-            index_of(&obfuscation_context.constant_type_map, LuaType::STRING),
+            index_of(
+                &obfuscation_context.constant_type_map,
+                ConstantType::BOOLEAN
+            ),
+            index_of(&obfuscation_context.constant_type_map, ConstantType::NUMBER),
+            index_of(&obfuscation_context.constant_type_map, ConstantType::STRING),
         );
         vm_string += vm_strings::DESERIALIZER_2;
 

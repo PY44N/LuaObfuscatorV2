@@ -5,7 +5,6 @@ use lua_deserializer::{
     structs::{chunk::Chunk, constant::Constant, instruction::Instruction},
     util::write_stream::WriteStream,
 };
-use magic_crypt::{new_magic_crypt, MagicCrypt128, MagicCryptTrait};
 
 use crate::obfuscation_settings::ObfuscationSettings;
 
@@ -27,24 +26,20 @@ impl Serializer {
     }
 
     fn serialize_constant(&mut self, constant: &Constant) {
-        let type_code = self
-            .obfuscation_context
-            .constant_type_map
-            .iter()
-            .position(|&v| v == constant.lua_type)
-            .unwrap();
+        self.write_stream.write_int8(match constant.lua_type {
+            LuaType::NIL => 0,
+            LuaType::BOOLEAN(_) => 1,
+            LuaType::INVALID => 2,
+            LuaType::NUMBER(_) => 3,
+            LuaType::STRING(_) => 4,
+        });
 
-        self.write_stream.write_int8(type_code as u8);
-
-        match constant.lua_type {
+        match &constant.lua_type {
             LuaType::NIL => {}
-            LuaType::BOOLEAN => {
-                self.write_stream
-                    .write_int8(if constant.bool_data { 1 } else { 0 })
-            }
-            LuaType::INVALID => todo!(),
-            LuaType::NUMBER => self.write_stream.write_double(constant.number_data),
-            LuaType::STRING => self.write_stream.write_string(&constant.string_data),
+            LuaType::BOOLEAN(data) => self.write_stream.write_int8(if *data { 1 } else { 0 }),
+            LuaType::INVALID => unreachable!(),
+            LuaType::NUMBER(data) => self.write_stream.write_double(*data),
+            LuaType::STRING(data) => self.write_stream.write_string(&data),
         }
     }
 
