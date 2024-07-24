@@ -8,6 +8,5 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 regex = "1.7.3"
-lua_deserializer = { git = "https://github.com/PY44N/LuaDeserializer" }
-magic-crypt = "3.1.12"
+lua_deserializer = { git = "https://github.com/PY44N/LuaDeserializer", version = "0.1.1"}
 clap = { version = "4.5.7", features = ["derive"] }

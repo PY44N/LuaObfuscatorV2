@@ -1,10 +1,8 @@
 use std::{
-    env,
     fs::{self, File},
     io::{BufReader, Read},
     path::Path,
     process::Command,
-    thread::panicking,
 };
 
 use clap::Parser;
