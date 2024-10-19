@@ -49,4 +49,4 @@ cargo run -- --file YOURFILE.lua
 
 [luamin](https://github.com/mathiasbynens/luamin) (by Mathias Bynens) - A Lua minifier written in Javascript that is being used as a temporary solution until the [minification rework](https://pyan.notion.site/014c3553be6b45d1989e1e133ec2c424?v=acc453043e2844728d3db628693c100d&p=597187d43f014c02b3f61fb70aaed968&pm=s)
 
-[FiOne](https://github.com/Rerumu/FiOne/blob/master/source.lua) (by Rerumu) - Lua interpreter
+[FiOne](https://github.com/Rerumu/FiOne/blob/master/source.lua) (by Rerumu) - Lua bytecode interpreter
