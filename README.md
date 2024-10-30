@@ -19,7 +19,24 @@ print("Hello World")
 - [Nodejs](https://nodejs.org/en)
 - Lua 5.1 [windows](https://github.com/rjpcomputing/luaforwindows/releases/), [macos (with homebrew)](https://formulae.brew.sh/formula/lua@5.1#default), Linux (lua5.1 on most package managers)
 
-### Building from source
+### Running the latest release (windows only)
+1) The [Latest Release](https://github.com/PY44N/LuaObfuscatorV2/releases/)
+
+2) Open the terminal in the unzipped directory
+
+3) Install the required nodejs packages
+```
+cd minifier && npm i && cd ..
+```
+
+4) Put the code you wish to obfuscate into a file
+
+5) Run the executable
+```
+./lua_obfuscator.exe ./YOURFILE.lua
+```
+
+### Building from source (may not work)
 1) Download [Rust](https://www.rust-lang.org/)
 
 2) Clone the repo
