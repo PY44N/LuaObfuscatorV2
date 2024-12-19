@@ -409,12 +409,12 @@ const VARARG_IS: u8 = 2;
 const VARARG_NEED: u8 = 4;
 
 #[derive(Debug)]
-struct DebugLocalInfo {
-    name: String,
+pub struct DebugLocalInfo {
+    pub name: String,
     /// start pc
-    spc: usize,
+    pub spc: usize,
     /// end pc
-    epc: usize,
+    pub epc: usize,
 }
 
 impl DebugLocalInfo {
@@ -442,25 +442,25 @@ impl Debug for DebugCall {
 
 #[derive(Debug)]
 pub struct FunctionProto {
-    source: String,
+    pub source: String,
     /// lineinfo: (startline, endline)
-    lineinfo: (u32, u32),
-    upval_count: u8,
-    param_count: u8,
-    is_vararg: u8,
-    used_registers: u8,
-    code: Vec<Instruction>,
-    constants: Vec<Rc<Value>>,
-    prototypes: Vec<Box<FunctionProto>>,
+    pub lineinfo: (u32, u32),
+    pub upval_count: u8,
+    pub param_count: u8,
+    pub is_vararg: u8,
+    pub used_registers: u8,
+    pub code: Vec<Instruction>,
+    pub constants: Vec<Rc<Value>>,
+    pub prototypes: Vec<Box<FunctionProto>>,
 
     /// Debug information
-    debug_pos: Vec<u32>,
-    debug_locals: Vec<Box<DebugLocalInfo>>,
-    debug_calls: Vec<DebugCall>,
-    debug_upval: Vec<String>,
+    pub debug_pos: Vec<u32>,
+    pub debug_locals: Vec<Box<DebugLocalInfo>>,
+    pub debug_calls: Vec<DebugCall>,
+    pub debug_upval: Vec<String>,
 
     /// String constants
-    strings: Vec<String>,
+    pub strings: Vec<String>,
 }
 
 impl FunctionProto {
