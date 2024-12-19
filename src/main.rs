@@ -8,7 +8,7 @@ use std::{
 use clap::Parser;
 use lua::state::State;
 use lua_deserializer::deserializer::Deserializer;
-use obfuscator::vm_generator::VMGenerator;
+use obfuscator::{bytecode::bytecode_converter::BytecodeConverter, vm_generator::VMGenerator};
 
 use crate::{
     obfuscation_settings::ObfuscationSettings, obfuscator::encryption::constant_encryption,
@@ -62,9 +62,11 @@ fn main() {
     fs::write("temp/temp2.lua", initial_code).expect("Failed to write to file temp2.lua");
 
     println!("[Obfuscator] Compiling...");
-    
+
     let mut compiler_state = State::new();
-    let compiled = compiler_state.load_file("./temp/temp2.lua").expect("Failed to compile file");
+    let compiled = compiler_state
+        .load_file("./temp/temp2.lua")
+        .expect("Failed to compile file");
 
     println!("{:?}", compiled);
 
@@ -84,7 +86,8 @@ fn main() {
     println!("[Obfuscator] Deserializing...");
 
     let mut deserializer = Deserializer::new(buffer);
-    let main_chunk = deserializer.deserialize();
+    // let main_chunk = deserializer.deserialize();
+    let main_chunk = BytecodeConverter::convert(*compiled);
 
     println!("[Obfuscator] Generating VM...");
 

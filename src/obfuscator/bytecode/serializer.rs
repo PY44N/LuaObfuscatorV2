@@ -6,9 +6,9 @@ use lua_deserializer::{
     util::write_stream::WriteStream,
 };
 
-use crate::obfuscation_settings::ObfuscationSettings;
-
-use super::obfuscation_context::ObfuscationContext;
+use crate::{
+    obfuscation_settings::ObfuscationSettings, obfuscator::obfuscation_context::ObfuscationContext,
+};
 
 pub struct Serializer {
     write_stream: WriteStream,

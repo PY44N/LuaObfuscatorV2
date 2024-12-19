@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use lua_deserializer::{
-    enums::{chunk_components::ChunkComponents, lua_type::LuaType, opcode_type::OpcodeType},
+    enums::{chunk_components::ChunkComponents, opcode_type::OpcodeType},
     structs::chunk::Chunk,
 };
 use rand::seq::SliceRandom;
@@ -11,7 +11,7 @@ use crate::{
 };
 
 use super::{
-    serializer::Serializer,
+    bytecode::serializer::Serializer,
     vm::{opcode_strings, vm_strings},
 };
 
@@ -137,7 +137,7 @@ impl VMGenerator {
             ConstantType::NUMBER,
             ConstantType::STRING,
         ];
-        constant_list.shuffle(&mut rand);
+        // constant_list.shuffle(&mut rand);
 
         let mut chunk_component_list = [
             ChunkComponents::CONSTANTS,

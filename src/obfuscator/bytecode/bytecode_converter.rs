@@ -5,7 +5,7 @@ use lua::{
     instruction::get_opcode,
 };
 use lua_deserializer::{
-    enums::lua_type::LuaType,
+    enums::{lua_type::LuaType, opcode_type::OPCODE_TYPE_MAP},
     structs::{chunk::Chunk, constant::Constant, local::Local},
 };
 
@@ -13,13 +13,19 @@ pub struct BytecodeConverter;
 
 // TODO: Replace the temporary bytecode converter by standardizing byecode formats
 impl BytecodeConverter {
-    fn convert_instruction(
+    pub fn convert_instruction(
         instruction: lua::instruction::Instruction,
     ) -> lua_deserializer::structs::instruction::Instruction {
+        println!(
+            "Opcode: {:?} = {:?}, {:?}",
+            get_opcode(instruction),
+            instruction & 0x3f,
+            OPCODE_TYPE_MAP[(instruction & 0x3f) as usize]
+        );
         lua_deserializer::structs::instruction::Instruction::new(get_opcode(instruction) as u32)
     }
 
-    fn convert_constant(constant: &lua::value::Value) -> Constant {
+    pub fn convert_constant(constant: &lua::value::Value) -> Constant {
         match constant {
             lua::value::Value::Nil => Constant {
                 lua_type: LuaType::NIL,
@@ -41,7 +47,7 @@ impl BytecodeConverter {
         }
     }
 
-    fn convert_local(info: DebugLocalInfo) -> Local {
+    pub fn convert_local(info: DebugLocalInfo) -> Local {
         Local {
             name: info.name,
             start: info.spc as u64,
@@ -49,7 +55,7 @@ impl BytecodeConverter {
         }
     }
 
-    fn convert(input: FunctionProto) -> Chunk {
+    pub fn convert(input: FunctionProto) -> Chunk {
         Chunk {
             source_name: input.source,
             line_defined: input.lineinfo.0 as u64,
