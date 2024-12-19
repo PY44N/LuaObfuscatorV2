@@ -7,8 +7,7 @@ pub mod parser;
 pub mod scanner;
 pub mod state;
 pub mod undump;
-
-mod value;
+pub mod value;
 
 use std::io;
 use std::result;

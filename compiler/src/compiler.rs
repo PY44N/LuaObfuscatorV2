@@ -408,7 +408,7 @@ const VARARG_HAS: u8 = 1;
 const VARARG_IS: u8 = 2;
 const VARARG_NEED: u8 = 4;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DebugLocalInfo {
     pub name: String,
     /// start pc
@@ -423,6 +423,7 @@ impl DebugLocalInfo {
     }
 }
 
+#[derive(Clone)]
 struct DebugCall {
     name: String,
     pc: usize,
@@ -440,7 +441,7 @@ impl Debug for DebugCall {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionProto {
     pub source: String,
     /// lineinfo: (startline, endline)
