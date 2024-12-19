@@ -9,4 +9,5 @@ edition = "2021"
 rand = "0.8.5"
 regex = "1.7.3"
 lua_deserializer = { git = "https://github.com/PY44N/LuaDeserializer", version = "0.1.1"}
+lua = { path = "./compiler" }
 clap = { version = "4.5.7", features = ["derive"] }

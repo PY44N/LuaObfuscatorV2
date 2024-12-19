@@ -61,6 +61,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "bytes"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e4cec68f03f32e44924783795810fa50a7035d8c8ebe78580ad7e6c703fba38"
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -142,6 +148,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "201de327520df007757c1f0adce6e827fe8562fbc28bfd9c15571c66ca1f5f79"
 
 [[package]]
+name = "lua"
+version = "0.1.0"
+dependencies = [
+ "bytes",
+]
+
+[[package]]
 name = "lua_deserializer"
 version = "0.1.1"
 source = "git+https://github.com/PY44N/LuaDeserializer#f21aef6f6fe76b7a2af6a15bf8dc9b802d7927d8"
@@ -151,6 +164,7 @@ name = "lua_obfuscator"
 version = "0.1.1"
 dependencies = [
  "clap",
+ "lua",
  "lua_deserializer",
  "rand",
  "regex",

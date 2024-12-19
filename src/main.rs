@@ -6,6 +6,7 @@ use std::{
 };
 
 use clap::Parser;
+use lua::state::State;
 use lua_deserializer::deserializer::Deserializer;
 use obfuscator::vm_generator::VMGenerator;
 
@@ -61,6 +62,11 @@ fn main() {
     fs::write("temp/temp2.lua", initial_code).expect("Failed to write to file temp2.lua");
 
     println!("[Obfuscator] Compiling...");
+    
+    let mut compiler_state = State::new();
+    let compiled = compiler_state.load_file("./temp/temp2.lua").expect("Failed to compile file");
+
+    println!("{:?}", compiled);
 
     Command::new(luac_command)
         .arg("temp2.lua")
