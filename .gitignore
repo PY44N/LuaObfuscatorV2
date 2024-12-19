@@ -1,8 +1,7 @@
-.idea
-/target
-/temp
-/build
+node_modules
+build
 
 # Files used for input and output when testing
 Input.lua
 Out.lua
+luac
