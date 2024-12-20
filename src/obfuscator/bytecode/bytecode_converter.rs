@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use lua::{
     compiler::{DebugLocalInfo, FunctionProto},
-    instruction::get_opcode,
+    instruction::{get_opcode, OP_NAMES},
 };
 use lua_deserializer::{
     enums::{lua_type::LuaType, opcode_type::OPCODE_TYPE_MAP},
@@ -16,13 +16,15 @@ impl BytecodeConverter {
     pub fn convert_instruction(
         instruction: lua::instruction::Instruction,
     ) -> lua_deserializer::structs::instruction::Instruction {
+        let inst = lua_deserializer::structs::instruction::Instruction::new(instruction);
         println!(
-            "Opcode: {:?} = {:?}, {:?}",
+            "Opcode: {:?} = {:?}, {:?}, {:?}",
             get_opcode(instruction),
             instruction & 0x3f,
-            OPCODE_TYPE_MAP[(instruction & 0x3f) as usize]
+            OPCODE_TYPE_MAP[get_opcode(instruction) as usize],
+            OP_NAMES[get_opcode(instruction) as usize],
         );
-        lua_deserializer::structs::instruction::Instruction::new(get_opcode(instruction) as u32)
+        inst
     }
 
     pub fn convert_constant(constant: &lua::value::Value) -> Constant {

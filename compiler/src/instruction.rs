@@ -147,7 +147,7 @@ impl ToString for OpType {
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-struct OpProp {
+pub struct OpProp {
     name: &'static str,
     is_test: bool,
     set_reg_a: bool,
@@ -156,7 +156,7 @@ struct OpProp {
     typ: OpType,
 }
 
-static OP_NAMES: &'static [OpProp; OP_NOP as usize + 1] = &[
+pub static OP_NAMES: &'static [OpProp; OP_NOP as usize + 1] = &[
     OpProp {
         name: "MOVE",
         is_test: false,
