@@ -6,7 +6,10 @@ use lua_deserializer::{
     util::write_stream::WriteStream,
 };
 
-use crate::obfuscation_settings::ObfuscationSettings;
+use crate::{
+    obfuscation_settings::ObfuscationSettings,
+    obfuscator::{utils::index_of, vm_generator::ConstantType},
+};
 
 use super::obfuscation_context::ObfuscationContext;
 
@@ -27,11 +30,26 @@ impl Serializer {
 
     fn serialize_constant(&mut self, constant: &Constant) {
         self.write_stream.write_int8(match constant.lua_type {
-            LuaType::NIL => 0,
-            LuaType::BOOLEAN(_) => 1,
-            LuaType::INVALID => 2,
-            LuaType::NUMBER(_) => 3,
-            LuaType::STRING(_) => 4,
+            LuaType::NIL => unreachable!(),
+            LuaType::BOOLEAN(_) => index_of(
+                &self.obfuscation_context.constant_type_map,
+                ConstantType::BOOLEAN,
+            )
+            .try_into()
+            .unwrap(),
+            LuaType::INVALID => unreachable!(),
+            LuaType::NUMBER(_) => index_of(
+                &self.obfuscation_context.constant_type_map,
+                ConstantType::NUMBER,
+            )
+            .try_into()
+            .unwrap(),
+            LuaType::STRING(_) => index_of(
+                &self.obfuscation_context.constant_type_map,
+                ConstantType::STRING,
+            )
+            .try_into()
+            .unwrap(),
         });
 
         match &constant.lua_type {

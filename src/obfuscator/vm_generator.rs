@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 
 use lua_deserializer::{
-    enums::{chunk_components::ChunkComponents, lua_type::LuaType, opcode_type::OpcodeType},
+    enums::{chunk_components::ChunkComponents, opcode_type::OpcodeType},
     structs::chunk::Chunk,
 };
 use rand::seq::SliceRandom;
 
 use crate::{
-    obfuscation_settings::ObfuscationSettings, obfuscator::obfuscation_context::ObfuscationContext,
+    obfuscation_settings::ObfuscationSettings,
+    obfuscator::{obfuscation_context::ObfuscationContext, utils::index_of},
 };
 
 use super::{
@@ -53,13 +54,6 @@ fn create_context(
         opcode_map: opcode_list,
         chunk_component_map: chunk_component_list,
     }
-}
-
-fn index_of<T>(list: &[T], value: T) -> usize
-where
-    T: PartialEq<T>,
-{
-    list.iter().position(|v| *v == value).unwrap()
 }
 
 // From: https://rosettacode.org/wiki/LZW_compression#Rust

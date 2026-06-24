@@ -1,6 +1,4 @@
-use lua_deserializer::enums::{
-    chunk_components::ChunkComponents, lua_type::LuaType, opcode_type::OpcodeType,
-};
+use lua_deserializer::enums::{chunk_components::ChunkComponents, opcode_type::OpcodeType};
 
 use super::vm_generator::ConstantType;
 

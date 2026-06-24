@@ -273,7 +273,7 @@ end
 -- string stm_lstring(Stream S)
 -- @S - Stream object to read from
 local function stm_lstring(S)
-	local len = stm_int64(S)
+	local len = stm_int32(S)
 	local str
 
 	if len ~= 0 then str = StringSub(stm_string(S, len), 1, -2) end
