@@ -1,10 +1,23 @@
 pub static VARIABLE_DECLARATION: &str = "
 local String = string
-local StringChar = String.char
-local StringByte = String.byte
-local StringSub = String.sub
-local StringReverse = String.reverse
-local StringFindReal = String.find
+local function TableUnpack(tbl, i, j)
+    i = i or 1
+    j = j or #tbl
+    if j-i+1 >= 10 then
+        return tbl[i], tbl[i + 1], tbl[i + 2], tbl[i + 3], tbl[i + 4],
+               tbl[i + 5], tbl[i + 6], tbl[i + 7], tbl[i + 8], tbl[i + 9],
+               TableUnpack(tbl, i + 10, j)
+    end
+    if i <= j then return tbl[i], TableUnpack(tbl, i + 1, j) end
+end
+local TableCreate = function(len)
+	return {TableUnpack({}, 1, len or 1)}
+end
+local StringChar = String['char']
+local StringByte = String['byte']
+local StringSub = String['sub']
+local StringReverse = String['reverse']
+local StringFindReal = String['find']
 -- I had to do this BS because lua returns start and end index and I didn't want to deal with that
 local StringFind = function(str, val) local a, _ = StringFindReal(str, val) return a - 1 end
 local StringConcat = function(...)
@@ -22,21 +35,9 @@ local Math = math
 local Error = error
 local Pairs = pairs
 local IPairs = ipairs
-local TableConcat = Table.concat
-local TableInsert = Table.insert
-local function TableUnpack(tbl, i, j)
-    i = i or 1
-    j = j or #tbl
-    if j-i+1 >= 10 then
-        return tbl[i], tbl[i + 1], tbl[i + 2], tbl[i + 3], tbl[i + 4],
-               tbl[i + 5], tbl[i + 6], tbl[i + 7], tbl[i + 8], tbl[i + 9],
-               TableUnpack(tbl, i + 10, j)
-    end
-    if i <= j then return tbl[i], TableUnpack(tbl, i + 1, j) end
-end
-local TableCreate = function(len)
-	return {TableUnpack({}, 1, len or 1)}
-end
+local TableConcat = Table['concat']
+local TableInsert = Table['insert']
+
 local TablePack = function(...)
 	return { n = Select(StringChar(35), ...), ... }
 end
@@ -57,10 +58,10 @@ local TableMerge = function(...)
 	return newTable
 end
 local Getfenv = getfenv
-local MathFloor = Math.floor
-local MathMax = Math.max
+local MathFloor = Math['floor']
+local MathMax = Math['max']
 local Pcall = pcall
-local MathAbs = Math.abs
+local MathAbs = Math['abs']
 local Tonumber = tonumber
 
 local RangeGen = function(inputStart, finish, step)
