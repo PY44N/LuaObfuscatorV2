@@ -1,5 +1,15 @@
-fn encrypt_strings(input: &mut String) {}
+use full_moon::visitors::VisitorMut;
 
-pub fn encrypt(input: &mut String) {
-    encrypt_strings(input);
+use crate::obfuscator::encryption::string_encryption::StringEncryptor;
+
+pub fn encrypt(input: &mut String) -> String {
+    let ast = full_moon::parse(input).expect("Failed to parse input code");
+
+    // println!("{:#?}", ast);
+
+    let mut string_encryptor = StringEncryptor;
+
+    let string_encrypted_ast = string_encryptor.visit_ast(ast);
+
+    string_encrypted_ast.to_string()
 }

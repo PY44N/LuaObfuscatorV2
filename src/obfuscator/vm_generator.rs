@@ -120,7 +120,7 @@ impl VMGenerator {
     }
 
     pub fn generate(&self, main_chunk: Chunk, settings: ObfuscationSettings) -> String {
-        let mut rand = rand::thread_rng();
+        let mut rand = rand::rng();
 
         let mut opcode_list = get_used_opcodes(&main_chunk);
         opcode_list.shuffle(&mut rand);
