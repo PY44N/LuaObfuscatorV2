@@ -37,7 +37,7 @@ fn xor_multibyte_key(bytes: &[u8], key: &[u8]) -> Vec<u8> {
 
 fn generate_decryption_code(byte_string: String, key: String) -> String {
     format!(
-        "return (function(s)
+        "return (function(str)
     local function bxor(a, b)
         local result = 0
         local bitval = 1
@@ -58,23 +58,20 @@ fn generate_decryption_code(byte_string: String, key: String) -> String {
         return result
     end
 
-    local function decode(str)
-        key = '{}'
-        local out = ''
-        for i = 0, #str - 1 do
-            local key_i = i % #key + 1
-            --   print(key_i)
-            local a = string.byte(string.sub(str, i + 1, i + 1))
-            local b = string.byte(string.sub(key, key_i, key_i))
-            -- print(a)
-            -- print(b)
-            out = out .. string.char(bxor(a, b))
-        end
-
-        return out
+    key = '{}'
+    local out = ''
+    for i = 0, #str - 1 do
+        local key_i = i % #key + 1
+        --   print(key_i)
+        local a = string.byte(string.sub(str, i + 1, i + 1))
+        local b = string.byte(string.sub(key, key_i, key_i))
+        -- print(a)
+        -- print(b)
+        out = out .. string.char(bxor(a, b))
     end
 
-    return decode(s)
+    return out
+
 end)('{}')",
         key, byte_string
     )
