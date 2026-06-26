@@ -1,0 +1,25 @@
+- [ ] Constant Encryption
+  - [X] Strings (pre obfuscation)
+  - [ ] Strings in constant handling
+  - [ ] Encrypt important strings (looks like Ironbrew just does as a match)
+- [ ] Binary expression mutations (pre obfuscation)
+- [ ] Control flow obfuscation in generated VM
+- [ ] Control flow obfuscation in input code (at the instruction level)
+  - [ ] From ironbrew
+    - [ ] TestFlip (invert polarity of Eq, Lt, Le, Test instructions)
+    - [ ] Eq Mutate (replace eq with lt + le -- disabled in ironbrew)
+    - [ ] TestSpam (only in max sections)
+    - [ ] Bounce (only in max sections)
+    - [ ] TestPreserve (also disabled)
+- [ ] Junk instruction insertion
+- [ ] Alternate instruction types (like what ironbrew has with OpAdd(B)(C))
+- [ ] Instruction Mutation (Also ironbrew)
+- [ ] Super Operators (conbine linear operators into big one -- Ironbrew does this)
+- [ ] Binary search for opcode disbatch (probably faster)
+- [ ] Macros
+  - [ ] Crash
+  - [ ] Encrypt string
+  - [ ] Bool for if running in obfuscator
+  - [ ] Inlining macro? (ironbrew has it)
+  - [ ] Extra control flow obfuscation in sections
+- [ ] Rework minification to be in Rust
