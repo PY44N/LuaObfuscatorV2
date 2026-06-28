@@ -4,7 +4,7 @@ use lua_deserializer::{
     enums::{chunk_components::ChunkComponents, opcode_type::OpcodeType},
     structs::chunk::Chunk,
 };
-use rand::seq::SliceRandom;
+use rand::{Rng, random_range, seq::SliceRandom};
 
 use crate::{
     obfuscation_settings::ObfuscationSettings,
@@ -42,18 +42,6 @@ fn get_used_opcodes(chunk: &Chunk) -> Vec<OpcodeType> {
     }
 
     opcodes
-}
-
-fn create_context(
-    const_list: [ConstantType; 4],
-    opcode_list: Vec<OpcodeType>,
-    chunk_component_list: [ChunkComponents; 3],
-) -> ObfuscationContext {
-    ObfuscationContext {
-        constant_type_map: const_list,
-        opcode_map: opcode_list,
-        chunk_component_map: chunk_component_list,
-    }
 }
 
 // From: https://rosettacode.org/wiki/LZW_compression#Rust
@@ -140,8 +128,15 @@ impl VMGenerator {
         ];
         chunk_component_list.shuffle(&mut rand);
 
-        let obfuscation_context =
-            create_context(constant_list, opcode_list.clone(), chunk_component_list);
+        let mut string_constant_keys = vec![0u8; random_range(3..6)];
+        rand.fill(&mut string_constant_keys[..]);
+
+        let obfuscation_context = ObfuscationContext {
+            constant_type_map: constant_list,
+            opcode_map: opcode_list.clone(),
+            chunk_component_map: chunk_component_list,
+            string_constant_keys,
+        };
 
         let mut serializer = Serializer::new(obfuscation_context.clone(), settings.clone());
         let bytes = serializer.serialze(main_chunk);
@@ -163,6 +158,15 @@ impl VMGenerator {
 
         let mut vm_string = String::new();
 
+        vm_string += "local decodeKeys = {";
+        for i in 0..obfuscation_context.string_constant_keys.len() {
+            if i != 0 {
+                vm_string += ",";
+            }
+            vm_string += &format!("{}", obfuscation_context.string_constant_keys[i]);
+        }
+        vm_string += "}\n";
+
         vm_string += vm_strings::VARIABLE_DECLARATION;
         vm_string += vm_strings::DESERIALIZER;
         vm_string += &format!(
@@ -180,7 +184,7 @@ impl VMGenerator {
             elseif tt == {} then -- Number
                 k = stm_num(S)
             elseif tt == {} then -- String
-                k = stm_lstring(S)
+                k = decode(stm_lstring(S))
             end
     
             list[i] = k -- offset +1 during instruction decode

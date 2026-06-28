@@ -1,7 +1,10 @@
 - [ ] Constant Encryption
   - [X] Strings (pre obfuscation)
-  - [ ] Strings in constant handling
+  - [X] Strings in constant handling
   - [ ] Encrypt important strings (looks like Ironbrew just does as a match)
+- [ ] Better numeric shuffling in output vm
+- [ ] Reimplement things like string.char to make it harder to hook functions for information
+- [ ] Some sort of function inlining pass on the output VM to make things harder to follow (for things like decode function)
 - [ ] Binary expression mutations (pre obfuscation)
 - [ ] Control flow obfuscation in generated VM
 - [ ] Control flow obfuscation in input code (at the instruction level)

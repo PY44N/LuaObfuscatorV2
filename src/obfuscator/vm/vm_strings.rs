@@ -78,6 +78,26 @@ local RangeGen = function(inputStart, finish, step)
 	return a
 end
 
+local function bxor(a, b)
+    local result = 0
+    local bitval = 1
+    
+    while a > 0 or b > 0 do
+        local a_bit = a % 2
+        local b_bit = b % 2
+        
+        if a_bit ~= b_bit then
+            result = result + bitval
+        end
+        
+        a = MathFloor(a / 2)
+        b = MathFloor(b / 2)
+        bitval = bitval * 2
+    end
+    
+    return result
+end
+
 local getBitwise = (function()
 	local function tobittable_r(x, ...)
 		if (x or 0) == 0 then
@@ -151,6 +171,18 @@ local getBitwise = (function()
 	return band, brshift, blshift
 end)
 local BitAnd, BitRShift, BitLShift = getBitwise()
+
+local decodeCount = 0
+local function decode(str)
+    local out = ''
+    for i = 0, #str - 1 do
+        local a = StringByte(StringSub(str, i + 1, i + 1))
+        out = out .. StringChar(bxor(a, (decodeKeys[decodeCount % #decodeKeys + 1] + i) % 255))
+    end
+	decodeCount = decodeCount + 1
+	
+	return out
+end
 ";
 
 pub static DESERIALIZER: &str = "

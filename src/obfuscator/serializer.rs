@@ -13,10 +13,20 @@ use crate::{
 
 use super::obfuscation_context::ObfuscationContext;
 
+fn xor_position_dependant_key(bytes: &[u8], key: u8) -> Vec<u8> {
+    let mut new_bytes = Vec::new();
+    for i in 0..bytes.len() {
+        new_bytes.push(bytes[i] ^ (key + i as u8) % 255);
+    }
+
+    new_bytes
+}
+
 pub struct Serializer {
     write_stream: WriteStream,
     obfuscation_context: ObfuscationContext,
     settings: ObfuscationSettings,
+    string_const_serialized_count: usize,
 }
 
 impl Serializer {
@@ -25,6 +35,7 @@ impl Serializer {
             write_stream: WriteStream::new(),
             obfuscation_context,
             settings,
+            string_const_serialized_count: 0,
         }
     }
 
@@ -57,7 +68,20 @@ impl Serializer {
             LuaType::BOOLEAN(data) => self.write_stream.write_int8(if *data { 1 } else { 0 }),
             LuaType::INVALID => unreachable!(),
             LuaType::NUMBER(data) => self.write_stream.write_double(*data),
-            LuaType::STRING(data) => self.write_stream.write_string(&data),
+            LuaType::STRING(data) => {
+                let mut encrypted_data = xor_position_dependant_key(
+                    data.as_bytes(),
+                    self.obfuscation_context.string_constant_keys[self
+                        .string_const_serialized_count
+                        % self.obfuscation_context.string_constant_keys.len()],
+                );
+                // self.write_stream.write_string(&data);
+
+                // TODO: This shouldn't have to be mutable
+                self.write_stream.write_size_t(encrypted_data.len() as u64);
+                self.write_stream.write(&mut encrypted_data);
+                self.string_const_serialized_count += 1;
+            }
         }
     }
 
