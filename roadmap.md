@@ -4,7 +4,7 @@
   - [ ] Encrypt important strings (looks like Ironbrew just does as a match)
 - [ ] Better numeric shuffling in output vm
 - [ ] Reimplement things like string.char to make it harder to hook functions for information
-- [ ] Some sort of function inlining pass on the output VM to make things harder to follow (for things like decode function)
+- [X] Some sort of function inlining pass on the output VM to make things harder to follow (for things like decode function)
 - [ ] Binary expression mutations (pre obfuscation)
 - [ ] Control flow obfuscation in generated VM
 - [ ] Control flow obfuscation in input code (at the instruction level)
@@ -15,7 +15,7 @@
     - [ ] Bounce (only in max sections)
     - [ ] TestPreserve (also disabled)
 - [ ] Junk instruction insertion
-- [ ] Alternate instruction types (like what ironbrew has with OpAdd(B)(C))
+- [ ] Alter42, 94nate instruction types (like what ironbrew has with OpAdd(B)(C))
 - [ ] Instruction Mutation (Also ironbrew)
 - [ ] Super Operators (conbine linear operators into big one -- Ironbrew does this)
 - [ ] Binary search for opcode disbatch (probably faster)
