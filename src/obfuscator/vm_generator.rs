@@ -77,20 +77,20 @@ fn compress(data: Vec<u8>) -> Vec<u32> {
     compressed
 }
 
-static BASE64_CHARS: &str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static BASE36_CHARS: &str = "+/=~!@#&_|;:<>*^$0123456789abcdefABCDEF";
 
-fn to_base64(value: u64) -> String {
+fn to_base36(value: u64) -> String {
     let mut ret = String::new();
     let mut value: usize = value.try_into().unwrap();
 
     loop {
         ret.push(
-            BASE64_CHARS
+            BASE36_CHARS
                 .chars()
-                .nth(value % BASE64_CHARS.len())
+                .nth(value % BASE36_CHARS.len())
                 .unwrap(),
         );
-        value /= BASE64_CHARS.len();
+        value /= BASE36_CHARS.len();
 
         if value == 0 {
             break;
@@ -145,8 +145,8 @@ impl VMGenerator {
             compress(bytes)
                 .into_iter()
                 .map(|v| {
-                    let byte_str = to_base64(v as u64);
-                    to_base64(byte_str.len() as u64) + &byte_str
+                    let byte_str = to_base36(v as u64);
+                    to_base36(byte_str.len() as u64) + &byte_str
                 })
                 .collect()
         } else {
@@ -158,6 +158,8 @@ impl VMGenerator {
 
         let mut vm_string = String::new();
 
+        vm_string += vm_strings::VARIABLE_DECLARATION;
+
         vm_string += "local decodeKeys = {";
         for i in 0..obfuscation_context.string_constant_keys.len() {
             if i != 0 {
@@ -167,7 +169,6 @@ impl VMGenerator {
         }
         vm_string += "}\n";
 
-        vm_string += vm_strings::VARIABLE_DECLARATION;
         vm_string += vm_strings::DESERIALIZER;
         vm_string += &format!(
             "
@@ -258,13 +259,14 @@ local function RangeGen_INLINE(inputStart, finish, step)
 	return a
 end
 
-        local base36Chars = StringChar(TableUnpack(TableMerge(RangeGen_INLINE(48, 57), RangeGen_INLINE(65, 90))))
+        --local base36Chars = '+/=~!@#&_|;:<>*^$0123456789abcdefABCDEF'
+        local base36Chars = StringChar(TableUnpack(TableMerge({43, 47, 61}, RangeGen_INLINE(126, 33, -93), {64}, RangeGen_INLINE(35, 38, 3), {95, 124}, TableReverse_INLINE(RangeGen_INLINE(58, 59)), {60, 62}, RangeGen_INLINE(42, 94, 52), {36}, RangeGen_INLINE(48, 57), RangeGen_INLINE(97, 102), RangeGen_INLINE(65, 70))))
 
         local function base36Decode_INLINE(inputStr)
             local num, str = 0, StringReverse(inputStr)
 
             for i = 1, #str do
-                num = num + StringFind(base36Chars, StringSub(str, i, i)) * 36 ^ (i - 1)
+                num = num + StringFind(base36Chars, StringSub(str, i, i)) * (#base36Chars) ^ (i - 1)
             end
 
             return num

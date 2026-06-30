@@ -13,13 +13,21 @@ end
 local TableCreate = function(len)
 	return {TableUnpack({}, 1, len or 1)}
 end
+local function TableReverse_INLINE(tbl)
+    local reversed = {}
+    local len = #tbl
+    for i = 1, len do
+        reversed[i] = tbl[len - i + 1]
+    end
+    return reversed
+end
 local StringChar = String['char']
 local StringByte = String['byte']
 local StringSub = String['sub']
 local StringReverse = String['reverse']
 local StringFindReal = String['find']
 -- I had to do this BS because lua returns start and end index and I didn't want to deal with that
-local StringFind = function(str, val) local a, _ = StringFindReal(str, val) return a - 1 end
+local StringFind = function(str, val) local a, _ = StringFindReal(str, val, 1, true) return a - 1 end
 local StringConcat = function(...)
 	local str = ''
 	local strs = {...}
