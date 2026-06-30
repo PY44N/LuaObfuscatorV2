@@ -16,7 +16,7 @@ use super::obfuscation_context::ObfuscationContext;
 fn xor_position_dependant_key(bytes: &[u8], key: u8) -> Vec<u8> {
     let mut new_bytes = Vec::new();
     for i in 0..bytes.len() {
-        new_bytes.push(bytes[i] ^ (key + i as u8) % 255);
+        new_bytes.push(bytes[i] ^ ((key as usize + i) % 255) as u8);
     }
 
     new_bytes
