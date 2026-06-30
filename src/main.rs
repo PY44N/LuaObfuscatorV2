@@ -7,11 +7,11 @@ use std::{
 
 use clap::Parser;
 use lua_deserializer::deserializer::Deserializer;
-use lua_inliner::Inliner;
 use obfuscator::vm_generator::VMGenerator;
 
 use crate::{
-    obfuscation_settings::ObfuscationSettings, obfuscator::encryption::constant_encryption,
+    obfuscation_settings::ObfuscationSettings,
+    obfuscator::{encryption::constant_encryption, uglification::inliner::Inliner},
 };
 
 pub mod obfuscation_settings;
