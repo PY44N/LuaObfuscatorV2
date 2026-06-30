@@ -132,7 +132,7 @@ impl VisitorMut for StringEncryptor {
 
                 panic!("Failed to find return statment")
             }
-            other => None,
+            _ => None,
         }
     }
 }

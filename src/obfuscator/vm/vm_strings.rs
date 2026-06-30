@@ -98,79 +98,74 @@ local function bxor(a, b)
     return result
 end
 
-local getBitwise = (function()
-	local function tobittable_r(x, ...)
-		if (x or 0) == 0 then
-			return ...
-		end
-		return tobittable_r(MathFloor(x / 2), x % 2, ...)
+local function tobittable_r(x, ...)
+	if (x or 0) == 0 then
+		return ...
 	end
+	return tobittable_r(MathFloor(x / 2), x % 2, ...)
+end
 
-	local function tobittable(x)
-		if x == 0 then
-			return { 0 }
-		end
-		return { tobittable_r(x) }
+local function tobittable(x)
+	if x == 0 then
+		return { 0 }
 	end
+	return { tobittable_r(x) }
+end
 
-	local function makeop(cond)
-		local function oper(x, y, ...)
-			if not y then
-				return x
+local function makeop(cond)
+	local function oper(x, y, ...)
+		if not y then
+			return x
+		end
+		x, y = tobittable(x), tobittable(y)
+		local xl, yl = #x, #y
+		local t, tl = {}, MathMax(xl, yl)
+		for i = 0, tl - 1 do
+			local b1, b2 = x[xl - i], y[yl - i]
+			if not (b1 or b2) then
+				break
 			end
-			x, y = tobittable(x), tobittable(y)
-			local xl, yl = #x, #y
-			local t, tl = {}, MathMax(xl, yl)
-			for i = 0, tl - 1 do
-				local b1, b2 = x[xl - i], y[yl - i]
-				if not (b1 or b2) then
-					break
-				end
-				t[tl - i] = (cond((b1 or 0) ~= 0, (b2 or 0) ~= 0) and 1 or 0)
-			end
-			return oper(Tonumber(TableConcat(t), 2), ...)
+			t[tl - i] = (cond((b1 or 0) ~= 0, (b2 or 0) ~= 0) and 1 or 0)
 		end
-		return oper
+		return oper(Tonumber(TableConcat(t), 2), ...)
 	end
+	return oper
+end
 
-	---
-	-- Perform bitwise AND of several numbers.
-	-- Truth table:
-	--   band(0,0) -> 0,
-	--   band(0,1) -> 0,
-	--   band(1,0) -> 0,
-	--   band(1,1) -> 1.
-	-- @class function
-	-- @name band
-	-- @param ...  Numbers.
-	-- @return  A number.
-	local band = makeop(function(a, b)
-		return a and b
-	end)
-
-	---
-	-- Shift a number's bits to the left.
-	-- Roughly equivalent to (x * (2^bits)).
-	-- @param x  The number to shift (number).
-	-- @param bits  Number of positions to shift by (number).
-	-- @return  A number.
-	local function blshift(x, bits)
-		return MathFloor(x) * (2 ^ bits)
-	end
-
-	---
-	-- Shift a number's bits to the right.
-	-- Roughly equivalent to (x / (2^bits)).
-	-- @param x  The number to shift (number).
-	-- @param bits  Number of positions to shift by (number).
-	-- @return  A number.
-	local function brshift(x, bits)
-		return MathFloor(MathFloor(x) / (2 ^ bits))
-	end
-
-	return band, brshift, blshift
+---
+-- Perform bitwise AND of several numbers.
+-- Truth table:
+--   band(0,0) -> 0,
+--   band(0,1) -> 0,
+--   band(1,0) -> 0,
+--   band(1,1) -> 1.
+-- @class function
+-- @name band
+-- @param ...  Numbers.
+-- @return  A number.
+local BitAnd = makeop(function(a, b)
+	return a and b
 end)
-local BitAnd, BitRShift, BitLShift = getBitwise()
+
+---
+-- Shift a number's bits to the left.
+-- Roughly equivalent to (x * (2^bits)).
+-- @param x  The number to shift (number).
+-- @param bits  Number of positions to shift by (number).
+-- @return  A number.
+local function BitLShift(x, bits)
+	return MathFloor(x) * (2 ^ bits)
+end
+
+---
+-- Shift a number's bits to the right.
+-- Roughly equivalent to (x / (2^bits)).
+-- @param x  The number to shift (number).
+-- @param bits  Number of positions to shift by (number).
+-- @return  A number.
+local function BitRShift(x, bits)
+	return MathFloor(MathFloor(x) / (2 ^ bits))
+end
 
 local decodeCount = 0
 local function decode(str)

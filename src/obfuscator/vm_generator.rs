@@ -276,7 +276,7 @@ impl VMGenerator {
             return TableConcat(result)
         end
 
-        local function decode(bytecode)
+        local function decode_bytecode(bytecode)
             local ret = {}
             local i = 1
             while i <= #bytecode do
@@ -293,7 +293,7 @@ impl VMGenerator {
 
         if settings.compress_bytecode {
             vm_string += &format!(
-                "lua_wrap_state(lua_bc_to_state(decode('{}')))()",
+                "lua_wrap_state(lua_bc_to_state(decode_bytecode('{}')))()",
                 bytecode_string
             );
         } else {

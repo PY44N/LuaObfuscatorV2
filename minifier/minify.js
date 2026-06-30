@@ -213,14 +213,13 @@
 	var formatBase = function(base) {
 		var result = '';
 		var type = base.type;
-		var needsParens = base.inParens && (
+		var needsParens = type == 'FunctionDeclaration' || (base.inParens && (
 			type == 'CallExpression' ||
 			type == 'BinaryExpression' ||
-			type == 'FunctionDeclaration' ||
 			type == 'TableConstructorExpression' ||
 			type == 'LogicalExpression' ||
 			type == 'StringLiteral'
-		);
+		));
 		if (needsParens) {
 			result += '(';
 		}
