@@ -171,20 +171,20 @@ impl VMGenerator {
         vm_string += vm_strings::DESERIALIZER;
         vm_string += &format!(
             "
-        local function stm_const_list(S)
-        local len = stm_int64(S)
+        local function stm_const_list_INLINE(S)
+        local len = stm_int64_INLINE(S)
         local list = TableCreate(len)
     
         for i = 1, len do
-            local tt = stm_byte(S)
+            local tt = stm_byte_INLINE(S)
             local k
     
             if tt == {} then -- Bool
-                k = stm_byte(S) ~= 0
+                k = stm_byte_INLINE(S) ~= 0
             elseif tt == {} then -- Number
-                k = stm_num(S)
+                k = stm_num_INLINE(S)
             elseif tt == {} then -- String
-                k = decode(stm_lstring(S))
+                k = decode_INLINE(stm_lstring_INLINE(S))
             end
     
             list[i] = k -- offset +1 during instruction decode
@@ -204,9 +204,13 @@ impl VMGenerator {
 
         for component in &obfuscation_context.chunk_component_map {
             vm_string += match component {
-                ChunkComponents::CONSTANTS => "proto[$CONSTANT_LIST$] = stm_const_list(stream)",
-                ChunkComponents::INSTRUCTIONS => "proto[$OPCODE_LIST$] = stm_inst_list(stream)",
-                ChunkComponents::PROTOS => "proto[$PROTO_LIST$] = stm_sub_list(stream, src)",
+                ChunkComponents::CONSTANTS => {
+                    "proto[$CONSTANT_LIST$] = stm_const_list_INLINE(stream)"
+                }
+                ChunkComponents::INSTRUCTIONS => {
+                    "proto[$OPCODE_LIST$] = stm_inst_list_INLINE(stream)"
+                }
+                ChunkComponents::PROTOS => "proto[$PROTO_LIST$] = stm_sub_list_INLINE(stream, src)",
             };
             vm_string += "\n";
         }
@@ -240,9 +244,23 @@ impl VMGenerator {
 
         if settings.compress_bytecode {
             vm_string += "
-        local base36Chars = StringChar(TableUnpack(TableMerge(RangeGen(48, 57), RangeGen(65, 90))))
+local function RangeGen_INLINE(inputStart, finish, step)
+	step = step or 1
+	local start = finish and inputStart or 1
+	finish = finish or inputStart
 
-        local function base36Decode(inputStr)
+	local a = {}
+
+	for i = start, finish, step do
+		TableInsert(a, i)
+	end
+
+	return a
+end
+
+        local base36Chars = StringChar(TableUnpack(TableMerge(RangeGen_INLINE(48, 57), RangeGen_INLINE(65, 90))))
+
+        local function base36Decode_INLINE(inputStr)
             local num, str = 0, StringReverse(inputStr)
 
             for i = 1, #str do
@@ -253,7 +271,7 @@ impl VMGenerator {
         end
 
         -- From https://rosettacode.org/wiki/LZW_compression#Lua
-        local function decompress(compressed) -- table
+        local function decompress_INLINE(compressed) -- table
             local dictionary, dictSize, entry, w, k = {}, 256, '', StringChar(compressed[1])
             local result = {w}
             for i = 0, 255 do
@@ -276,24 +294,24 @@ impl VMGenerator {
             return TableConcat(result)
         end
 
-        local function decode_bytecode(bytecode)
+        local function decode_bytecode_INLINE(bytecode)
             local ret = {}
             local i = 1
             while i <= #bytecode do
-                local len = base36Decode(StringSub(bytecode, i, i))
+                local len = base36Decode_INLINE(StringSub(bytecode, i, i))
                 i = i + 1
-                TableInsert(ret, base36Decode(StringSub(bytecode, i, i + len - 1)))
+                TableInsert(ret, base36Decode_INLINE(StringSub(bytecode, i, i + len - 1)))
                 i = i + len
             end
 
-            return decompress(ret)
+            return decompress_INLINE(ret)
         end
         ";
         }
 
         if settings.compress_bytecode {
             vm_string += &format!(
-                "lua_wrap_state(lua_bc_to_state(decode_bytecode('{}')))()",
+                "lua_wrap_state(lua_bc_to_state(decode_bytecode_INLINE('{}')))()",
                 bytecode_string
             );
         } else {

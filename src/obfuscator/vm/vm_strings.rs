@@ -64,21 +64,7 @@ local Pcall = pcall
 local MathAbs = Math['abs']
 local Tonumber = tonumber
 
-local RangeGen = function(inputStart, finish, step)
-	step = step or 1
-	local start = finish and inputStart or 1
-	finish = finish or inputStart
-
-	local a = {}
-
-	for i = start, finish, step do
-		TableInsert(a, i)
-	end
-
-	return a
-end
-
-local function bxor(a, b)
+local function bxor_INLINE(a, b)
     local result = 0
     local bitval = 1
     
@@ -105,19 +91,19 @@ local function tobittable_r(x, ...)
 	return tobittable_r(MathFloor(x / 2), x % 2, ...)
 end
 
-local function tobittable(x)
+local function tobittable_INLINE(x)
 	if x == 0 then
 		return { 0 }
 	end
 	return { tobittable_r(x) }
 end
 
-local function makeop(cond)
+local function makeop_INLINE(cond)
 	local function oper(x, y, ...)
 		if not y then
 			return x
 		end
-		x, y = tobittable(x), tobittable(y)
+		x, y = tobittable_INLINE(x), tobittable_INLINE(y)
 		local xl, yl = #x, #y
 		local t, tl = {}, MathMax(xl, yl)
 		for i = 0, tl - 1 do
@@ -143,7 +129,7 @@ end
 -- @name band
 -- @param ...  Numbers.
 -- @return  A number.
-local BitAnd = makeop(function(a, b)
+local BitAnd = makeop_INLINE(function(a, b)
 	return a and b
 end)
 
@@ -153,7 +139,7 @@ end)
 -- @param x  The number to shift (number).
 -- @param bits  Number of positions to shift by (number).
 -- @return  A number.
-local function BitLShift(x, bits)
+local function BitLShift_INLINE(x, bits)
 	return MathFloor(x) * (2 ^ bits)
 end
 
@@ -163,16 +149,16 @@ end
 -- @param x  The number to shift (number).
 -- @param bits  Number of positions to shift by (number).
 -- @return  A number.
-local function BitRShift(x, bits)
+local function BitRShift_INLINE(x, bits)
 	return MathFloor(MathFloor(x) / (2 ^ bits))
 end
 
 local decodeCount = 0
-local function decode(str)
+local function decode_INLINE(str)
     local out = ''
     for i = 0, #str - 1 do
         local a = StringByte(StringSub(str, i + 1, i + 1))
-        out = out .. StringChar(bxor(a, (decodeKeys[decodeCount % #decodeKeys + 1] + i) % 255))
+        out = out .. StringChar(bxor_INLINE(a, (decodeKeys[decodeCount % #decodeKeys + 1] + i) % 255))
     end
 	decodeCount = decodeCount + 1
 	
@@ -185,12 +171,12 @@ local lua_bc_to_state
 local lua_wrap_state
 local stm_lua_func
 
--- int rd_int_basic(string src, int s, int e, int d)
+-- int rd_int_basic_INLINE(string src, int s, int e, int d)
 -- @src - Source binary string
 -- @s - Start index of a little endian integer
 -- @e - End index of the integer
 -- @d - Direction of the loop
-local function rd_int_basic(src, s, e, d)
+local function rd_int_basic_INLINE(src, s, e, d)
 	local num = 0
 
 	-- if bb[l] > 127 then -- signed negative
@@ -207,11 +193,11 @@ local function rd_int_basic(src, s, e, d)
 	return num
 end
 
--- double rd_dbl_basic(byte f1..8)
+-- double rd_dbl_basic_INLINE(byte f1..8)
 -- @f1..8 - The 8 bytes composing a little endian double
-local function rd_dbl_basic(f1, f2, f3, f4, f5, f6, f7, f8)
-	local sign = (-1) ^ BitRShift(f8, 7)
-	local exp = BitLShift(BitAnd(f8, 0x7F), 4) + BitRShift(f7, 4)
+local function rd_dbl_basic_INLINE(f1, f2, f3, f4, f5, f6, f7, f8)
+	local sign = (-1) ^ BitRShift_INLINE(f8, 7)
+	local exp = BitLShift_INLINE(BitAnd(f8, 0x7F), 4) + BitRShift_INLINE(f7, 4)
 	local frac = BitAnd(f7, 0x0F) * 2 ^ 48
 	local normal = 1
 
@@ -235,20 +221,20 @@ local function rd_dbl_basic(f1, f2, f3, f4, f5, f6, f7, f8)
 	return sign * 2 ^ (exp - 1023) * (normal + frac / 2 ^ 52)
 end
 
--- int rd_int_le(string src, int s, int e)
+-- int rd_int_le_INLINE(string src, int s, int e)
 -- @src - Source binary string
 -- @s - Start index of a little endian integer
 -- @e - End index of the integer
-local function rd_int_le(src, s, e) return rd_int_basic(src, s, e - 1, 1) end
+local function rd_int_le_INLINE(src, s, e) return rd_int_basic_INLINE(src, s, e - 1, 1) end
 
--- double rd_dbl_le(string src, int s)
+-- double rd_dbl_le_INLINE(string src, int s)
 -- @src - Source binary string
 -- @s - Start index of little endian double
-local function rd_dbl_le(src, s) return rd_dbl_basic(StringByte(src, s, s + 7)) end
+local function rd_dbl_le_INLINE(src, s) return rd_dbl_basic_INLINE(StringByte(src, s, s + 7)) end
 
--- byte stm_byte(Stream S)
+-- byte stm_byte_INLINE(Stream S)
 -- @S - Stream object to read from
-local function stm_byte(S)
+local function stm_byte_INLINE(S)
 	local idx = S[1]
 	local bt = StringByte(S[2], idx, idx)
 
@@ -256,10 +242,10 @@ local function stm_byte(S)
 	return bt
 end
 
--- string stm_string(Stream S, int len)
+-- string stm_string_INLINE(Stream S, int len)
 -- @S - Stream object to read from
 -- @len - Length of string being read
-local function stm_string(S, len)
+local function stm_string_INLINE(S, len)
 	local pos = S[1] + len
 	local str = StringSub(S[2], S[1], pos - 1)
 
@@ -267,72 +253,72 @@ local function stm_string(S, len)
 	return str
 end
 
-local function stm_int16(S)
+local function stm_int16_INLINE(S)
 	local pos = S[1] + 2
-	local int = rd_int_le(S[2], S[1], pos)
+	local int = rd_int_le_INLINE(S[2], S[1], pos)
 	S[1] = pos
 
 	return int
 end
 
-local function stm_int32(S)
+local function stm_int32_INLINE(S)
 	local pos = S[1] + 4
-	local int = rd_int_le(S[2], S[1], pos)
+	local int = rd_int_le_INLINE(S[2], S[1], pos)
 	S[1] = pos
 
 	return int
 end
 
-local function stm_int64(S)
+local function stm_int64_INLINE(S)
 	local pos = S[1] + 8
-	local int = rd_int_le(S[2], S[1], pos)
+	local int = rd_int_le_INLINE(S[2], S[1], pos)
 	S[1] = pos
 
 	return int
 end
 
-local function stm_num(S)
-	local flt = rd_dbl_le(S[2], S[1])
+local function stm_num_INLINE(S)
+	local flt = rd_dbl_le_INLINE(S[2], S[1])
 	S[1] = S[1] + 8
 
 	return flt
 end
 
--- string stm_lstring(Stream S)
+-- string stm_lstring_INLINE(Stream S)
 -- @S - Stream object to read from
-local function stm_lstring(S)
-	local len = stm_int32(S)
+local function stm_lstring_INLINE(S)
+	local len = stm_int32_INLINE(S)
 	local str
 
-	if len ~= 0 then str = StringSub(stm_string(S, len), 1, -2) end
+	if len ~= 0 then str = StringSub(stm_string_INLINE(S, len), 1, -2) end
 
 	return str
 end
 
-local function stm_inst_list(S)
-	local len = stm_int64(S)
+local function stm_inst_list_INLINE(S)
+	local len = stm_int64_INLINE(S)
 	local list = TableCreate(len)
 
 	for i = 1, len do
-		local ins = stm_int16(S)
-		local op = BitAnd(BitRShift(ins, 4), 0x3f)
-		local args = BitAnd(BitRShift(ins, 2), 3)
-		local isConstantB = BitAnd(BitRShift(ins, 1), 1) == 1
+		local ins = stm_int16_INLINE(S)
+		local op = BitAnd(BitRShift_INLINE(ins, 4), 0x3f)
+		local args = BitAnd(BitRShift_INLINE(ins, 2), 3)
+		local isConstantB = BitAnd(BitRShift_INLINE(ins, 1), 1) == 1
 		local isConstantC = BitAnd(ins, 1) == 1
 		local data = {}
 		data[$OPCODE$] = op
-		data[$A_REGISTER$] = stm_byte(S)
+		data[$A_REGISTER$] = stm_byte_INLINE(S)
 
 		if args == 1 then -- ABC
-			data[$B_REGISTER$] = stm_int16(S)
-			data[$C_REGISTER$] = stm_int16(S)
+			data[$B_REGISTER$] = stm_int16_INLINE(S)
+			data[$C_REGISTER$] = stm_int16_INLINE(S)
 			data[$IS_KB$] = isConstantB and data[$B_REGISTER$] > 0xFF -- post process optimization
 			data[$IS_KC$] = isConstantC and data[$C_REGISTER$] > 0xFF
 		elseif args == 2 then -- ABx
-			data[$B_REGISTER$] = stm_int32(S)
+			data[$B_REGISTER$] = stm_int32_INLINE(S)
 			data[$IS_CONST$] = isConstantB
 		elseif args == 3 then -- AsBx
-			data[$B_REGISTER$] = stm_int32(S) - 131071
+			data[$B_REGISTER$] = stm_int32_INLINE(S) - 131071
 		end
 
 		list[i] = data
@@ -342,8 +328,8 @@ local function stm_inst_list(S)
 	return list
 end
 
-local function stm_sub_list(S, src)
-	local len = stm_int64(S)
+local function stm_sub_list_INLINE(S, src)
+	local len = stm_int64_INLINE(S)
 	local list = TableCreate(len)
 
 	for i = 1, len do
@@ -356,7 +342,7 @@ end
 
 pub static DESERIALIZER_2: &str = "
 function stm_lua_func(stream, psrc)
-	local src = stm_lstring(stream) or psrc -- source is propagated
+	local src = stm_lstring_INLINE(stream) or psrc -- source is propagated
 
 	local proto = {}
 	proto[$SOURCE_NAME$] = src
@@ -364,12 +350,12 @@ function stm_lua_func(stream, psrc)
 	-- stream:s_int() -- line defined
 	-- stream:s_int() -- last line defined
 
-	proto[$UPVALUE_COUNT$] = stm_byte(stream) -- num upvalues
-	proto[$PARAMETER_COUNT$] = stm_byte(stream) -- num params
+	proto[$UPVALUE_COUNT$] = stm_byte_INLINE(stream) -- num upvalues
+	proto[$PARAMETER_COUNT$] = stm_byte_INLINE(stream) -- num params
 
 
-	-- stm_byte(stream) -- vararg flag
-	-- proto.max_stack = stm_byte(stream) -- max stack size
+	-- stm_byte_INLINE(stream) -- vararg flag
+	-- proto.max_stack = stm_byte_INLINE(stream) -- max stack size
 ";
 
 pub static DESERIALIZER_3: &str = "
@@ -400,7 +386,7 @@ end
 ";
 
 pub static RUN_HELPERS: &str = "
-local function close_lua_upvalues(list, index)
+local function close_lua_upvalues_INLINE(list, index)
 	for i, uv in Pairs(list) do
 		if uv[1] >= index then
 			-- Replace with indexes if uncommenting
@@ -412,7 +398,7 @@ local function close_lua_upvalues(list, index)
 	end
 end
 
-local function open_lua_upvalue(list, index, memory)
+local function open_lua_upvalue_INLINE(list, index, memory)
 	local prev = list[index]
 
 	if not prev then
@@ -423,7 +409,7 @@ local function open_lua_upvalue(list, index, memory)
 	return prev
 end
 
-local function on_lua_error(failed, err)
+local function on_lua_error_INLINE(failed, err)
 	local src = failed[2]
 	-- local line = failed.lines[failed.pc - 1]
 	local line = 0
@@ -433,7 +419,7 @@ end
 ";
 
 pub static RUN_HELPERS_LI: &str = "
-local function close_lua_upvalues(list, index)
+local function close_lua_upvalues_INLINE(list, index)
 	for i, uv in Pairs(list) do
 		if uv[1] >= index then
 			--uv.value = uv.store[uv.index] -- store value
@@ -444,7 +430,7 @@ local function close_lua_upvalues(list, index)
 	end
 end
 
-local function open_lua_upvalue(list, index, memory)
+local function open_lua_upvalue_INLINE(list, index, memory)
 	local prev = list[index]
 
 	if not prev then
@@ -455,7 +441,7 @@ local function open_lua_upvalue(list, index, memory)
 	return prev
 end
 
-local function on_lua_error(failed, err)
+local function on_lua_error_INLINE(failed, err)
 	local src = failed[2]
 	local line = failed[3][failed[1] - 1]
 
@@ -521,7 +507,7 @@ function lua_wrap_state(proto, env, upval)
 		else
 			local failed = {state[5], proto[$SOURCE_NAME$] --[[,lines = proto.lines]]}
 
-			on_lua_error(failed, result[2])
+			on_lua_error_INLINE(failed, result[2])
 
 			return
 		end
@@ -563,7 +549,7 @@ function lua_wrap_state(proto, env, upval)
 		else
 			local failed = {state[5], proto[$SOURCE_NAME$], proto[$LINE_LIST$]}
 
-			on_lua_error(failed, result[2])
+			on_lua_error_INLINE(failed, result[2])
 
 			return
 		end

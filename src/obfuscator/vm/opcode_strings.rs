@@ -97,7 +97,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
             params = B - 1
         end
 
-        close_lua_upvalues(open_list, 0)
+        close_lua_upvalues_INLINE(open_list, 0)
 
         return memory[A](TableUnpack(memory, A + 1, A + params))".to_string(),
         OpcodeType::OpReturn => "local A = inst[$A_REGISTER$]
@@ -110,7 +110,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
             len = B - 1
         end
 
-        close_lua_upvalues(open_list, 0)
+        close_lua_upvalues_INLINE(open_list, 0)
 
         return TableUnpack(memory, A, A + len - 1)".to_string(),
         OpcodeType::OpForLoop => "local A = inst[$A_REGISTER$]
@@ -176,7 +176,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
         offset = (C - 1) * 50 --FIELDS_PER_FLUSH
 
         TableMove(memory, A + 1, A + len, offset + 1, tab)".to_string(),
-        OpcodeType::OpClose => "close_lua_upvalues(open_list, inst[$A_REGISTER$])".to_string(),
+        OpcodeType::OpClose => "close_lua_upvalues_INLINE(open_list, inst[$A_REGISTER$])".to_string(),
         OpcodeType::OpClosure => {
             let mut opcode_string = "local sub = subs[inst[$B_REGISTER$] + 1] -- offset for 1 based index
         local nups = sub[$UPVALUE_COUNT$]
@@ -191,7 +191,7 @@ pub fn get_opcode_string(opcode: &OpcodeType, opcode_list: &Vec<OpcodeType>) -> 
 
                 if opcode_list.contains(&OpcodeType::OpMove) {
                     opcode_string += "if pseudo[$OPCODE$] == $MOVE_OPCODE$ then -- @MOVE
-                                        uvlist[i - 1] = open_lua_upvalue(open_list, pseudo[$B_REGISTER$], memory)
+                                        uvlist[i - 1] = open_lua_upvalue_INLINE(open_list, pseudo[$B_REGISTER$], memory)
                                       end";
                 }
                 

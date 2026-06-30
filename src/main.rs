@@ -7,6 +7,7 @@ use std::{
 
 use clap::Parser;
 use lua_deserializer::deserializer::Deserializer;
+use lua_inliner::Inliner;
 use obfuscator::vm_generator::VMGenerator;
 
 use crate::{
@@ -16,7 +17,7 @@ use crate::{
 pub mod obfuscation_settings;
 pub mod obfuscator;
 
-static FINAL_FILE: &str = "temp4.lua";
+static FINAL_FILE: &str = "temp5.lua";
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -83,7 +84,11 @@ fn main() {
     let vm_generator = VMGenerator::new();
     let vm = vm_generator.generate(main_chunk, settings);
 
-    fs::write("temp/temp3.lua", vm).expect("Failed to write vm to file");
+    fs::write("temp/temp3.lua", vm.clone()).expect("Failed to write vm to file");
+
+    let inlined_code = Inliner::inline_from_code(vm);
+
+    fs::write("temp/temp4.lua", inlined_code).expect("Failed to write inlined code to file");
 
     println!("[Obfuscator] Minifying...");
 
