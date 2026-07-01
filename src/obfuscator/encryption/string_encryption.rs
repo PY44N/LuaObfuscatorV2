@@ -58,7 +58,7 @@ fn generate_decryption_code(byte_string: String, key: String) -> String {
         return result
     end
 
-    key = '{}'
+    local key = '{}'
     local out = ''
     for i = 0, #str - 1 do
         local key_i = i % #key + 1
