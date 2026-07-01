@@ -11,7 +11,7 @@ use obfuscator::vm_generator::VMGenerator;
 
 use crate::{
     obfuscation_settings::ObfuscationSettings,
-    obfuscator::{encryption::constant_encryption, uglification::inliner::Inliner},
+    obfuscator::{encryption::constant_encryption, mutations, uglification::inliner::Inliner},
 };
 
 pub mod obfuscation_settings;
@@ -53,11 +53,11 @@ fn main() {
 
     println!("[Obfuscator] Encrypting Constants...");
 
-    let mut initial_code =
-        fs::read_to_string("temp/temp1.lua").expect("Failed to read file temp1.lua");
-    let enctypted_code = constant_encryption::encrypt(&mut initial_code);
+    let initial_code = fs::read_to_string("temp/temp1.lua").expect("Failed to read file temp1.lua");
+    let encrypted_code = constant_encryption::encrypt(&initial_code);
+    let mutated_code = mutations::apply(&encrypted_code);
 
-    fs::write("temp/temp2.lua", enctypted_code).expect("Failed to write to file temp2.lua");
+    fs::write("temp/temp2.lua", mutated_code).expect("Failed to write to file temp2.lua");
 
     println!("[Obfuscator] Compiling...");
 

@@ -1,4 +1,5 @@
 pub mod encryption;
+pub mod mutations;
 pub mod obfuscation_context;
 pub mod serializer;
 pub mod uglification;
