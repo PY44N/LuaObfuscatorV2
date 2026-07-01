@@ -87,8 +87,10 @@ fn main() {
     fs::write("temp/temp3.lua", vm.clone()).expect("Failed to write vm to file");
 
     let inlined_code = Inliner::inline_from_code(vm);
+    let mutated_inlined_code = mutations::apply(&inlined_code);
 
-    fs::write("temp/temp4.lua", inlined_code).expect("Failed to write inlined code to file");
+    fs::write("temp/temp4.lua", mutated_inlined_code)
+        .expect("Failed to write inlined code to file");
 
     println!("[Obfuscator] Minifying...");
 

@@ -1,13 +1,13 @@
 use full_moon::{parse, visitors::VisitorMut};
 
-use crate::obfuscator::mutations::binary_expression::BinaryExpressionMutator;
+use crate::obfuscator::mutations::numerics::NumericMutator;
 
-mod binary_expression;
+mod numerics;
 
 pub fn apply(input: &String) -> String {
     let ast = parse(input).expect("Failed to parse input ast");
 
-    let mut binary_expression = BinaryExpressionMutator;
+    let mut binary_expression = NumericMutator;
 
     let mutated = binary_expression.visit_ast(ast);
 

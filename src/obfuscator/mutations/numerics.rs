@@ -11,8 +11,8 @@ randomizable_enum! {
     enum ArithmeticOperator {
         Add,
         Subract,
-        Multiply,
-        Divide
+        // Multiply,
+        // Divide
     }
 }
 
@@ -21,8 +21,8 @@ impl ArithmeticOperator {
         match self {
             ArithmeticOperator::Add => a + b,
             ArithmeticOperator::Subract => a - b,
-            ArithmeticOperator::Multiply => a * b,
-            ArithmeticOperator::Divide => a / b,
+            // ArithmeticOperator::Multiply => a * b,
+            // ArithmeticOperator::Divide => a / b,
         }
     }
 
@@ -30,8 +30,8 @@ impl ArithmeticOperator {
         match self {
             ArithmeticOperator::Add => ArithmeticOperator::Subract,
             ArithmeticOperator::Subract => ArithmeticOperator::Add,
-            ArithmeticOperator::Multiply => ArithmeticOperator::Divide,
-            ArithmeticOperator::Divide => ArithmeticOperator::Multiply,
+            // ArithmeticOperator::Multiply => ArithmeticOperator::Divide,
+            // ArithmeticOperator::Divide => ArithmeticOperator::Multiply,
         }
     }
 }
@@ -44,24 +44,35 @@ impl fmt::Display for ArithmeticOperator {
             match self {
                 ArithmeticOperator::Add => "+",
                 ArithmeticOperator::Subract => "-",
-                ArithmeticOperator::Multiply => "*",
-                ArithmeticOperator::Divide => "/",
+                // ArithmeticOperator::Multiply => "*",
+                // ArithmeticOperator::Divide => "/",
             },
         )
     }
 }
 
-pub struct BinaryExpressionMutator;
+pub struct NumericMutator;
 
-impl VisitorMut for BinaryExpressionMutator {
+impl VisitorMut for NumericMutator {
     fn fold_expression(
         &mut self,
         node: &full_moon::ast::Expression,
     ) -> Option<full_moon::ast::Expression> {
         if let full_moon::ast::Expression::Number(num) = node {
-            let number: f64 = num.token().to_string().parse().unwrap();
+            let token_str = num.token().to_string();
+            let number: f64 = if let Some(hex) = token_str
+                .strip_prefix("0x")
+                .or_else(|| token_str.strip_prefix("0X"))
+            {
+                u64::from_str_radix(hex, 16)
+                    .map(|n| n as f64)
+                    .unwrap_or_else(|_| token_str.parse().unwrap())
+            } else {
+                token_str.parse().unwrap()
+            };
 
-            let second_num: f64 = rng().random::<f64>() * 50.0;
+            // let second_num: f64 = rng().random::<f64>() * 50.0;
+            let second_num: f64 = rng().random_range(1..50).try_into().unwrap();
             let op = ArithmeticOperator::random();
 
             let first_num = op.invert().apply(number, second_num);
