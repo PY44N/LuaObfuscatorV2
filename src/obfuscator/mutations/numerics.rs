@@ -77,6 +77,7 @@ impl VisitorMut for NumericMutator {
 
             let first_num = op.invert().apply(number, second_num);
 
+            // TODO: Clean this up (duplicated version in string_encryption)
             let encrypted_ast = parse(&format!("return ({} {} {})", first_num, op, second_num))
                 .expect("Failed to parse generated binary expression code");
 

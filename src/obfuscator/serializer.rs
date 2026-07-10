@@ -2,13 +2,13 @@ use lua_deserializer::{
     enums::{
         chunk_components::ChunkComponents, instruction_type::InstructionType, lua_type::LuaType,
     },
-    structs::{chunk::Chunk, constant::Constant, instruction::Instruction},
+    structs::{chunk::Chunk, constant::Constant},
     util::write_stream::WriteStream,
 };
 
 use crate::{
     obfuscation_settings::ObfuscationSettings,
-    obfuscator::{utils::index_of, vm_generator::ConstantType},
+    obfuscator::{ir::instruction::VMInstruction, utils::index_of, vm_generator::ConstantType},
 };
 
 use super::obfuscation_context::ObfuscationContext;
@@ -85,7 +85,7 @@ impl Serializer {
         }
     }
 
-    fn serialize_instruction(&mut self, instruction: &Instruction) {
+    fn serialize_instruction(&mut self, instruction: &VMInstruction) {
         let opcode_num = self
             .obfuscation_context
             .opcode_map
@@ -132,9 +132,11 @@ impl Serializer {
                     }
                 }
                 ChunkComponents::INSTRUCTIONS => {
+                    let vm_instructions: Vec<VMInstruction> =
+                        chunk.instructions.iter().map(|i| i.into()).collect();
                     self.write_stream
                         .write_int64(chunk.instructions.len() as u64);
-                    for instruction in &chunk.instructions {
+                    for instruction in &vm_instructions {
                         self.serialize_instruction(instruction);
                     }
                 }

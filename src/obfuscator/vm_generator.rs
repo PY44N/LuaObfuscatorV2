@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 
-use lua_deserializer::{
-    enums::{chunk_components::ChunkComponents, opcode_type::OpcodeType},
-    structs::chunk::Chunk,
-};
+use lua_deserializer::{enums::chunk_components::ChunkComponents, structs::chunk::Chunk};
 use rand::{Rng, random_range, seq::SliceRandom};
 
 use crate::{
     obfuscation_settings::ObfuscationSettings,
-    obfuscator::{obfuscation_context::ObfuscationContext, utils::index_of},
+    obfuscator::{
+        ir::opcode_type::VMOpcodeType, obfuscation_context::ObfuscationContext, utils::index_of,
+    },
 };
 
 use super::{
@@ -24,12 +23,12 @@ pub enum ConstantType {
     STRING,
 }
 
-fn get_used_opcodes(chunk: &Chunk) -> Vec<OpcodeType> {
-    let mut opcodes = vec![];
+fn get_used_opcodes(chunk: &Chunk) -> Vec<VMOpcodeType> {
+    let mut opcodes: Vec<VMOpcodeType> = vec![];
 
     for instruction in &chunk.instructions {
-        if !opcodes.contains(&instruction.opcode) {
-            opcodes.push(instruction.opcode);
+        if !opcodes.contains(&instruction.opcode.into()) {
+            opcodes.push(instruction.opcode.into());
         }
     }
 
@@ -345,10 +344,10 @@ end
             vm_string = vm_string.replace(&format!("${}$", *rename), &(i + 1).to_string());
         }
 
-        let move_opcode = opcode_list.iter().position(|&r| r == OpcodeType::OpMove);
+        let move_opcode = opcode_list.iter().position(|&r| r == VMOpcodeType::OpMove);
         let getupval_opcode = opcode_list
             .iter()
-            .position(|&r| r == OpcodeType::OpGetUpval);
+            .position(|&r| r == VMOpcodeType::OpGetUpval);
 
         if move_opcode != None {
             vm_string = vm_string.replace("$MOVE_OPCODE$", &move_opcode.unwrap().to_string());

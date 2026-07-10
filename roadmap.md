@@ -15,7 +15,7 @@
     - [ ] Bounce (only in max sections)
     - [ ] TestPreserve (also disabled)
 - [ ] Junk instruction insertion
-- [ ] Alter42, 94nate instruction types (like what ironbrew has with OpAdd(B)(C))
+- [ ] Alternate instruction types (like what ironbrew has with OpAdd(B)(C))
 - [ ] Instruction Mutation (Also ironbrew)
 - [ ] Super Operators (conbine linear operators into big one -- Ironbrew does this)
 - [ ] Binary search for opcode disbatch (probably faster)
@@ -26,3 +26,4 @@
   - [ ] Inlining macro? (ironbrew has it)
   - [ ] Extra control flow obfuscation in sections
 - [ ] Rework minification to be in Rust
+- [ ] Add Site-integrity key derivation (Claude) - make it so the obfuscator refuses to run if anything is modified
