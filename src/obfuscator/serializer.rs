@@ -112,9 +112,7 @@ impl Serializer {
                 self.write_stream.write_int16(instruction.data_c as u16);
             }
             InstructionType::ABx => self.write_stream.write_int32(instruction.data_b as u32),
-            InstructionType::AsBx => self
-                .write_stream
-                .write_int32((instruction.data_b + 131071) as u32),
+            InstructionType::AsBx => self.write_stream.write_int32((instruction.data_b) as u32),
         }
     }
 

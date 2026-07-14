@@ -326,7 +326,7 @@ local function stm_inst_list_INLINE(S)
 			data[$B_REGISTER$] = stm_int32_INLINE(S)
 			data[$IS_CONST$] = isConstantB
 		elseif args == 3 then -- AsBx
-			data[$B_REGISTER$] = stm_int32_INLINE(S) - 131071
+			data[$B_REGISTER$] = stm_int32_INLINE(S)
 		end
 
 		list[i] = data
