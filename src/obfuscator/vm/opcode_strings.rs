@@ -1,5 +1,22 @@
 use crate::obfuscator::ir::opcode_type::VMOpcodeType;
 
+fn constant_b(b: bool) -> String {
+    if b {
+        "inst[$CONST_B$]"
+    } else {
+        "memory[inst[$B_REGISTER$]]"
+    }
+    .to_string()
+}
+
+fn constant_c(c: bool) -> String {
+    if c {
+        "inst[$CONST_C$]"
+    } else {
+        "memory[inst[$C_REGISTER$]]"
+    }
+    .to_string()
+}
 
 pub fn get_opcode_string(opcode: &VMOpcodeType, opcode_list: &Vec<VMOpcodeType>) -> String {
     match opcode {
@@ -17,25 +34,25 @@ pub fn get_opcode_string(opcode: &VMOpcodeType, opcode_list: &Vec<VMOpcodeType>)
         memory[inst[$A_REGISTER$]] = uv[2][uv[1]]".to_string()
         }
         VMOpcodeType::OpGetGlobal => "memory[inst[$A_REGISTER$]] = env[inst[$CONSTANT$]]".to_string(),
-        VMOpcodeType::OpGetTable => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]".to_string(),
+        VMOpcodeType::OpGetTable { constant_c: c} => format!("memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][{}]", constant_c(*c)),
+        // VMOpcodeType::OpGetTableC => "memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][inst[$CONST_C$]]".to_string(),
         VMOpcodeType::OpSetGlobal => "env[inst[$CONSTANT$]] = memory[inst[$A_REGISTER$]]".to_string(),
         VMOpcodeType::OpSetUpval => {
             "local uv = upvals[inst[$B_REGISTER$]]
 
         uv[2][uv[1]] = memory[inst[$A_REGISTER$]]".to_string()
         }
-        VMOpcodeType::OpSetTable => "memory[inst[$A_REGISTER$]][constantB(inst)] = constantC(inst)".to_string(),
+        VMOpcodeType::OpSetTable { constant_b: b, constant_c: c } => format!("memory[inst[$A_REGISTER$]][{}] = {}", constant_b(*b), constant_c(*c)),
         VMOpcodeType::OpNewTable => "memory[inst[$A_REGISTER$]] = TableCreate(inst[$B_REGISTER$])".to_string(),
-        VMOpcodeType::OpSelf => {
-            "memory[inst[$A_REGISTER$] + 1] = memory[inst[$B_REGISTER$]]
-        memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][constantC(inst)]".to_string()
-        }
-        VMOpcodeType::OpAdd => "memory[inst[$A_REGISTER$]] = constantB(inst) + constantC(inst)".to_string(),
-        VMOpcodeType::OpSub => "memory[inst[$A_REGISTER$]] = constantB(inst) - constantC(inst)".to_string(),
-        VMOpcodeType::OpMul => "memory[inst[$A_REGISTER$]] = constantB(inst) * constantC(inst)".to_string(),
-        VMOpcodeType::OpDiv => "memory[inst[$A_REGISTER$]] = constantB(inst) / constantC(inst)".to_string(),
-        VMOpcodeType::OpMod => "memory[inst[$A_REGISTER$]] = constantB(inst) % constantC(inst)".to_string(),
-        VMOpcodeType::OpPow => "memory[inst[$A_REGISTER$]] = constantB(inst) ^ constantC(inst)".to_string(),
+        VMOpcodeType::OpSelf {constant_c: c } =>
+            format!("memory[inst[$A_REGISTER$] + 1] = memory[inst[$B_REGISTER$]]
+            memory[inst[$A_REGISTER$]] = memory[inst[$B_REGISTER$]][{}]", constant_c(*c)),
+        VMOpcodeType::OpAdd {constant_b: b, constant_c: c} => format!("memory[inst[$A_REGISTER$]] = {} + {}", constant_b(*b), constant_c(*c)),
+        VMOpcodeType::OpSub {constant_b: b, constant_c: c} => format!("memory[inst[$A_REGISTER$]] = {} - {}", constant_b(*b), constant_c(*c)),
+        VMOpcodeType::OpMul {constant_b: b, constant_c: c} => format!("memory[inst[$A_REGISTER$]] = {} * {}", constant_b(*b), constant_c(*c)),
+        VMOpcodeType::OpDiv {constant_b: b, constant_c: c} => format!("memory[inst[$A_REGISTER$]] = {} / {}", constant_b(*b), constant_c(*c)),
+        VMOpcodeType::OpMod {constant_b: b, constant_c: c} => format!("memory[inst[$A_REGISTER$]] = {} % {}", constant_b(*b), constant_c(*c)),
+        VMOpcodeType::OpPow {constant_b: b, constant_c: c} => format!("memory[inst[$A_REGISTER$]] = {} ^ {}", constant_b(*b), constant_c(*c)),
         VMOpcodeType::OpUnm => "memory[inst[$A_REGISTER$]] = -memory[inst[$B_REGISTER$]]".to_string(),
         VMOpcodeType::OpNot => "memory[inst[$A_REGISTER$]] = not memory[inst[$B_REGISTER$]]".to_string(),
         VMOpcodeType::OpLen => "memory[inst[$A_REGISTER$]] = #memory[inst[$B_REGISTER$]]".to_string(),
@@ -48,15 +65,15 @@ pub fn get_opcode_string(opcode: &VMOpcodeType, opcode_list: &Vec<VMOpcodeType>)
         memory[inst[$A_REGISTER$]] = str".to_string()
         }
         VMOpcodeType::OpJmp => "pc = pc + inst[$B_REGISTER$]".to_string(),
-        VMOpcodeType::OpEq => "if (constantB(inst) == constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
+        VMOpcodeType::OpEq {constant_b: b, constant_c: c} => format!("if ({} == {}) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
-        pc = pc + 1".to_string(),
-        VMOpcodeType::OpLt => "if (constantB(inst) < constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
+        pc = pc + 1", constant_b(*b), constant_c(*c)),
+        VMOpcodeType::OpLt {constant_b: b, constant_c: c} => format!("if ({} < {}) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
-        pc = pc + 1".to_string(),
-        VMOpcodeType::OpLe => "if (constantB(inst) <= constantC(inst)) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
+        pc = pc + 1", constant_b(*b), constant_c(*c)),
+        VMOpcodeType::OpLe {constant_b: b, constant_c: c} => format!("if ({} <= {}) == (inst[$A_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
 
-        pc = pc + 1".to_string(),
+        pc = pc + 1", constant_b(*b), constant_c(*c)),
         VMOpcodeType::OpTest => "if (not memory[inst[$A_REGISTER$]]) ~= (inst[$C_REGISTER$] ~= 0) then pc = pc + code[pc][$B_REGISTER$] end
         pc = pc + 1".to_string(),
         VMOpcodeType::OpTestSet => "local A = inst[$A_REGISTER$]
@@ -195,22 +212,20 @@ pub fn get_opcode_string(opcode: &VMOpcodeType, opcode_list: &Vec<VMOpcodeType>)
                                         uvlist[i - 1] = open_lua_upvalue_INLINE(open_list, pseudo[$B_REGISTER$], memory)
                                       end";
                 }
-                
+
                 if opcode_list.contains(&VMOpcodeType::OpGetUpval) {
                     opcode_string += " if pseudo[$OPCODE$] == $GETUPVAL_OPCODE$ then -- @GETUPVAL
                                         uvlist[i - 1] = upvals[pseudo[$B_REGISTER$]]
                                       end";
                 }
-                
+
                 opcode_string += " end
 
             pc = pc + nups";
             }
 
-            
 
         opcode_string += " end; memory[inst[$A_REGISTER$]] = lua_wrap_state(sub, env, uvlist)";
-    
     opcode_string},
         VMOpcodeType::OpVarArg => "local A = inst[$A_REGISTER$]
         local len = inst[$B_REGISTER$]
@@ -222,5 +237,4 @@ pub fn get_opcode_string(opcode: &VMOpcodeType, opcode_list: &Vec<VMOpcodeType>)
 
         TableMove(vararg[2], 1, len, A, memory)".to_string(),
     }
-    
 }

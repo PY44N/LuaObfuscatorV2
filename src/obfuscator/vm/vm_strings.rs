@@ -468,14 +468,6 @@ local function run_lua_func(state, env, upvals)
 	local memory = state[2]
 	local pc = state[5]
 
-	local function constantB(inst)
-		return inst[$IS_KB$] and inst[$CONST_B$] or memory[inst[$B_REGISTER$]]
-	end
-
-	local function constantC(inst)
-		return inst[$IS_KC$] and inst[$CONST_C$] or memory[inst[$C_REGISTER$]]
-	end
-
 	while true do
 		local inst = code[pc]
 		local op = inst[$OPCODE$]

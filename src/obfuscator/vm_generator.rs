@@ -6,7 +6,9 @@ use rand::{Rng, random_range, seq::SliceRandom};
 use crate::{
     obfuscation_settings::ObfuscationSettings,
     obfuscator::{
-        ir::opcode_type::VMOpcodeType, obfuscation_context::ObfuscationContext, utils::index_of,
+        ir::{instruction::VMInstruction, opcode_type::VMOpcodeType},
+        obfuscation_context::ObfuscationContext,
+        utils::index_of,
     },
 };
 
@@ -26,7 +28,8 @@ pub enum ConstantType {
 fn get_used_opcodes(chunk: &Chunk) -> Vec<VMOpcodeType> {
     let mut opcodes: Vec<VMOpcodeType> = vec![];
 
-    for instruction in &chunk.instructions {
+    for original_instruction in &chunk.instructions {
+        let instruction: VMInstruction = original_instruction.into();
         if !opcodes.contains(&instruction.opcode.into()) {
             opcodes.push(instruction.opcode.into());
         }
@@ -106,7 +109,7 @@ impl VMGenerator {
         Self {}
     }
 
-    pub fn generate(&self, main_chunk: Chunk, settings: ObfuscationSettings) -> String {
+    pub fn generate(&self, main_chunk: Chunk, settings: &ObfuscationSettings) -> String {
         let mut rand = rand::rng();
 
         let mut opcode_list = get_used_opcodes(&main_chunk);

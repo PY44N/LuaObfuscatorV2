@@ -1,3 +1,4 @@
+- [ ] Fix nil constants not being serialized
 - [ ] Constant Encryption
   - [X] Strings (pre obfuscation)
   - [X] Strings in constant handling
@@ -15,7 +16,7 @@
     - [ ] Bounce (only in max sections)
     - [ ] TestPreserve (also disabled)
 - [ ] Junk instruction insertion
-- [ ] Alternate instruction types (like what ironbrew has with OpAdd(B)(C))
+- [X] Alternate instruction types (like what ironbrew has with OpAdd(B)(C))
 - [ ] Instruction Mutation (Also ironbrew)
 - [ ] Super Operators (conbine linear operators into big one -- Ironbrew does this)
 - [ ] Binary search for opcode disbatch (probably faster)
