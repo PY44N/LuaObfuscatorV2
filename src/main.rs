@@ -55,7 +55,11 @@ fn main() {
 
     let initial_code = fs::read_to_string("temp/temp1.lua").expect("Failed to read file temp1.lua");
     let encrypted_code = constant_encryption::encrypt(&initial_code, &settings);
-    let mutated_code = mutations::apply(&encrypted_code, &settings);
+    let mutated_code = if settings.constant_mutations {
+        mutations::apply(&encrypted_code)
+    } else {
+        encrypted_code
+    };
 
     fs::write("temp/temp2.lua", mutated_code).expect("Failed to write to file temp2.lua");
 
@@ -87,7 +91,7 @@ fn main() {
     fs::write("temp/temp3.lua", vm.clone()).expect("Failed to write vm to file");
 
     let inlined_code = Inliner::inline_from_code(vm);
-    let mutated_inlined_code = mutations::apply(&inlined_code, &settings);
+    let mutated_inlined_code = mutations::apply(&inlined_code);
 
     fs::write("temp/temp4.lua", mutated_inlined_code)
         .expect("Failed to write inlined code to file");
