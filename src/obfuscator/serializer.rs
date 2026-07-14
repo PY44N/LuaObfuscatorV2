@@ -41,7 +41,12 @@ impl Serializer {
 
     fn serialize_constant(&mut self, constant: &Constant) {
         self.write_stream.write_int8(match constant.lua_type {
-            LuaType::NIL => unreachable!(),
+            LuaType::NIL => index_of(
+                &self.obfuscation_context.constant_type_map,
+                ConstantType::NIL,
+            )
+            .try_into()
+            .unwrap(),
             LuaType::BOOLEAN(_) => index_of(
                 &self.obfuscation_context.constant_type_map,
                 ConstantType::BOOLEAN,
