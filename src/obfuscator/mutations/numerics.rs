@@ -3,7 +3,7 @@ use std::fmt;
 use full_moon::{ast::LastStmt, parse, visitors::VisitorMut};
 use rand::{Rng, rng, seq::IndexedRandom};
 
-use crate::randomizable_enum;
+use crate::{obfuscator::utils, randomizable_enum};
 
 // TODO: Maybe mult + div (not sure if that would cause issues though)
 randomizable_enum! {
@@ -77,26 +77,10 @@ impl VisitorMut for NumericMutator {
 
             let first_num = op.invert().apply(number, second_num);
 
-            // TODO: Clean this up (duplicated version in string_encryption)
-            let encrypted_ast = parse(&format!("return ({} {} {})", first_num, op, second_num))
-                .expect("Failed to parse generated binary expression code");
+            let expr = utils::extract_expression(&format!("({} {} {})", first_num, op, second_num))
+                .expect("Failed to extract numeric expression");
 
-            let last_stmt = encrypted_ast
-                .nodes()
-                .last_stmt()
-                .expect("Failed to extract last statement");
-
-            if let LastStmt::Return(ret_stmt) = last_stmt {
-                let expr = ret_stmt
-                    .returns()
-                    .iter()
-                    .next()
-                    .expect("Failed to get return expr");
-
-                return Some(expr.clone());
-            }
-
-            panic!("Failed to find return statement")
+            return Some(expr);
         }
 
         None

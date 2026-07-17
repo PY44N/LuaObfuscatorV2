@@ -1,9 +1,7 @@
-use full_moon::{
-    ast::{self, LastStmt},
-    parse,
-    visitors::VisitorMut,
-};
+use full_moon::{ast, visitors::VisitorMut};
 use rand::{Rng, distr::Alphanumeric, random_range};
+
+use crate::obfuscator::utils;
 
 pub struct StringEncryptor;
 
@@ -37,7 +35,7 @@ fn xor_multibyte_key(bytes: &[u8], key: &[u8]) -> Vec<u8> {
 
 fn generate_decryption_code(byte_string: String, key: String) -> String {
     format!(
-        "return (function(str)
+        "function(str)
     local function bxor(a, b)
         local result = 0
         local bitval = 1
@@ -109,28 +107,10 @@ impl VisitorMut for StringEncryptor {
                     cut_first_and_last(&string, 1)
                 };
 
-                // NOTE: This is a really hacky way of doing this
-                // TODO: Clean this up/find a better approach
+                let expr = utils::extract_expression(&encrypt_string(string_value))
+                    .expect("Failed to extract string encryption expession");
 
-                let encrypted_ast = parse(&encrypt_string(string_value))
-                    .expect("Failed to parse generated string encryption code");
-
-                let last_stmt = encrypted_ast
-                    .nodes()
-                    .last_stmt()
-                    .expect("Failed to extract last statement");
-
-                if let LastStmt::Return(ret_stmt) = last_stmt {
-                    let expr = ret_stmt
-                        .returns()
-                        .iter()
-                        .next()
-                        .expect("Failed to get return expr");
-
-                    return Some(expr.clone());
-                }
-
-                panic!("Failed to find return statment")
+                Some(expr)
             }
             _ => None,
         }
