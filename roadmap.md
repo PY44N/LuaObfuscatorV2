@@ -1,4 +1,3 @@
-- [ ] Fix nil constants not being serialized
 - [ ] Constant Encryption
   - [X] Strings (pre obfuscation)
   - [X] Strings in constant handling
@@ -21,7 +20,7 @@
 - [ ] Super Operators (conbine linear operators into big one -- Ironbrew does this)
 - [ ] Binary search for opcode disbatch (probably faster)
 - [ ] Macros
-  - [ ] Crash
+  - [X] Crash
   - [ ] Encrypt string
   - [ ] Bool for if running in obfuscator
   - [ ] Inlining macro? (ironbrew has it)

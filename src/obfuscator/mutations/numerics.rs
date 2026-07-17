@@ -1,6 +1,6 @@
 use std::fmt;
 
-use full_moon::{ast::LastStmt, parse, visitors::VisitorMut};
+use full_moon::visitors::VisitorMut;
 use rand::{Rng, rng, seq::IndexedRandom};
 
 use crate::{obfuscator::utils, randomizable_enum};

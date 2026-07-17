@@ -1,5 +1,6 @@
 pub mod encryption;
 pub mod ir;
+pub mod macros;
 pub mod mutations;
 pub mod obfuscation_context;
 pub mod serializer;

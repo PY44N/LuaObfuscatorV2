@@ -11,7 +11,9 @@ use obfuscator::vm_generator::VMGenerator;
 
 use crate::{
     obfuscation_settings::ObfuscationSettings,
-    obfuscator::{encryption::constant_encryption, mutations, uglification::inliner::Inliner},
+    obfuscator::{
+        encryption::constant_encryption, macros, mutations, uglification::inliner::Inliner,
+    },
 };
 
 pub mod obfuscation_settings;
@@ -60,8 +62,9 @@ fn main() {
     } else {
         encrypted_code
     };
+    let macro_added_code = macros::apply(&mutated_code);
 
-    fs::write("temp/temp2.lua", mutated_code).expect("Failed to write to file temp2.lua");
+    fs::write("temp/temp2.lua", macro_added_code).expect("Failed to write to file temp2.lua");
 
     println!("[Obfuscator] Compiling...");
 
