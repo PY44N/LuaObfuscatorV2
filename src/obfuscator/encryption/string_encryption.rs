@@ -92,7 +92,7 @@ fn encrypt_string(string_value: &str) -> String {
 }
 
 impl VisitorMut for StringEncryptor {
-    fn fold_expression(
+    fn replace_expression(
         &mut self,
         expr: &full_moon::ast::Expression,
     ) -> Option<full_moon::ast::Expression> {

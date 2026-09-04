@@ -23,7 +23,7 @@ impl VisitorMut for CrashMacroAdder {
     //     // }
     // }
 
-    fn fold_function_call(
+    fn replace_function_call(
         &mut self,
         node: &full_moon::ast::FunctionCall,
     ) -> Option<full_moon::ast::FunctionCall> {

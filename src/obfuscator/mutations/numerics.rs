@@ -54,7 +54,7 @@ impl fmt::Display for ArithmeticOperator {
 pub struct NumericMutator;
 
 impl VisitorMut for NumericMutator {
-    fn fold_expression(
+    fn replace_expression(
         &mut self,
         node: &full_moon::ast::Expression,
     ) -> Option<full_moon::ast::Expression> {

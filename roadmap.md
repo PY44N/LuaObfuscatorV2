@@ -1,3 +1,6 @@
+- [ ] Test suite
+  - [ ] All settings tested
+  - [ ] Different inputs
 - [ ] Constant Encryption
   - [X] Strings (pre obfuscation)
   - [X] Strings in constant handling
