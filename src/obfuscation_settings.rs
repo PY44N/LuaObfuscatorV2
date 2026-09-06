@@ -11,7 +11,7 @@ impl ObfuscationSettings {
         Self {
             include_debug_line_info: false,
             compress_bytecode: true,
-            encrypt_strings: false,
+            encrypt_strings: true,
             constant_mutations: false,
         }
     }

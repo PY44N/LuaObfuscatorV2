@@ -6,9 +6,9 @@ use crate::{
 };
 
 pub fn encrypt(input: &String, settings: &ObfuscationSettings) -> String {
-    let ast = full_moon::parse(input).expect("Failed to parse input code");
-
     if settings.encrypt_strings {
+        let ast = full_moon::parse(input).expect("Failed to parse input code");
+
         let mut string_encryptor = StringEncryptor;
 
         let string_encrypted_ast = string_encryptor.visit_ast(ast);

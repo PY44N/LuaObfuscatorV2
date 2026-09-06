@@ -162,6 +162,8 @@ impl VMGenerator {
 
         vm_string += vm_strings::VARIABLE_DECLARATION;
 
+        // NOTE: The reason this works is because the decode function is inlined, so the function doesn't actually get defined until later
+        // TODO: Fix this
         vm_string += "local decodeKeys = {";
         for i in 0..obfuscation_context.string_constant_keys.len() {
             if i != 0 {
