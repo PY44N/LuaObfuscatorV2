@@ -221,7 +221,7 @@ impl VMGenerator {
         }
 
         if settings.include_debug_line_info {
-            vm_string += "proto[$LINE_LIST$] = stm_line_list(stream)";
+            vm_string += "proto[$LINE_LIST$] = stm_line_list_INLINE(stream)";
         }
 
         vm_string += vm_strings::DESERIALIZER_3;

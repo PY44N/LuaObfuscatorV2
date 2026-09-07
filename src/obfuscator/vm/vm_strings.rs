@@ -346,6 +346,17 @@ local function stm_sub_list_INLINE(S, src)
 
 	return list
 end
+
+local function stm_line_list_INLINE(S)
+	local len = stm_int64_INLINE(S)
+	local list = TableCreate(len)
+
+	for i = 1, len do
+		list[i] = stm_int64_INLINE(S)
+	end
+
+	return list
+end
 ";
 
 pub static DESERIALIZER_2: &str = "
@@ -451,7 +462,7 @@ end
 
 local function on_lua_error_INLINE(failed, err)
 	local src = failed[2]
-	local line = failed[3][failed[1] - 1]
+	local line = failed[3][failed[1]]
 
 	Error(StringConcat(src, ':', line, ':', err), 0)
 end
