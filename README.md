@@ -17,8 +17,10 @@ print("Hello World")
 - [Nodejs](https://nodejs.org/en)
 - Lua 5.1 [windows](https://github.com/rjpcomputing/luaforwindows/releases/), [macos (with homebrew)](https://formulae.brew.sh/formula/lua@5.1#default), Linux (lua5.1 on most package managers)
 
-### Running the latest release (windows only)
-1) The [Latest Release](https://github.com/PY44N/LuaObfuscatorV2/releases/)
+### Running the latest release (Windows & Linux)
+1) Download the zip for your OS from the [Latest Release](https://github.com/PY44N/LuaObfuscatorV2/releases/) (`LuaObfuscator-windows.zip` or `LuaObfuscator-linux.zip`)
+
+Note: There is currently no prebuilt macOS binary. Mac users should build from source (see below)
 
 2) Open the terminal in the unzipped directory
 
@@ -31,20 +33,34 @@ cd minifier && npm i && cd ..
 
 5) Run the executable
 ```
-./lua_obfuscator.exe ./YOURFILE.lua
+# Windows
+./lua_obfuscator.exe --file ./YOURFILE.lua --run
+
+# Linux
+./lua_obfuscator --file ./YOURFILE.lua --run
 ```
+
+### CLI options
+| Flag | Default | Description |
+| --- | --- | --- |
+| `-f, --file <FILE>` | required | Lua file to obfuscate |
+| `-r, --run` | off | Run the obfuscated output after building it |
+| `--no-encrypt-strings` | off (strings are encrypted) | Disable the extra layer of string encryption |
+| `--no-compress-bytecode` | off (bytecode is compressed) | Disable bytecode compression |
+| `--no-constant-mutations` | off (constants are mutated) | Disable constant mutation |
+| `--include-debug-line-info` | off | Include debug line info so runtime errors report a source line |
 
 ### Building from source (may not work)
 1) Download [Rust](https://www.rust-lang.org/)
 
 2) Clone the repo
 ```
-git clone https://github.com/PY44N/LuaObfuscator/
+git clone https://github.com/PY44N/LuaObfuscatorV2/
 ```
 
 3) Enter the directory
 ```
-cd LuaObfuscator
+cd LuaObfuscatorV2
 ```
 
 4) Install the required nodejs packages
