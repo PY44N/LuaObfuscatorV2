@@ -245,7 +245,7 @@ source = "git+https://github.com/PY44N/LuaDeserializer#f21aef6f6fe76b7a2af6a15bf
 
 [[package]]
 name = "lua_obfuscator"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "clap",
  "full_moon",
