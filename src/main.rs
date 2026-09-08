@@ -32,12 +32,33 @@ struct Args {
     /// Run the program after obfuscated
     #[arg(short, long, default_value_t = false)]
     run: bool,
+
+    // Add an extra layer of encryption to strings in the program
+    #[arg(long = "no-encrypt-strings", action = clap::ArgAction::SetFalse, default_value_t = true)]
+    encrypt_strings: bool,
+
+    // Compress the program bytecode
+    #[arg(long = "no-compress-bytecode", action = clap::ArgAction::SetFalse, default_value_t = true)]
+    compress_bytecode: bool,
+
+    // Mutates constants in the original source
+    #[arg(long = "no-constant-mutations", action = clap::ArgAction::SetFalse, default_value_t = true)]
+    constant_mutations: bool,
+
+    // Include debug line information in the obfuscated program
+    #[arg(long, default_value_t = false)]
+    include_debug_line_info: bool,
 }
 
 fn main() {
-    let settings = ObfuscationSettings::new();
-
     let args = Args::parse();
+
+    let settings = ObfuscationSettings {
+        include_debug_line_info: args.include_debug_line_info,
+        compress_bytecode: args.compress_bytecode,
+        encrypt_strings: args.encrypt_strings,
+        constant_mutations: args.constant_mutations,
+    };
 
     if Path::new("temp").is_dir() {
         fs::remove_dir_all("temp").unwrap();
